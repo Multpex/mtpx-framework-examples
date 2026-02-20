@@ -23,6 +23,20 @@ interface JobResult {
   data?: Record<string, unknown>;
 }
 
+function logJobPayload(job: { id: string; name: string }, data: unknown): void {
+  console.log(
+    `   📦 Payload processado: ${JSON.stringify(
+      {
+        jobId: job.id,
+        jobName: job.name,
+        data,
+      },
+      null,
+      2,
+    )}`,
+  );
+}
+
 // ============================================================================
 // Job Handlers (cada classe = um job)
 // ============================================================================
@@ -32,6 +46,7 @@ class ProcessData extends JobHandler<
   JobResult
 > {
   async handle() {
+    logJobPayload(this.job, this.data);
     console.log(
       `   📊 [ProcessData] job='${this.job.name}' id='${this.job.id}' - Processando dados...`,
     );
@@ -55,6 +70,7 @@ class GenerateReport extends JobHandler<
   JobResult
 > {
   async handle() {
+    logJobPayload(this.job, this.data);
     console.log(
       `   📄 [GenerateReport] job='${this.job.name}' id='${this.job.id}' - Gerando relatório: ${this.data.type}`,
     );
@@ -80,6 +96,7 @@ class SendNotification extends JobHandler<
   JobResult
 > {
   async handle() {
+    logJobPayload(this.job, this.data);
     const channel = this.data.channel ?? "push";
     console.log(
       `   🔔 [SendNotification] job='${this.job.name}' id='${this.job.id}' - Enviando notificação via ${channel}`,
@@ -102,6 +119,7 @@ class Cleanup extends JobHandler<
   JobResult
 > {
   async handle() {
+    logJobPayload(this.job, this.data);
     const days = this.data.olderThanDays ?? 30;
     const table = this.data.table ?? "logs";
 
@@ -123,6 +141,7 @@ class Cleanup extends JobHandler<
 
 class TestJob extends JobHandler<unknown, JobResult> {
   async handle() {
+    logJobPayload(this.job, this.data);
     console.log(
       `   🧪 [TestJob] job='${this.job.name}' id='${this.job.id}' - executado com data:`,
       this.data,
