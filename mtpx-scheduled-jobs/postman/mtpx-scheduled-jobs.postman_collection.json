@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "scheduled-jobs-collection",
+    "_postman_id": "mtpx-scheduled-jobs-collection",
     "name": "mtpx scheduled jobs api",
     "description": "API para gerenciamento de jobs agendados (cron/repeatable) com Multpex Framework.\n\n## Autenticação\n\nUse o grupo **Auth (Keycloak)** para obter token e preencher `accessToken` automaticamente.\n\nEndpoints de jobs, schedulers, queues e DLQ exigem Bearer token.\nDefina o valor da variável `accessToken` no environment.\n\n## Conceito\n\n- **Scheduler**: Define QUANDO criar jobs (cron pattern ou intervalo)\n- **Worker**: Define O QUE FAZER quando o job for executado\n\n## Fluxo\n\n1. Criar scheduler via POST /schedulers\n2. O sidecar cria jobs na fila conforme o agendamento\n3. O worker processa os jobs baseado no `jobName`",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"

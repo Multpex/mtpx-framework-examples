@@ -17,8 +17,8 @@
     "start:prod:orders": "SERVICE=orders bun run ./dist/main.js",
     "start:prod:products": "SERVICE=products bun run ./dist/main.js",
     "clean": "rm -rf dist",
-    "postman:test": "bunx newman run postman/Multpex-Moleculer.postman_collection.json -e postman/Multpex-Local.postman_environment.json",
-    "postman:test:verbose": "bunx newman run postman/Multpex-Moleculer.postman_collection.json -e postman/Multpex-Local.postman_environment.json --verbose"
+    "postman:test": "bunx newman run postman/mtpx-micro-services.postman_collection.json -e postman/mtpx-micro-services.postman_environment.json",
+    "postman:test:verbose": "bunx newman run postman/mtpx-micro-services.postman_collection.json -e postman/mtpx-micro-services.postman_environment.json --verbose"
   },
   "dependencies": {
     "@multpex/typescript-sdk": "file:../../sdk-typescript",

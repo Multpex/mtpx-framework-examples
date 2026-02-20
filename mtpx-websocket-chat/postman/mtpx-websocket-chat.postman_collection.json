@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "websocket-chat-collection",
-    "name": "mtpx websocket chat example",
+    "_postman_id": "mtpx-websocket-chat-collection",
+    "name": "mtpx websocket chat",
     "description": "Postman collection for the Multpex WebSocket Chat example.\n\nThis example demonstrates:\n- WebSocket-based real-time chat\n- Room management\n- Message history\n- Typing indicators\n\n## WebSocket Endpoints\n\nWebSocket connections should be made to:\n```\nws://{{baseUrl}}/ws/chat?token={{authToken}}\n```\n\n### WebSocket Events (send)\n\n| Event | Payload | Description |\n|-------|---------|-------------|\n| `chat.join` | `{ roomId: string }` | Join a chat room |\n| `chat.leave` | `{ roomId: string }` | Leave a chat room |\n| `chat.send` | `{ roomId: string, content: string }` | Send a message |\n| `chat.typing` | `{ roomId: string, isTyping: boolean }` | Typing indicator |\n| `chat.history` | `{ roomId: string, limit?: number, before?: string }` | Get message history |\n| `chat.rooms` | `{}` | Get list of joined rooms |\n\n### WebSocket Events (receive)\n\n| Event | Payload | Description |\n|-------|---------|-------------|\n| `chat.message` | `{ roomId, userId, content, timestamp }` | New message in room |\n| `chat.typing` | `{ roomId, userId, isTyping }` | User typing status |\n| `chat.user.joined` | `{ roomId, userId }` | User joined room |\n| `chat.user.left` | `{ roomId, userId }` | User left room |",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },

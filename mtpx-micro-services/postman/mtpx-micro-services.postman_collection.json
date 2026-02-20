@@ -1,6 +1,7 @@
 {
   "info": {
-    "name": "mtpx moleculer example",
+    "_postman_id": "mtpx-micro-services-collection",
+    "name": "mtpx moleculer",
     "description": "Collection for testing the Moleculer-style microservices example",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },

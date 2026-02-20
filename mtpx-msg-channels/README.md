@@ -23,7 +23,7 @@ src/
 └── svc_c.ts      # consumidor + stats
 postman/
 ├── mtpx-msg-channels.postman_collection.json
-└── local.postman_environment.json
+└── mtpx-msg-channels.postman_environment.json
 ```
 
 ## Infraestrutura Docker
@@ -116,7 +116,7 @@ Ou seja, existe **distribuição de carga por grupo** (`demo-workers`).
 Importe:
 
 - `postman/mtpx-msg-channels.postman_collection.json`
-- `postman/local.postman_environment.json`
+- `postman/mtpx-msg-channels.postman_environment.json`
 
 Fluxo recomendado:
 

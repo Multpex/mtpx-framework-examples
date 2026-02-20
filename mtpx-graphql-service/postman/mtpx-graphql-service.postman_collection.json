@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "graphql-service-collection",
-    "name": "mtpx graphql service example",
+    "_postman_id": "mtpx-graphql-service-collection",
+    "name": "mtpx graphql service",
     "description": "Collection para testar o exemplo graphql-service do Multpex Framework.\n\nDemonstra:\n1. Actions com metadata GraphQL para exposição automática pelo linkd\n2. GraphQL Client para consumir APIs externas\n3. Endpoints REST que também funcionam como GraphQL queries/mutations\n\n## REST Endpoints\n\n- GET /graphql-example/books\n- GET /graphql-example/books/:id\n- GET /graphql-example/books/author/:author\n- POST /graphql-example/books (editor/admin)\n- DELETE /graphql-example/books/:id (admin)\n- GET /graphql-example/external/countries\n\n## GraphQL (via linkd)\n\n- POST /graphql - Endpoint unificado gerado pelo linkd",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },

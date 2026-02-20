@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "mtpx-msg-channels-emit-vs-channel",
+    "_postman_id": "mtpx-msg-channels-collection",
     "name": "mtpx-msg-channels (emit vs channel)",
     "description": "Demonstra diferença entre emit (broadcast) e sendToChannel (load-balanced por grupo).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"

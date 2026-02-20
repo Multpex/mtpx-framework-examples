@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "bun run src/main.ts",
     "start": "bun run src/main.ts",
-    "postman:test": "bunx newman run postman/websocket-chat.postman_collection.json -e postman/local.postman_environment.json",
-    "postman:test:verbose": "bunx newman run postman/websocket-chat.postman_collection.json -e postman/local.postman_environment.json --verbose"
+    "postman:test": "bunx newman run postman/mtpx-websocket-chat.postman_collection.json -e postman/mtpx-websocket-chat.postman_environment.json",
+    "postman:test:verbose": "bunx newman run postman/mtpx-websocket-chat.postman_collection.json -e postman/mtpx-websocket-chat.postman_environment.json --verbose"
   },
   "dependencies": {
     "@multpex/typescript-sdk": "file:../../sdk-typescript",

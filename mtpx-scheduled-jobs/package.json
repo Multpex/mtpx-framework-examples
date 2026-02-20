@@ -11,8 +11,8 @@
     "test": "bun test tests/",
     "test:integration": "bun test tests/integration.test.ts",
     "test:e2e": "bun test tests/e2e.test.ts",
-    "postman:test": "bunx newman run postman/scheduled-jobs.postman_collection.json -e postman/local.postman_environment.json",
-    "postman:test:verbose": "bunx newman run postman/scheduled-jobs.postman_collection.json -e postman/local.postman_environment.json --verbose"
+    "postman:test": "bunx newman run postman/mtpx-scheduled-jobs.postman_collection.json -e postman/mtpx-scheduled-jobs.postman_environment.json",
+    "postman:test:verbose": "bunx newman run postman/mtpx-scheduled-jobs.postman_collection.json -e postman/mtpx-scheduled-jobs.postman_environment.json --verbose"
   },
   "dependencies": {
     "@multpex/typescript-sdk": "file:../../sdk-typescript",

@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "auth-rbac-collection",
-    "name": "mtpx auth rbac example",
+    "_postman_id": "mtpx-auth-rbac-collection",
+    "name": "mtpx auth rbac",
     "description": "Collection para testar o exemplo auth-rbac do Multpex Framework.\n\nDemonstra autorização baseada em roles (RBAC) integrada com Keycloak.\n\n## Roles\n\n- **admin**: Acesso total\n- **editor**: Criar e editar documentos\n- **viewer**: Somente leitura\n\n## Endpoints Públicos\n\n- GET /auth-example/health\n\n## Endpoints Viewer+\n\n- GET /auth-example/documents\n- GET /auth-example/documents/:id\n- GET /auth-example/documents/export\n\n## Endpoints Editor+\n\n- POST /auth-example/documents\n- PUT /auth-example/documents/:id\n\n## Endpoints Admin\n\n- DELETE /auth-example/documents/:id\n- GET /auth-example/admin/settings\n- GET /auth-example/admin/stats\n\n## Endpoints Autenticado\n\n- GET /auth-example/profile/me",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },

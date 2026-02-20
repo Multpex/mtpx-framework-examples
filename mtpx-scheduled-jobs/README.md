@@ -29,7 +29,8 @@ src/
 ├── worker.ts       # Worker que processa os jobs
 └── schedules.yaml  # Jobs fixos carregados no startup (opcional)
 postman/
-└── scheduled-jobs.postman_collection.json  # Collection do Postman
+├── mtpx-scheduled-jobs.postman_collection.json  # Collection do Postman
+└── mtpx-scheduled-jobs.postman_environment.json # Variáveis de ambiente
 ```
 
 ## Executando
@@ -110,13 +111,13 @@ O worker processa os seguintes tipos de job (baseado no `jobName`):
 Importe a collection do Postman para testar facilmente:
 
 ```
-postman/scheduled-jobs.postman_collection.json
+postman/mtpx-scheduled-jobs.postman_collection.json
 ```
 
 Preencha a variável `accessToken` no environment local:
 
 ```
-postman/local.postman_environment.json
+postman/mtpx-scheduled-jobs.postman_environment.json
 ```
 
 Na collection, execute primeiro o grupo `Auth (Keycloak)`:
