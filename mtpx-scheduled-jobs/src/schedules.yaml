@@ -5,6 +5,8 @@
 #
 # IMPORTANTE: Estes definem QUANDO criar jobs.
 #             O worker.ts define O QUE FAZER quando receber o job.
+#
+# NOTA: Recurso de importação de schedules ainda não está implementado.
 
 queues:
   # Fila "jobs" - mesma fila que o worker.ts processa

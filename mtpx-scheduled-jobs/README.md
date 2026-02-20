@@ -120,6 +120,8 @@ Preencha a variável `accessToken` no environment local:
 postman/mtpx-scheduled-jobs.postman_environment.json
 ```
 
+> Nota: o recurso de importação de schedules ainda não está implementado.
+
 Na collection, execute primeiro o grupo `Auth (Keycloak)`:
 
 - Request: `Get Access Token (Password Grant)`
