@@ -297,7 +297,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"schedulerKey\": \"weekly-cleanup\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 3 * * 0\",\n  \"jobName\": \"Cleanup\",\n  \"data\": {\n    \"table\": \"logs\",\n    \"olderThanDays\": 30\n  }\n}"
+              "raw": "{\n  \"schedulerKey\": \"weekly-cleanup\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 3 * * SUN\",\n  \"jobName\": \"Cleanup\",\n  \"data\": {\n    \"table\": \"logs\",\n    \"olderThanDays\": 30\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/schedulers",

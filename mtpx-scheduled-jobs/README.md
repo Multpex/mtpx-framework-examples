@@ -170,6 +170,22 @@ curl -X DELETE http://localhost:3000/schedulers/test-job \
   -H "Authorization: Bearer <seu_access_token>"
 ```
 
+### Scheduler semanal de limpeza (domingo às 3h)
+
+Use `SUN` no dia da semana para compatibilidade com o parser de cron do Linkd:
+
+```bash
+curl -X POST http://localhost:3000/schedulers \
+  -H "Authorization: Bearer <seu_access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "schedulerKey": "weekly-cleanup",
+    "pattern": "0 3 * * SUN",
+    "jobName": "Cleanup",
+    "data": { "table": "logs", "olderThanDays": 30 }
+  }'
+```
+
 ## O que acontece
 
 1. Você cria um scheduler via API
