@@ -8,13 +8,13 @@ Cada pasta neste repositorio mostra um caso de uso pratico do `@multpex/typescri
 
 | Projeto | Objetivo | README |
 |---|---|---|
-| `mtpx-minimal-app` | Servico minimo com actions HTTP e testes basicos | `mtpx-minimal-app/README.md` (quando aplicavel) |
-| `mtpx-micro-services` | Arquitetura estilo microservicos com loader, eventos e banco | `mtpx-micro-services/README.md` |
-| `mtpx-auth-rbac` | Autenticacao e autorizacao (RBAC) com roles | `mtpx-auth-rbac/README.md` |
-| `mtpx-graphql-service` | Exposicao/consumo GraphQL no ecossistema | `mtpx-graphql-service/README.md` |
-| `mtpx-msg-channels` | Diferenca entre `emit` e `sendToChannel` | `mtpx-msg-channels/README.md` |
-| `mtpx-scheduled-jobs` | Jobs agendados, scheduler e worker | `mtpx-scheduled-jobs/README.md` |
-| `mtpx-websocket-chat` | Exemplo de API WebSocket do SDK | `mtpx-websocket-chat/README.md` |
+| [mtpx-minimal-app](./mtpx-minimal-app) | Servico minimo com actions HTTP e testes basicos | [Abrir](./mtpx-minimal-app/README.md) |
+| [mtpx-micro-services](./mtpx-micro-services) | Arquitetura estilo microservicos com loader, eventos e banco | [Abrir](./mtpx-micro-services/README.md) |
+| [mtpx-auth-rbac](./mtpx-auth-rbac) | Autenticacao e autorizacao (RBAC) com roles | [Abrir](./mtpx-auth-rbac/README.md) |
+| [mtpx-graphql-service](./mtpx-graphql-service) | Exposicao/consumo GraphQL no ecossistema | [Abrir](./mtpx-graphql-service/README.md) |
+| [mtpx-msg-channels](./mtpx-msg-channels) | Diferenca entre `emit` e `sendToChannel` | [Abrir](./mtpx-msg-channels/README.md) |
+| [mtpx-scheduled-jobs](./mtpx-scheduled-jobs) | Jobs agendados, scheduler e worker | [Abrir](./mtpx-scheduled-jobs/README.md) |
+| [mtpx-websocket-chat](./mtpx-websocket-chat) | Exemplo de API WebSocket do SDK | [Abrir](./mtpx-websocket-chat/README.md) |
 
 ## Pre-requisitos
 
