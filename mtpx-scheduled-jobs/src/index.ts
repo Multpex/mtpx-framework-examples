@@ -14,6 +14,7 @@ import {
   z,
   type Context,
   BadRequestError,
+  NotFoundError,
 } from "@multpex/typescript-sdk";
 
 const service = createApp({
@@ -283,6 +284,16 @@ service.action(
     const queueName = (ctx.query?.queue as string) || "jobs";
 
     const queue = service.queue(queueName);
+
+    const schedulers = await queue.getJobSchedulers();
+    const exists = schedulers.some((scheduler) => scheduler.key === key);
+
+    if (!exists) {
+      throw new NotFoundError(
+        `Scheduler '${key}' não encontrado na fila '${queueName}'`,
+      );
+    }
+
     await queue.removeJobScheduler(key);
 
     console.log(`🗑️  Scheduler removido: ${key} (fila=${queueName})`);
