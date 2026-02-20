@@ -13,14 +13,14 @@ const INSTANCE_ID = process.env.INSTANCE_ID || crypto.randomUUID().slice(0, 8);
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 const service = createApp({
-  name: "minimal-service",
+  name: "minimal-app",
   instanceId: INSTANCE_ID,
-  namespace: "minimal-service",  // Namespace isolado para evitar conflitos
+  namespace: "minimal-app",  // Namespace isolado para evitar conflitos
   health: {
     enabled: true,
-    healthRoute: "/minimal-service/health",
-    readyRoute: "/minimal-service/ready",
-    liveRoute: "/minimal-service/live",
+    healthRoute: "/minimal-app/health",
+    readyRoute: "/minimal-app/ready",
+    liveRoute: "/minimal-app/live",
   },
 
   // Logging integrado - service.logger e ctx.logger disponíveis automaticamente
@@ -72,7 +72,7 @@ const items = new Map<
 // Actions (CRUD)
 
 // List (with optional filtering by query params)
-service.action("list", { route: "/minimal-service/items", method: "GET" }, async (ctx: Context) => {
+service.action("list", { route: "/minimal-app/items", method: "GET" }, async (ctx: Context) => {
   let result = Array.from(items.values());
 
   if (ctx.query?.id) {
@@ -90,7 +90,7 @@ service.action("list", { route: "/minimal-service/items", method: "GET" }, async
 
 service.action(
   "get",
-  { route: "/minimal-service/items/:id", method: "GET" },
+  { route: "/minimal-app/items/:id", method: "GET" },
   async (ctx: Context) => {
     const item = items.get(ctx.params.id);
     if (!item) return { error: "Not found", statusCode: 404 };
@@ -102,7 +102,7 @@ service.action(
 service.action(
   "create",
   {
-    route: "/minimal-service/items",
+    route: "/minimal-app/items",
     method: "POST",
     validate: createItemSchema,
   },
@@ -139,7 +139,7 @@ service.action(
 // Delete (auth required)
 service.action(
   "delete",
-  { route: "/minimal-service/items/:id", method: "DELETE", auth: true, roles: ["admin"] },
+  { route: "/minimal-app/items/:id", method: "DELETE", auth: true, roles: ["admin"] },
   async (ctx: Context) => {
     if (!items.delete(ctx.params.id)) {
       return { error: "Not found", statusCode: 404 };
@@ -172,7 +172,7 @@ service.on("audit.*", async (event: EventContext, _ctx) => {
   console.log(`📝 Audit: ${event.name}`);
 });
 
-service.group("/minimal-service/admin", (g) => {
+service.group("/minimal-app/admin", (g) => {
   g.use(requireRole("admin"));
 
   g.action("stats", { route: "/stats", method: "GET" }, async () => {

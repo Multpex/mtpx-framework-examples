@@ -1,5 +1,5 @@
 {
-  "name": "minimal-service-example",
+  "name": "minimal-app-example",
   "version": "1.0.0",
   "type": "module",
   "description": "Minimal example of @multpex/typescript-sdk features",
@@ -13,8 +13,8 @@
     "clean": "rm -rf dist",
     "test": "bun test tests/",
     "test:integration": "bun test tests/integration.test.ts",
-    "postman:test": "bunx newman run postman/minimal-service.postman_collection.json -e postman/local.postman_environment.json",
-    "postman:test:verbose": "bunx newman run postman/minimal-service.postman_collection.json -e postman/local.postman_environment.json --verbose"
+    "postman:test": "bunx newman run postman/minimal-app.postman_collection.json -e postman/local.postman_environment.json",
+    "postman:test:verbose": "bunx newman run postman/minimal-app.postman_collection.json -e postman/local.postman_environment.json --verbose"
   },
   "dependencies": {
     "@multpex/typescript-sdk": "file:../../sdk-typescript"

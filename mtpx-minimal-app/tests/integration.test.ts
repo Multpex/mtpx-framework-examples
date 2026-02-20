@@ -19,7 +19,7 @@ function generateToken(
 
 async function isServiceAvailable(): Promise<boolean> {
   try {
-    const response = await fetch(`${BASE_URL}/minimal-service/health`, { signal: AbortSignal.timeout(1000) });
+    const response = await fetch(`${BASE_URL}/minimal-app/health`, { signal: AbortSignal.timeout(1000) });
     return response.ok;
   } catch {
     return false;
@@ -36,17 +36,17 @@ describe("Minimal Service Integration", async () => {
 
   describe("Health Checks", () => {
     it("GET /health should return service health status", async () => {
-      const response = await fetch(`${BASE_URL}/minimal-service/health`);
+      const response = await fetch(`${BASE_URL}/minimal-app/health`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
       expect(data.status).toBe("healthy");
-      expect(data.service).toBe("minimal-service");
+      expect(data.service).toBe("minimal-app");
       expect(data.checks).toBeDefined();
     });
 
     it("GET /ready should return readiness status", async () => {
-      const response = await fetch(`${BASE_URL}/minimal-service/ready`);
+      const response = await fetch(`${BASE_URL}/minimal-app/ready`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -54,7 +54,7 @@ describe("Minimal Service Integration", async () => {
     });
 
     it("GET /live should return liveness status", async () => {
-      const response = await fetch(`${BASE_URL}/minimal-service/live`);
+      const response = await fetch(`${BASE_URL}/minimal-app/live`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -64,7 +64,7 @@ describe("Minimal Service Integration", async () => {
 
   describe("CRUD Operations", () => {
     it("GET /items should list all items", async () => {
-      const response = await fetch(`${BASE_URL}/minimal-service/items`);
+      const response = await fetch(`${BASE_URL}/minimal-app/items`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -73,7 +73,7 @@ describe("Minimal Service Integration", async () => {
     });
 
     it("GET /items/:id should get item by ID", async () => {
-      const response = await fetch(`${BASE_URL}/minimal-service/items/1`);
+      const response = await fetch(`${BASE_URL}/minimal-app/items/1`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -83,7 +83,7 @@ describe("Minimal Service Integration", async () => {
     });
 
     it("GET /items/:id should return 404 for non-existent item", async () => {
-      const response = await fetch(`${BASE_URL}/minimal-service/items/non-existent-id`);
+      const response = await fetch(`${BASE_URL}/minimal-app/items/non-existent-id`);
       expect(response.status).toBe(404);
 
       const data = await response.json();
@@ -97,7 +97,7 @@ describe("Minimal Service Integration", async () => {
         tags: ["test", "integration"],
       };
 
-      const response = await fetch(`${BASE_URL}/minimal-service/items`, {
+      const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newItem),
@@ -117,7 +117,7 @@ describe("Minimal Service Integration", async () => {
     it("POST /items should return validation error for missing name", async () => {
       const invalidItem = { price: 10 };
 
-      const response = await fetch(`${BASE_URL}/minimal-service/items`, {
+      const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(invalidItem),
@@ -135,7 +135,7 @@ describe("Minimal Service Integration", async () => {
     it("POST /items should return validation error for negative price", async () => {
       const invalidItem = { name: "Test", price: -10 };
 
-      const response = await fetch(`${BASE_URL}/minimal-service/items`, {
+      const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(invalidItem),
@@ -151,7 +151,7 @@ describe("Minimal Service Integration", async () => {
     it("POST /items should return validation error for empty name", async () => {
       const invalidItem = { name: "", price: 10 };
 
-      const response = await fetch(`${BASE_URL}/minimal-service/items`, {
+      const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(invalidItem),
@@ -166,7 +166,7 @@ describe("Minimal Service Integration", async () => {
     it("POST /items should return validation error for name too long", async () => {
       const invalidItem = { name: "x".repeat(101), price: 10 };
 
-      const response = await fetch(`${BASE_URL}/minimal-service/items`, {
+      const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(invalidItem),
@@ -181,7 +181,7 @@ describe("Minimal Service Integration", async () => {
 
   describe("Authentication", () => {
     it("DELETE /items/:id should return 401 without token", async () => {
-      const response = await fetch(`${BASE_URL}/minimal-service/items/1`, {
+      const response = await fetch(`${BASE_URL}/minimal-app/items/1`, {
         method: "DELETE",
       });
 
@@ -195,7 +195,7 @@ describe("Minimal Service Integration", async () => {
     it("DELETE /items/:id should return 403 with user token (not admin)", async () => {
       const userToken = generateToken("user");
 
-      const response = await fetch(`${BASE_URL}/minimal-service/items/1`, {
+      const response = await fetch(`${BASE_URL}/minimal-app/items/1`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${userToken}` },
       });
@@ -207,7 +207,7 @@ describe("Minimal Service Integration", async () => {
     });
 
     it("DELETE /items/:id should succeed with admin token", async () => {
-      const createResponse = await fetch(`${BASE_URL}/minimal-service/items`, {
+      const createResponse = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: "To Delete", price: 1 }),
@@ -216,7 +216,7 @@ describe("Minimal Service Integration", async () => {
       const createdItem = await createResponse.json();
       const adminToken = generateToken("admin");
 
-      const deleteResponse = await fetch(`${BASE_URL}/minimal-service/items/${createdItem.id}`, {
+      const deleteResponse = await fetch(`${BASE_URL}/minimal-app/items/${createdItem.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${adminToken}` },
       });
@@ -230,14 +230,14 @@ describe("Minimal Service Integration", async () => {
 
   describe("Admin Group", () => {
     it("GET /admin/stats should return 401 without token", async () => {
-      const response = await fetch(`${BASE_URL}/minimal-service/admin/stats`);
+      const response = await fetch(`${BASE_URL}/minimal-app/admin/stats`);
       expect(response.status).toBe(401);
     });
 
     it("GET /admin/stats should return 403 with user token", async () => {
       const userToken = generateToken("user");
 
-      const response = await fetch(`${BASE_URL}/minimal-service/admin/stats`, {
+      const response = await fetch(`${BASE_URL}/minimal-app/admin/stats`, {
         headers: { Authorization: `Bearer ${userToken}` },
       });
 
@@ -247,7 +247,7 @@ describe("Minimal Service Integration", async () => {
     it("GET /admin/stats should succeed with admin token", async () => {
       const adminToken = generateToken("admin");
 
-      const response = await fetch(`${BASE_URL}/minimal-service/admin/stats`, {
+      const response = await fetch(`${BASE_URL}/minimal-app/admin/stats`, {
         headers: { Authorization: `Bearer ${adminToken}` },
       });
 

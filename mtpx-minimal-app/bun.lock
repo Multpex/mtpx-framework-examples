@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "minimal-service-example",
+      "name": "minimal-app-example",
       "dependencies": {
         "@multpex/typescript-sdk": "file:../../sdk-typescript",
       },

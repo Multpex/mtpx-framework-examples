@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "minimal-service-collection",
+    "_postman_id": "minimal-app-collection",
     "name": "mtpx minimal service api",
-    "description": "Collection para testar o exemplo minimal-service do Multpex Framework.\n\n## Endpoints\n\n- **GET /minimal-service/items** - Listar items\n- **GET /minimal-service/items/:id** - Buscar item por ID\n- **POST /minimal-service/items** - Criar item (com validação Zod)\n- **DELETE /minimal-service/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-service/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-service/health** - Health check\n- **GET /minimal-service/ready** - Readiness check\n- **GET /minimal-service/live** - Liveness check",
+    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (com validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -50,9 +50,9 @@
             "auth": { "type": "noauth" },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/health",
+              "raw": "{{baseUrl}}/minimal-app/health",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "health"]
+              "path": ["minimal-app", "health"]
             }
           }
         },
@@ -75,9 +75,9 @@
             "auth": { "type": "noauth" },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/ready",
+              "raw": "{{baseUrl}}/minimal-app/ready",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "ready"]
+              "path": ["minimal-app", "ready"]
             }
           }
         },
@@ -100,9 +100,9 @@
             "auth": { "type": "noauth" },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/live",
+              "raw": "{{baseUrl}}/minimal-app/live",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "live"]
+              "path": ["minimal-app", "live"]
             }
           }
         }
@@ -140,9 +140,9 @@
             "auth": { "type": "noauth" },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/items",
+              "raw": "{{baseUrl}}/minimal-app/items",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "items"]
+              "path": ["minimal-app", "items"]
             }
           }
         },
@@ -152,9 +152,9 @@
             "auth": { "type": "noauth" },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/items?name=widget",
+              "raw": "{{baseUrl}}/minimal-app/items?name=widget",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "items"],
+              "path": ["minimal-app", "items"],
               "query": [
                 { "key": "name", "value": "widget" }
               ]
@@ -186,9 +186,9 @@
             "auth": { "type": "noauth" },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/items/1",
+              "raw": "{{baseUrl}}/minimal-app/items/1",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "items", "1"]
+              "path": ["minimal-app", "items", "1"]
             }
           }
         },
@@ -212,9 +212,9 @@
             "auth": { "type": "noauth" },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/items/nonexistent",
+              "raw": "{{baseUrl}}/minimal-app/items/nonexistent",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "items", "nonexistent"]
+              "path": ["minimal-app", "items", "nonexistent"]
             }
           }
         },
@@ -257,9 +257,9 @@
               "raw": "{\n  \"name\": \"New Product\",\n  \"price\": 49.99,\n  \"tags\": [\"new\", \"featured\"]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/items",
+              "raw": "{{baseUrl}}/minimal-app/items",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "items"]
+              "path": ["minimal-app", "items"]
             }
           }
         },
@@ -289,9 +289,9 @@
               "raw": "{\n  \"name\": \"\",\n  \"price\": -10\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/items",
+              "raw": "{{baseUrl}}/minimal-app/items",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "items"]
+              "path": ["minimal-app", "items"]
             },
             "description": "Testa validação Zod: name vazio e price negativo devem falhar"
           }
@@ -315,9 +315,9 @@
             "auth": { "type": "noauth" },
             "method": "DELETE",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/items/1",
+              "raw": "{{baseUrl}}/minimal-app/items/1",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "items", "1"]
+              "path": ["minimal-app", "items", "1"]
             },
             "description": "Deve falhar sem autenticação"
           }
@@ -340,9 +340,9 @@
           "request": {
             "method": "DELETE",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/items/{{itemId}}",
+              "raw": "{{baseUrl}}/minimal-app/items/{{itemId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "items", "{{itemId}}"]
+              "path": ["minimal-app", "items", "{{itemId}}"]
             },
             "description": "Requer auth com role admin. Usa itemId salvo do teste Create."
           }
@@ -371,9 +371,9 @@
             "auth": { "type": "noauth" },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/admin/stats",
+              "raw": "{{baseUrl}}/minimal-app/admin/stats",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "admin", "stats"]
+              "path": ["minimal-app", "admin", "stats"]
             }
           }
         },
@@ -398,9 +398,9 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/minimal-service/admin/stats",
+              "raw": "{{baseUrl}}/minimal-app/admin/stats",
               "host": ["{{baseUrl}}"],
-              "path": ["minimal-service", "admin", "stats"]
+              "path": ["minimal-app", "admin", "stats"]
             },
             "description": "Requer auth com role admin"
           }

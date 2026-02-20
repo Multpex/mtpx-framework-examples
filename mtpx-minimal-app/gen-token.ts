@@ -52,6 +52,6 @@ console.log(token);
 console.log(`\n📋 Payload:\n`);
 console.log(JSON.stringify(payload, null, 2));
 console.log(`\n🧪 Test with:\n`);
-console.log(`curl -X DELETE http://localhost:3999/minimal-service/items/1 \\
+console.log(`curl -X DELETE http://localhost:3999/minimal-app/items/1 \\
   -H "Authorization: Bearer ${token}"`);
 console.log("");
