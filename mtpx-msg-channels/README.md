@@ -32,7 +32,7 @@ A infraestrutura compartilhada (PostgreSQL, NATS, Redis, Keycloak) está no proj
 
 https://github.com/Multpex/mtpx-framework-dev-infra
 
-Suba os serviços necessários antes de executar os serviços deste exemplo:
+Suba a infraestrutura necessária antes de executar os serviços deste exemplo:
 
 ```bash
 git clone https://github.com/Multpex/mtpx-framework-dev-infra.git
