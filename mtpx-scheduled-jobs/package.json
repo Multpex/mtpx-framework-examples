@@ -15,7 +15,8 @@
     "postman:test:verbose": "bunx newman run postman/scheduled-jobs.postman_collection.json -e postman/local.postman_environment.json --verbose"
   },
   "dependencies": {
-    "@multpex/typescript-sdk": "file:../../sdk-typescript"
+    "@multpex/typescript-sdk": "file:../../sdk-typescript",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/bun": "^1.0.0",

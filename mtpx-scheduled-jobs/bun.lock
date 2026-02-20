@@ -5,6 +5,7 @@
       "name": "scheduled-jobs-example",
       "dependencies": {
         "@multpex/typescript-sdk": "file:../../sdk-typescript",
+        "zod": "^3.22.0",
       },
       "devDependencies": {
         "@types/bun": "^1.0.0",
