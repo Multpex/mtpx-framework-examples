@@ -58,6 +58,14 @@ service.afterStart(async () => {
   );
 });
 
+const JOB_NAMES = [
+  "ProcessData",
+  "GenerateReport",
+  "SendNotification",
+  "Cleanup",
+  "TestJob",
+] as const;
+
 // ============================================================================
 // Schemas de Validação
 // ============================================================================
@@ -66,7 +74,7 @@ const createJobSchema = z.object({
   // Nome da fila (default: "jobs")
   queue: z.string().min(1).max(100).default("jobs"),
   // Nome do job (o worker usa isso para decidir o que fazer)
-  name: z.string().min(1).max(100),
+  name: z.enum(JOB_NAMES),
   // Dados que serão passados para o job
   data: z.record(z.unknown()).default({}),
   // Delay em ms antes de executar (0 = imediato)
@@ -88,7 +96,7 @@ const createSchedulerSchema = z.object({
   // Intervalo em ms (ex: 60000 = 1 min) - mutualmente exclusivo com 'pattern'
   every: z.number().positive().optional(),
   // Nome do job (o worker usa isso para decidir o que fazer)
-  jobName: z.string().min(1).max(100),
+  jobName: z.enum(JOB_NAMES),
   // Dados que serão passados para o job
   data: z.record(z.unknown()).default({}),
   // Timezone para cron (ex: "America/Sao_Paulo")

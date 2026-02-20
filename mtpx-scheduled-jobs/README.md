@@ -101,10 +101,10 @@ O worker processa os seguintes tipos de job (baseado no `jobName`):
 
 | Job Name | Descrição | Payload |
 |----------|-----------|---------|
-| `process-data` | Processa dados genéricos | `{ message?, items? }` |
-| `generate-report` | Gera relatórios | `{ type, recipients? }` |
-| `send-notification` | Envia notificações | `{ userId?, channel?, message? }` |
-| `cleanup` | Limpa dados antigos | `{ table?, olderThanDays? }` |
+| `ProcessData` | Processa dados genéricos | `{ message?, items? }` |
+| `GenerateReport` | Gera relatórios | `{ type, recipients? }` |
+| `SendNotification` | Envia notificações | `{ userId?, channel?, message? }` |
+| `Cleanup` | Limpa dados antigos | `{ table?, olderThanDays? }` |
 
 ## Postman Collection
 
@@ -137,7 +137,7 @@ curl -X POST http://localhost:3000/schedulers \
   -d '{
     "schedulerKey": "test-job",
     "every": 10000,
-    "jobName": "process-data",
+    "jobName": "ProcessData",
     "data": { "message": "Hello from scheduler!" }
   }'
 ```
@@ -151,7 +151,7 @@ curl -X POST http://localhost:3000/schedulers \
   -d '{
     "schedulerKey": "daily-report",
     "pattern": "0 9 * * *",
-    "jobName": "generate-report",
+    "jobName": "GenerateReport",
     "data": { "type": "daily" }
   }'
 ```
@@ -200,7 +200,7 @@ class MyNewJob extends JobHandler<{ field1: string; field2?: number }, JobResult
 ### 2. Registrar no worker
 
 ```typescript
-service.job(MyNewJob, "my-new-job");
+service.job(MyNewJob);
 ```
 
 ### 3. Criar o scheduler via API
@@ -212,7 +212,7 @@ curl -X POST http://localhost:3000/schedulers \
   -d '{
     "schedulerKey": "my-scheduler",
     "every": 60000,
-    "jobName": "my-new-job",
+    "jobName": "MyNewJob",
     "data": { "field1": "value" }
   }'
 ```

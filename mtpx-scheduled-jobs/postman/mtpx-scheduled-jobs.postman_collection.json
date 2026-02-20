@@ -176,7 +176,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"queue\": \"{{queueName}}\",\n  \"name\": \"process-data\",\n  \"data\": {\n    \"message\": \"Immediate job\",\n    \"items\": [1, 2, 3]\n  },\n  \"delay\": 0,\n  \"priority\": 1,\n  \"attempts\": 3\n}"
+              "raw": "{\n  \"queue\": \"{{queueName}}\",\n  \"name\": \"ProcessData\",\n  \"data\": {\n    \"message\": \"Immediate job\",\n    \"items\": [1, 2, 3]\n  },\n  \"delay\": 0,\n  \"priority\": 1,\n  \"attempts\": 3\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/jobs",
@@ -199,7 +199,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"queue\": \"{{queueName}}\",\n  \"name\": \"send-notification\",\n  \"data\": {\n    \"userId\": \"user-123\",\n    \"message\": \"Delayed notification\"\n  },\n  \"delay\": 30000,\n  \"priority\": 2,\n  \"attempts\": 3\n}"
+              "raw": "{\n  \"queue\": \"{{queueName}}\",\n  \"name\": \"SendNotification\",\n  \"data\": {\n    \"userId\": \"user-123\",\n    \"message\": \"Delayed notification\"\n  },\n  \"delay\": 30000,\n  \"priority\": 2,\n  \"attempts\": 3\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/jobs",
@@ -228,7 +228,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"schedulerKey\": \"test-job\",\n  \"queue\": \"{{queueName}}\",\n  \"every\": 10000,\n  \"jobName\": \"process-data\",\n  \"data\": {\n    \"message\": \"Hello from scheduler!\",\n    \"items\": [1, 2, 3]\n  }\n}"
+              "raw": "{\n  \"schedulerKey\": \"test-job\",\n  \"queue\": \"{{queueName}}\",\n  \"every\": 10000,\n  \"jobName\": \"ProcessData\",\n  \"data\": {\n    \"message\": \"Hello from scheduler!\",\n    \"items\": [1, 2, 3]\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/schedulers",
@@ -251,7 +251,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"schedulerKey\": \"daily-report\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 9 * * *\",\n  \"jobName\": \"generate-report\",\n  \"data\": {\n    \"type\": \"daily\",\n    \"recipients\": [\"admin@example.com\"]\n  },\n  \"timezone\": \"America/Sao_Paulo\"\n}"
+              "raw": "{\n  \"schedulerKey\": \"daily-report\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 9 * * *\",\n  \"jobName\": \"GenerateReport\",\n  \"data\": {\n    \"type\": \"daily\",\n    \"recipients\": [\"admin@example.com\"]\n  },\n  \"timezone\": \"America/Sao_Paulo\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/schedulers",
@@ -274,7 +274,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"schedulerKey\": \"hourly-notification\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 * * * *\",\n  \"jobName\": \"send-notification\",\n  \"data\": {\n    \"channel\": \"push\",\n    \"message\": \"Lembrete de hora em hora\"\n  }\n}"
+              "raw": "{\n  \"schedulerKey\": \"hourly-notification\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 * * * *\",\n  \"jobName\": \"SendNotification\",\n  \"data\": {\n    \"channel\": \"push\",\n    \"message\": \"Lembrete de hora em hora\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/schedulers",
@@ -297,7 +297,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"schedulerKey\": \"weekly-cleanup\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 3 * * 0\",\n  \"jobName\": \"cleanup\",\n  \"data\": {\n    \"table\": \"logs\",\n    \"olderThanDays\": 30\n  }\n}"
+              "raw": "{\n  \"schedulerKey\": \"weekly-cleanup\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 3 * * 0\",\n  \"jobName\": \"Cleanup\",\n  \"data\": {\n    \"table\": \"logs\",\n    \"olderThanDays\": 30\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/schedulers",

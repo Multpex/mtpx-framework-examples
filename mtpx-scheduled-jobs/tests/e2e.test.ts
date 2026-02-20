@@ -70,7 +70,7 @@ describe("Scheduled Jobs E2E", async () => {
         body: JSON.stringify({
           schedulerKey,
           every: 5000,
-          jobName: "process-data",
+          jobName: "ProcessData",
           data: {
             message: "E2E Test Job",
             items: ["item1", "item2", "item3"],
@@ -94,7 +94,7 @@ describe("Scheduled Jobs E2E", async () => {
         (s: { key: string }) => s.key === schedulerKey,
       );
       expect(ourScheduler).toBeDefined();
-      expect(ourScheduler.jobName).toBe("process-data");
+      expect(ourScheduler.jobName).toBe("ProcessData");
 
       await sleep(6000);
 
@@ -121,7 +121,7 @@ describe("Scheduled Jobs E2E", async () => {
         body: JSON.stringify({
           schedulerKey,
           pattern: "*/1 * * * *",
-          jobName: "generate-report",
+          jobName: "GenerateReport",
           data: {
             type: "e2e-test",
             recipients: ["test@example.com"],
@@ -145,7 +145,7 @@ describe("Scheduled Jobs E2E", async () => {
   });
 
   describe("Worker Job Handlers", () => {
-    it("deve criar scheduler de execução única para process-data", async () => {
+    it("deve criar scheduler de execução única para ProcessData", async () => {
       const schedulerKey = `e2e-handler-process-${Date.now()}`;
       createdSchedulerKeys.push(schedulerKey);
 
@@ -156,7 +156,7 @@ describe("Scheduled Jobs E2E", async () => {
           schedulerKey,
           every: 3000,
           limit: 1,
-          jobName: "process-data",
+          jobName: "ProcessData",
           data: {
             message: "Handler test",
             items: [1, 2, 3, 4, 5],

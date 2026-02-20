@@ -10,7 +10,7 @@ queues:
   # Fila "jobs" - mesma fila que o worker.ts processa
   jobs:
     # Relatório diário às 9h
-    - name: generate-report
+    - name: GenerateReport
       cron: "0 9 * * *"
       data:
         type: daily
@@ -24,7 +24,7 @@ queues:
           delay: 5000
 
     # Limpeza semanal (domingo às 3h)
-    - name: cleanup
+    - name: Cleanup
       cron: "0 3 * * 0"
       data:
         olderThanDays: 30
@@ -33,7 +33,7 @@ queues:
         attempts: 2
 
     # Notificação de resumo toda sexta às 18h
-    - name: send-notification
+    - name: SendNotification
       cron: "0 18 * * 5"
       data:
         channel: email

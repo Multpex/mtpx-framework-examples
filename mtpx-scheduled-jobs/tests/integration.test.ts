@@ -78,7 +78,7 @@ describe("Scheduled Jobs Integration", async () => {
         body: JSON.stringify({
           schedulerKey,
           every: 60000,
-          jobName: "process-data",
+          jobName: "ProcessData",
           data: { message: "Test message" },
         }),
       });
@@ -102,7 +102,7 @@ describe("Scheduled Jobs Integration", async () => {
         body: JSON.stringify({
           schedulerKey,
           pattern: "0 9 * * *",
-          jobName: "generate-report",
+          jobName: "GenerateReport",
           data: { type: "daily" },
           timezone: "America/Sao_Paulo",
         }),
@@ -135,7 +135,7 @@ describe("Scheduled Jobs Integration", async () => {
         body: JSON.stringify({
           schedulerKey,
           every: 60000,
-          jobName: "cleanup",
+          jobName: "Cleanup",
           data: {},
         }),
       });
@@ -160,7 +160,7 @@ describe("Scheduled Jobs Integration", async () => {
         headers: withAuth({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           schedulerKey: "invalid-test",
-          jobName: "process-data",
+          jobName: "ProcessData",
           data: {},
         }),
       });
@@ -179,7 +179,7 @@ describe("Scheduled Jobs Integration", async () => {
           schedulerKey: "invalid-test-2",
           pattern: "0 9 * * *",
           every: 60000,
-          jobName: "process-data",
+          jobName: "ProcessData",
           data: {},
         }),
       });
@@ -197,7 +197,7 @@ describe("Scheduled Jobs Integration", async () => {
         body: JSON.stringify({
           schedulerKey: "",
           every: 60000,
-          jobName: "process-data",
+          jobName: "ProcessData",
           data: {},
         }),
       });
@@ -212,7 +212,7 @@ describe("Scheduled Jobs Integration", async () => {
         body: JSON.stringify({
           schedulerKey: "negative-test",
           every: -1000,
-          jobName: "process-data",
+          jobName: "ProcessData",
           data: {},
         }),
       });

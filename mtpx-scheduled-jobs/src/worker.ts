@@ -160,13 +160,12 @@ const service = createApp({
   queue: { defaultQueue: QUEUE_NAME },
 });
 
-// Registrar handlers — nome customizado para compatibilidade com schedulers/API
-service.job(ProcessData, "process-data");
-service.job(ProcessData, "process-data3");
-service.job(GenerateReport, "generate-report");
-service.job(SendNotification, "send-notification");
-service.job(Cleanup, "cleanup");
-service.job(TestJob, "test-job");
+// Registrar handlers usando o nome da classe como job name
+service.job(ProcessData);
+service.job(GenerateReport);
+service.job(SendNotification);
+service.job(Cleanup);
+service.job(TestJob);
 
 service.beforeStart(async () => {
   console.log("⏳ Iniciando Worker de jobs agendados...");
@@ -176,7 +175,7 @@ service.afterStart(async () => {
   console.log("✅ Worker pronto! Aguardando jobs...");
   console.log(`📦 Fila: ${QUEUE_NAME}`);
   console.log(
-    "🧩 Jobs registrados: process-data, process-data3, generate-report, send-notification, cleanup, test-job",
+    "🧩 Jobs registrados: ProcessData, GenerateReport, SendNotification, Cleanup, TestJob",
   );
 });
 
