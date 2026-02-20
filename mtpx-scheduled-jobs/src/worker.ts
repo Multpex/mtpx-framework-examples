@@ -10,6 +10,7 @@
 import {
   createApp,
   JobHandler,
+  type JobHandlerContext,
   setupGracefulShutdown,
 } from "@multpex/typescript-sdk";
 
@@ -43,7 +44,8 @@ function logJobPayload(job: { id: string; name: string }, data: unknown): void {
 
 class ProcessData extends JobHandler<
   { message?: string; items?: unknown[] },
-  JobResult
+  JobResult,
+  JobHandlerContext
 > {
   async handle() {
     logJobPayload(this.job, this.data);
@@ -53,6 +55,12 @@ class ProcessData extends JobHandler<
     await sleep(500);
 
     const itemCount = this.data.items?.length ?? 1;
+
+    const hasDb = Boolean(this.ctx?.db);
+    console.log(
+      `   🧩 [ProcessData] infra ctx disponível: db=${hasDb}`,
+    );
+
     console.log(
       `   📊 [ProcessData] job='${this.job.name}' id='${this.job.id}' - ${itemCount} item(s) processado(s)`,
     );
