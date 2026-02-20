@@ -9,7 +9,7 @@
     "postman:test:verbose": "bunx newman run postman/websocket-chat.postman_collection.json -e postman/local.postman_environment.json --verbose"
   },
   "dependencies": {
-    "@multpex/typescript-sdk": "workspace:*",
+    "@multpex/typescript-sdk": "file:../../sdk-typescript",
     "zod": "^3.23.8"
   },
   "devDependencies": {
