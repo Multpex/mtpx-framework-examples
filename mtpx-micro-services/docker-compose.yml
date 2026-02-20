@@ -1,0 +1,89 @@
+# Infrastructure Docker Compose
+#
+# Provides infrastructure services for local development.
+# Use this when running linkd and the app locally (not in containers).
+#
+# Usage:
+#   docker-compose up -d
+#
+# Then run linkd locally:
+#   cd ../../linkd && cargo run
+#
+# And run the app:
+#   bun dev
+
+services:
+  # PostgreSQL Database
+  pg:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: multpex
+      POSTGRES_PASSWORD: multpex
+      POSTGRES_DB: ecommerce
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U multpex -d ecommerce"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # NATS Message Broker
+  nats:
+    image: nats:2.12-alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["--jetstream", "--http_port", "8222"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:8-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Keycloak Identity Provider
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    environment:
+      # Admin credentials
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Use H2 database for development (faster startup)
+      KC_DB: dev-file
+      # Hostname configuration
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      # Health endpoint
+      KC_HEALTH_ENABLED: "true"
+    command: ["start-dev", "--import-realm"]
+    ports:
+      - "8180:8080"
+    volumes:
+      - ../../config/keycloak:/opt/keycloak/data/import:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+volumes:
+  postgres_data:

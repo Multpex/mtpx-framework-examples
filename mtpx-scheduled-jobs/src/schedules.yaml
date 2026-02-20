@@ -1,0 +1,60 @@
+# Fixed Schedules Configuration
+#
+# Jobs definidos aqui são carregados no startup via loadSchedules().
+# Para cada job, será criado um scheduler que cria jobs na fila no horário definido.
+#
+# IMPORTANTE: Estes definem QUANDO criar jobs.
+#             O worker.ts define O QUE FAZER quando receber o job.
+
+queues:
+  # Fila "jobs" - mesma fila que o worker.ts processa
+  jobs:
+    # Relatório diário às 9h
+    - name: generate-report
+      cron: "0 9 * * *"
+      data:
+        type: daily
+        recipients:
+          - admin@example.com
+          - team@example.com
+      options:
+        attempts: 3
+        backoff:
+          type: exponential
+          delay: 5000
+
+    # Limpeza semanal (domingo às 3h)
+    - name: cleanup
+      cron: "0 3 * * 0"
+      data:
+        olderThanDays: 30
+        table: logs
+      options:
+        attempts: 2
+
+    # Notificação de resumo toda sexta às 18h
+    - name: send-notification
+      cron: "0 18 * * 5"
+      data:
+        channel: email
+        message: "Resumo semanal disponível!"
+
+  # Fila separada para monitoramento
+  monitoring:
+    # Health check a cada 5 minutos
+    - name: health-check
+      every: 5m
+      data:
+        services:
+          - api
+          - database
+          - cache
+
+    # Métricas a cada 1 hora
+    - name: collect-metrics
+      every: 1h
+      data:
+        metrics:
+          - cpu
+          - memory
+          - requests

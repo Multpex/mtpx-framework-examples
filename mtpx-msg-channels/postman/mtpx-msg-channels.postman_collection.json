@@ -1,0 +1,140 @@
+{
+  "info": {
+    "_postman_id": "mtpx-msg-channels-emit-vs-channel",
+    "name": "mtpx-msg-channels (emit vs channel)",
+    "description": "Demonstra diferença entre emit (broadcast) e sendToChannel (load-balanced por grupo).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "keycloakUrl", "value": "http://localhost:8180", "type": "string" },
+    { "key": "keycloakRealm", "value": "multpex", "type": "string" },
+    { "key": "keycloakClientId", "value": "multpex-services", "type": "string" },
+    { "key": "keycloakClientSecret", "value": "multpex-services-secret", "type": "string" },
+    { "key": "keycloakUsername", "value": "admin", "type": "string" },
+    { "key": "keycloakPassword", "value": "admin", "type": "string" },
+    { "key": "orderId", "value": "order-1001", "type": "string" },
+    { "key": "customerId", "value": "customer-abc", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Get Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('retorna access_token', function () { pm.expect(json.access_token).to.be.a('string'); });",
+                  "if (json.access_token) pm.environment.set('accessToken', json.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password", "type": "text" },
+                { "key": "client_id", "value": "{{keycloakClientId}}", "type": "text" },
+                { "key": "client_secret", "value": "{{keycloakClientSecret}}", "type": "text" },
+                { "key": "username", "value": "{{keycloakUsername}}", "type": "text" },
+                { "key": "password", "value": "{{keycloakPassword}}", "type": "text" },
+                { "key": "scope", "value": "openid profile email roles offline_access", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{keycloakRealm}}/protocol/openid-connect/token",
+              "host": ["{{keycloakUrl}}"],
+              "path": ["realms", "{{keycloakRealm}}", "protocol", "openid-connect", "token"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Demo",
+      "item": [
+        {
+          "name": "Emit (Broadcast)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"customerId\": \"{{customerId}}\",\n  \"total\": 149.9,\n  \"priority\": \"normal\",\n  \"forceFail\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/svc-a/demo/emit",
+              "host": ["{{baseUrl}}"],
+              "path": ["svc-a", "demo", "emit"]
+            }
+          }
+        },
+        {
+          "name": "Channel (Load Balanced)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"order-2002\",\n  \"customerId\": \"customer-b\",\n  \"total\": 249.9,\n  \"priority\": \"normal\",\n  \"forceFail\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/svc-a/demo/channel",
+              "host": ["{{baseUrl}}"],
+              "path": ["svc-a", "demo", "channel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stats",
+      "item": [
+        {
+          "name": "svc-b Stats",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/svc-b/demo/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["svc-b", "demo", "stats"]
+            }
+          }
+        },
+        {
+          "name": "svc-c Stats",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/svc-c/demo/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["svc-c", "demo", "stats"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "websocket-chat-example",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/main.ts",
+    "start": "bun run src/main.ts",
+    "postman:test": "bunx newman run postman/websocket-chat.postman_collection.json -e postman/local.postman_environment.json",
+    "postman:test:verbose": "bunx newman run postman/websocket-chat.postman_collection.json -e postman/local.postman_environment.json --verbose"
+  },
+  "dependencies": {
+    "@multpex/typescript-sdk": "workspace:*",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

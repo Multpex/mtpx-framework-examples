@@ -1,0 +1,530 @@
+{
+  "info": {
+    "_postman_id": "scheduled-jobs-collection",
+    "name": "mtpx scheduled jobs api",
+    "description": "API para gerenciamento de jobs agendados (cron/repeatable) com Multpex Framework.\n\n## Autenticação\n\nUse o grupo **Auth (Keycloak)** para obter token e preencher `accessToken` automaticamente.\n\nEndpoints de jobs, schedulers, queues e DLQ exigem Bearer token.\nDefina o valor da variável `accessToken` no environment.\n\n## Conceito\n\n- **Scheduler**: Define QUANDO criar jobs (cron pattern ou intervalo)\n- **Worker**: Define O QUE FAZER quando o job for executado\n\n## Fluxo\n\n1. Criar scheduler via POST /schedulers\n2. O sidecar cria jobs na fila conforme o agendamento\n3. O worker processa os jobs baseado no `jobName`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "queueName",
+      "value": "jobs",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "keycloakUrl",
+      "value": "http://localhost:8180",
+      "type": "string"
+    },
+    {
+      "key": "keycloakRealm",
+      "value": "multpex",
+      "type": "string"
+    },
+    {
+      "key": "keycloakClientId",
+      "value": "multpex-services",
+      "type": "string"
+    },
+    {
+      "key": "keycloakClientSecret",
+      "value": "multpex-services-secret",
+      "type": "string"
+    },
+    {
+      "key": "keycloakUsername",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "keycloakPassword",
+      "value": "admin",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth (Keycloak)",
+      "description": "Obtenha token de acesso no Keycloak para usar nos endpoints autenticados.",
+      "item": [
+        {
+          "name": "Get Access Token (Password Grant)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set('keycloakClientId', 'multpex-services');",
+                  "pm.variables.set('keycloakClientSecret', 'multpex-services-secret');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('token retornado', function () { pm.expect(json.access_token).to.be.a('string'); });",
+                  "if (json.access_token) {",
+                  "  pm.environment.set('accessToken', json.access_token);",
+                  "  pm.collectionVariables.set('accessToken', json.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{keycloakClientId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{keycloakClientSecret}}",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "{{keycloakUsername}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{keycloakPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid profile email roles offline_access",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{keycloakRealm}}/protocol/openid-connect/token",
+              "host": [
+                "{{keycloakUrl}}"
+              ],
+              "path": [
+                "realms",
+                "{{keycloakRealm}}",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            },
+            "description": "Obtém um access token no Keycloak e salva em `accessToken`."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "description": "Endpoints para criar jobs para execução imediata ou com delay.",
+      "item": [
+        {
+          "name": "Create Job (Run Now)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"queue\": \"{{queueName}}\",\n  \"name\": \"process-data\",\n  \"data\": {\n    \"message\": \"Immediate job\",\n    \"items\": [1, 2, 3]\n  },\n  \"delay\": 0,\n  \"priority\": 1,\n  \"attempts\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs"]
+            },
+            "description": "Cria um job para execução imediata ou com delay.\n\n**Campos:**\n- `queue`: Nome da fila (default: jobs)\n- `name`: Nome do job (usado pelo worker para rotear)\n- `data`: Dados passados para o job\n- `delay`: Delay em ms (0 = imediato)\n- `priority`: Prioridade (menor = mais prioritário)\n- `attempts`: Número de tentativas em caso de falha"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Job (With Delay)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"queue\": \"{{queueName}}\",\n  \"name\": \"send-notification\",\n  \"data\": {\n    \"userId\": \"user-123\",\n    \"message\": \"Delayed notification\"\n  },\n  \"delay\": 30000,\n  \"priority\": 2,\n  \"attempts\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs"]
+            },
+            "description": "Cria um job para execução após 30 segundos."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Schedulers",
+      "description": "Endpoints para gerenciamento de schedulers (jobs agendados).",
+      "item": [
+        {
+          "name": "Create Scheduler (Interval)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schedulerKey\": \"test-job\",\n  \"queue\": \"{{queueName}}\",\n  \"every\": 10000,\n  \"jobName\": \"process-data\",\n  \"data\": {\n    \"message\": \"Hello from scheduler!\",\n    \"items\": [1, 2, 3]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedulers",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedulers"]
+            },
+            "description": "Cria um scheduler que executa a cada 10 segundos.\n\n**Campos:**\n- `schedulerKey`: Identificador único do scheduler\n- `queue`: Nome da fila\n- `every`: Intervalo em milissegundos\n- `jobName`: Nome do job (usado pelo worker para rotear)\n- `data`: Dados passados para o job"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Scheduler (Cron)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schedulerKey\": \"daily-report\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 9 * * *\",\n  \"jobName\": \"generate-report\",\n  \"data\": {\n    \"type\": \"daily\",\n    \"recipients\": [\"admin@example.com\"]\n  },\n  \"timezone\": \"America/Sao_Paulo\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedulers",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedulers"]
+            },
+            "description": "Cria um scheduler com cron pattern (todo dia às 9h).\n\n**Cron Format:** `minute hour day month weekday`\n\n**Exemplos:**\n- `0 9 * * *` - Todo dia às 9h\n- `*/5 * * * *` - A cada 5 minutos\n- `0 0 * * 0` - Todo domingo à meia-noite"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Scheduler (Notification)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schedulerKey\": \"hourly-notification\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 * * * *\",\n  \"jobName\": \"send-notification\",\n  \"data\": {\n    \"channel\": \"push\",\n    \"message\": \"Lembrete de hora em hora\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedulers",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedulers"]
+            },
+            "description": "Cria um scheduler de notificação que executa a cada hora."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Scheduler (Cleanup)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schedulerKey\": \"weekly-cleanup\",\n  \"queue\": \"{{queueName}}\",\n  \"pattern\": \"0 3 * * 0\",\n  \"jobName\": \"cleanup\",\n  \"data\": {\n    \"table\": \"logs\",\n    \"olderThanDays\": 30\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedulers",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedulers"]
+            },
+            "description": "Cria um scheduler de limpeza semanal (todo domingo às 3h da manhã)."
+          },
+          "response": []
+        },
+        {
+          "name": "List Schedulers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/schedulers?queue={{queueName}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedulers"],
+              "query": [
+                {
+                  "key": "queue",
+                  "value": "{{queueName}}"
+                }
+              ]
+            },
+            "description": "Lista todos os schedulers ativos.\n\n**Query params:**\n- `queue`: Nome da fila (default: jobs)\n\n**Retorna:**\n- `count`: Total de schedulers\n- `schedulers`: Array com detalhes de cada scheduler"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Scheduler",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/schedulers/test-job",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedulers", "test-job"]
+            },
+            "description": "Remove um scheduler pelo seu key.\n\nAltere `test-job` na URL para o key do scheduler que deseja remover."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Queues",
+      "description": "Endpoints para gerenciamento de filas.",
+      "item": [
+        {
+          "name": "Get Queue Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/queues/{{queueName}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["queues", "{{queueName}}", "stats"]
+            },
+            "description": "Obter estatísticas de uma fila.\n\n**Retorna:**\n- `waiting`: Jobs aguardando\n- `active`: Jobs em processamento\n- `delayed`: Jobs com delay\n- `completed`: Jobs concluídos\n- `failed`: Jobs com falha\n- `paused`: Se a fila está pausada"
+          },
+          "response": []
+        },
+        {
+          "name": "Drain Queue",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/queues/{{queueName}}/drain",
+              "host": ["{{baseUrl}}"],
+              "path": ["queues", "{{queueName}}", "drain"]
+            },
+            "description": "Remover TODOS os jobs não-ativos de uma fila.\n\nRemove jobs de: waiting, priority, delayed, completed e failed.\nJobs ativos (em processamento) NÃO são afetados.\n\n**CUIDADO:** Esta operação é irreversível.\n\n**Retorna:**\n- `removedCount`: Número de jobs removidos\n- `statsBefore`: Contagem de jobs antes do drain"
+          },
+          "response": []
+        },
+        {
+          "name": "Pause Queue",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/queues/{{queueName}}/pause",
+              "host": ["{{baseUrl}}"],
+              "path": ["queues", "{{queueName}}", "pause"]
+            },
+            "description": "Pausar uma fila. Jobs não serão processados até retomar."
+          },
+          "response": []
+        },
+        {
+          "name": "Resume Queue",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/queues/{{queueName}}/resume",
+              "host": ["{{baseUrl}}"],
+              "path": ["queues", "{{queueName}}", "resume"]
+            },
+            "description": "Retomar uma fila pausada."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dead Letter Queue (DLQ)",
+      "description": "Endpoints para gerenciamento de jobs com falha.",
+      "item": [
+        {
+          "name": "List Failed Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/queues/{{queueName}}/failed?offset=0&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["queues", "{{queueName}}", "failed"],
+              "query": [
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Listar jobs com falha (DLQ).\n\n**Query params:**\n- `offset`: Offset para paginação (default: 0)\n- `limit`: Limite de resultados (default: 20, max: 100)"
+          },
+          "response": []
+        },
+        {
+          "name": "Retry Failed Job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/queues/{{queueName}}/failed/{{failedJobId}}/retry",
+              "host": ["{{baseUrl}}"],
+              "path": ["queues", "{{queueName}}", "failed", "{{failedJobId}}", "retry"]
+            },
+            "description": "Retry um job com falha (move de volta para a fila waiting).\n\nSubstitua `{{failedJobId}}` pelo ID do job."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Failed Job",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/queues/{{queueName}}/failed/{{failedJobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["queues", "{{queueName}}", "failed", "{{failedJobId}}"]
+            },
+            "description": "Remover um job com falha permanentemente.\n\nSubstitua `{{failedJobId}}` pelo ID do job."
+          },
+          "response": []
+        },
+        {
+          "name": "Clear All Failed Jobs",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/queues/{{queueName}}/failed",
+              "host": ["{{baseUrl}}"],
+              "path": ["queues", "{{queueName}}", "failed"]
+            },
+            "description": "Limpar todos os jobs com falha da DLQ.\n\n**CUIDADO:** Esta operação remove permanentemente todos os jobs com falha."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "description": "Endpoints de monitoramento.",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Verifica se o serviço está funcionando."
+          },
+          "response": []
+        },
+        {
+          "name": "Readiness Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ready",
+              "host": ["{{baseUrl}}"],
+              "path": ["ready"]
+            },
+            "description": "Verifica se o serviço está pronto para receber requisições."
+          },
+          "response": []
+        },
+        {
+          "name": "Liveness Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/live",
+              "host": ["{{baseUrl}}"],
+              "path": ["live"]
+            },
+            "description": "Verifica se o serviço está vivo (para Kubernetes)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

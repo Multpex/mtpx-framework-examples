@@ -1,0 +1,25 @@
+{
+  "name": "mtpx-msg-channels",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Example of emit vs channel messaging with svc-a, svc-b and svc-c",
+  "main": "src/api.ts",
+  "scripts": {
+    "dev": "bun run --hot src/api.ts",
+    "dev:svc_a": "SERVICE=svc_a bun run --hot src/api.ts",
+    "dev:svc_b": "SERVICE=svc_b bun run --hot src/api.ts",
+    "dev:svc_c": "SERVICE=svc_c bun run --hot src/api.ts",
+    "start": "bun run src/api.ts",
+    "start:svc_a": "SERVICE=svc_a bun run src/api.ts",
+    "start:svc_b": "SERVICE=svc_b bun run src/api.ts",
+    "start:svc_c": "SERVICE=svc_c bun run src/api.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@multpex/typescript-sdk": "file:../../sdk-typescript"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.0",
+    "typescript": "^5.3.0"
+  }
+}

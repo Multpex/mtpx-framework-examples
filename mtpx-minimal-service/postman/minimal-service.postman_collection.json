@@ -1,0 +1,411 @@
+{
+  "info": {
+    "_postman_id": "minimal-service-collection",
+    "name": "mtpx minimal service api",
+    "description": "Collection para testar o exemplo minimal-service do Multpex Framework.\n\n## Endpoints\n\n- **GET /minimal-service/items** - Listar items\n- **GET /minimal-service/items/:id** - Buscar item por ID\n- **POST /minimal-service/items** - Criar item (com validação Zod)\n- **DELETE /minimal-service/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-service/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-service/health** - Health check\n- **GET /minimal-service/ready** - Readiness check\n- **GET /minimal-service/live** - Liveness check",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Health check returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Status is healthy', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal('healthy');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "health"]
+            }
+          }
+        },
+        {
+          "name": "Readiness Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Readiness returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/ready",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "ready"]
+            }
+          }
+        },
+        {
+          "name": "Liveness Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Liveness returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/live",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "live"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Items",
+      "item": [
+        {
+          "name": "List Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('List returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has items array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.items).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Response has instanceId', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.instanceId).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "items"]
+            }
+          }
+        },
+        {
+          "name": "List Items (Filter by Name)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/items?name=widget",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "items"],
+              "query": [
+                { "key": "name", "value": "widget" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Item by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Get item returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has item data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.equal('1');",
+                  "    pm.expect(jsonData.name).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/items/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "items", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Item Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns 404 or error', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.equal('Not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/items/nonexistent",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "items", "nonexistent"]
+            }
+          }
+        },
+        {
+          "name": "Create Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Create returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has new item', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.expect(jsonData.name).to.equal('New Product');",
+                  "    pm.expect(jsonData.price).to.equal(49.99);",
+                  "});",
+                  "",
+                  "// Save item ID for later tests",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.environment.set('itemId', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Product\",\n  \"price\": 49.99,\n  \"tags\": [\"new\", \"featured\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "items"]
+            }
+          }
+        },
+        {
+          "name": "Create Item (Validation Error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Validation fails', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"price\": -10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "items"]
+            },
+            "description": "Testa validação Zod: name vazio e price negativo devem falhar"
+          }
+        },
+        {
+          "name": "Delete Item (No Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns 401 unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/items/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "items", "1"]
+            },
+            "description": "Deve falhar sem autenticação"
+          }
+        },
+        {
+          "name": "Delete Item (With Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Delete successful or not found', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/items/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "items", "{{itemId}}"]
+            },
+            "description": "Requer auth com role admin. Usa itemId salvo do teste Create."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Stats (No Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns 401 unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "admin", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Stats (With Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns stats', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.totalItems).to.be.a('number');",
+                  "    pm.expect(jsonData.totalValue).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-service/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-service", "admin", "stats"]
+            },
+            "description": "Requer auth com role admin"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "minimal-service-example",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Minimal example of @multpex/typescript-sdk features",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "build": "bun build ./src/index.ts --target=bun --outdir=./dist --minify --bytecode --sourcemap=linked",
+    "build:prod": "NODE_ENV=production bun run build",
+    "start:prod": "bun run ./dist/index.js",
+    "clean": "rm -rf dist",
+    "test": "bun test tests/",
+    "test:integration": "bun test tests/integration.test.ts",
+    "postman:test": "bunx newman run postman/minimal-service.postman_collection.json -e postman/local.postman_environment.json",
+    "postman:test:verbose": "bunx newman run postman/minimal-service.postman_collection.json -e postman/local.postman_environment.json --verbose"
+  },
+  "dependencies": {
+    "@multpex/typescript-sdk": "file:../../sdk-typescript"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "@types/jsonwebtoken": "^9.0.0",
+    "typescript": "^5.3.0"
+  }
+}

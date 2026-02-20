@@ -1,0 +1,32 @@
+{
+  "name": "moleculer-style-example",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Moleculer-style microservices example with service loader, PostgreSQL, NATS events and caching",
+  "main": "src/main.ts",
+  "scripts": {
+    "dev": "bun run --hot src/main.ts",
+    "start": "bun run src/main.ts",
+    "start:users": "SERVICE=users bun run src/main.ts",
+    "start:orders": "SERVICE=orders bun run src/main.ts",
+    "start:products": "SERVICE=products bun run src/main.ts",
+    "build": "bun build ./src/main.ts --target=bun --outdir=./dist --minify --bytecode --sourcemap=linked",
+    "build:prod": "NODE_ENV=production bun run build",
+    "start:prod": "bun run ./dist/main.js",
+    "start:prod:users": "SERVICE=users bun run ./dist/main.js",
+    "start:prod:orders": "SERVICE=orders bun run ./dist/main.js",
+    "start:prod:products": "SERVICE=products bun run ./dist/main.js",
+    "clean": "rm -rf dist",
+    "postman:test": "bunx newman run postman/Multpex-Moleculer.postman_collection.json -e postman/Multpex-Local.postman_environment.json",
+    "postman:test:verbose": "bunx newman run postman/Multpex-Moleculer.postman_collection.json -e postman/Multpex-Local.postman_environment.json --verbose"
+  },
+  "dependencies": {
+    "@multpex/typescript-sdk": "file:../../sdk-typescript",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}

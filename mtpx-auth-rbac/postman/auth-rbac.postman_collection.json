@@ -1,0 +1,409 @@
+{
+  "info": {
+    "_postman_id": "auth-rbac-collection",
+    "name": "mtpx auth rbac example",
+    "description": "Collection para testar o exemplo auth-rbac do Multpex Framework.\n\nDemonstra autorização baseada em roles (RBAC) integrada com Keycloak.\n\n## Roles\n\n- **admin**: Acesso total\n- **editor**: Criar e editar documentos\n- **viewer**: Somente leitura\n\n## Endpoints Públicos\n\n- GET /auth-example/health\n\n## Endpoints Viewer+\n\n- GET /auth-example/documents\n- GET /auth-example/documents/:id\n- GET /auth-example/documents/export\n\n## Endpoints Editor+\n\n- POST /auth-example/documents\n- PUT /auth-example/documents/:id\n\n## Endpoints Admin\n\n- DELETE /auth-example/documents/:id\n- GET /auth-example/admin/settings\n- GET /auth-example/admin/stats\n\n## Endpoints Autenticado\n\n- GET /auth-example/profile/me",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Health check returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Status is healthy', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal('healthy');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents - Viewer",
+      "description": "Endpoints acessíveis por viewer, editor e admin",
+      "item": [
+        {
+          "name": "List Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('List returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has documents array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.documents).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Response has meta', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.meta.total).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "documents"]
+            },
+            "description": "Requer role: viewer, editor ou admin"
+          }
+        },
+        {
+          "name": "Get Document by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns 200 or 404', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/documents/seed-1",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "documents", "seed-1"]
+            },
+            "description": "Requer role: viewer+ (via withAuthorization/roles)"
+          }
+        },
+        {
+          "name": "Get Document Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns 404', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.equal('Document not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/documents/nonexistent",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "documents", "nonexistent"]
+            }
+          }
+        },
+        {
+          "name": "Export Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Export returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has format', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.format).to.be.oneOf(['full', 'standard', 'summary']);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/documents/export",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "documents", "export"]
+            },
+            "description": "Requer autenticação. Retorna formato diferente por role:\n- admin: full (com metadados)\n- editor: standard (sem createdBy)\n- viewer: summary (apenas títulos)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents - Editor",
+      "description": "Endpoints acessíveis por editor e admin",
+      "item": [
+        {
+          "name": "Create Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Create returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has document data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.expect(jsonData.title).to.equal('Meu Documento');",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.environment.set('documentId', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Meu Documento\",\n  \"content\": \"Conteúdo de exemplo para testar RBAC\",\n  \"tags\": [\"teste\", \"rbac\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "documents"]
+            },
+            "description": "Requer role: editor ou admin. Valida título (1-200 chars) e conteúdo."
+          }
+        },
+        {
+          "name": "Update Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Update returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Title was updated', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.equal('Documento Atualizado');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Documento Atualizado\",\n  \"tags\": [\"atualizado\", \"rbac\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/documents/{{documentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "documents", "{{documentId}}"]
+            },
+            "description": "Requer role: editor+ (via withAuthorization/roles). Campos opcionais."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents - Admin",
+      "description": "Endpoints exclusivos para admin",
+      "item": [
+        {
+          "name": "Delete Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Delete returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Deleted successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/documents/{{documentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "documents", "{{documentId}}"]
+            },
+            "description": "Requer role: admin"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "description": "Endpoints administrativos",
+      "item": [
+        {
+          "name": "Get Settings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Settings returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Has settings data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.maxDocuments).to.be.a('number');",
+                  "    pm.expect(jsonData.features).to.be.an('object');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/admin/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "admin", "settings"]
+            },
+            "description": "Requer role: admin (usa adminOnly wrapper)"
+          }
+        },
+        {
+          "name": "Get Stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Stats returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Has stats data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.totalDocuments).to.be.a('number');",
+                  "    pm.expect(jsonData.documentsPerUser).to.be.an('object');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "admin", "stats"]
+            },
+            "description": "Requer autenticação + role admin (verificação manual via requireAdmin)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Profile returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Has profile data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.roles).to.be.an('array');",
+                  "    pm.expect(jsonData.permissions).to.be.an('object');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth-example/profile/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth-example", "profile", "me"]
+            },
+            "description": "Requer autenticação (qualquer role). Retorna perfil, roles, permissões e documentos do usuário."
+          }
+        }
+      ]
+    }
+  ]
+}
