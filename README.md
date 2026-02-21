@@ -15,6 +15,7 @@ Cada pasta neste repositorio mostra um caso de uso pratico do `@multpex/typescri
 | [mtpx-msg-channels](./mtpx-msg-channels) | Diferenca entre `emit` e `sendToChannel` | [Abrir](./mtpx-msg-channels/README.md) |
 | [mtpx-scheduled-jobs](./mtpx-scheduled-jobs) | Jobs agendados, scheduler e worker | [Abrir](./mtpx-scheduled-jobs/README.md) |
 | [mtpx-websocket-chat](./mtpx-websocket-chat) | Exemplo de API WebSocket do SDK | [Abrir](./mtpx-websocket-chat/README.md) |
+| [mtpx-db-env-selector](./mtpx-db-env-selector) | Seleciona database via env var e valida credencial no keystore | [Abrir](./mtpx-db-env-selector/src/index.ts) |
 
 ## Pre-requisitos
 

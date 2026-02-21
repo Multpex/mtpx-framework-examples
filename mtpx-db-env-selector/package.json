@@ -1,0 +1,19 @@
+{
+  "name": "mtpx-db-env-selector",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Example app selecting linkd database by environment variable and keystore credential",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@multpex/typescript-sdk": "file:../../sdk-typescript"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.0",
+    "typescript": "^5.3.0"
+  }
+}
