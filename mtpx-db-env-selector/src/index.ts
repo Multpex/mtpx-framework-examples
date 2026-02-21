@@ -1,23 +1,7 @@
 import {
   createApp,
-  isValidDatabaseName,
-  resolveDatabaseNameFromEnv,
   setupGracefulShutdown,
 } from "@multpex/typescript-sdk";
-
-const databaseName = resolveDatabaseNameFromEnv();
-
-if (!databaseName) {
-  throw new Error(
-    "Defina MULTPEX_DATABASE_NAME (ou MTPX_DATABASE_NAME / MULTPEX_DATABASE / DATABASE_NAME) com o nome do database.",
-  );
-}
-
-if (!isValidDatabaseName(databaseName)) {
-  throw new Error(
-    `Database inválido: '${databaseName}'. Use <provider>-<db-server-type>-<database-name> (ex: docker-pg-test, k8s-pg-voucher, local-pg-voucher, docker-mysql-voucher).`,
-  );
-}
 
 interface ItemRow extends Record<string, unknown> {
   id: string;
@@ -31,7 +15,6 @@ const app = createApp({
   namespace: "db-env-selector",
   database: {
     allowRaw: true,
-    defaultDatabase: databaseName,
   },
   logging: {
     level: "info",
@@ -42,6 +25,7 @@ const app = createApp({
 
 app.afterStart(async (ctx) => {
   let exitCode = 0;
+  const databaseName = ctx.env.required("LINKD_DATABASE_NAME");
 
   try {
     const database = ctx.db;
@@ -53,17 +37,13 @@ app.afterStart(async (ctx) => {
     const tableName = "sample_items";
     const itemId = "item-1";
 
-    await database.raw(
-      `
-        CREATE TABLE IF NOT EXISTS ${tableName} (
-          id VARCHAR(64) PRIMARY KEY,
-          name VARCHAR(120) NOT NULL,
-          quantity INTEGER NOT NULL,
-          updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
-      `,
-      [],
-    );
+    // Schema builder API — identifiers são auto-quoted, imune a SQL injection
+    await database.schema.createTableIfNotExists(tableName, (t) => {
+      t.string("id", 64).primary();
+      t.string("name", 120).notNullable();
+      t.integer("quantity").notNullable();
+      t.timestamp("updated_at").notNullable().default("CURRENT_TIMESTAMP");
+    });
 
     const table = database.table<ItemRow>(tableName);
 
@@ -107,5 +87,5 @@ await app.start();
 setupGracefulShutdown(app);
 
 app.logger.info("db-env-selector iniciado", {
-  databaseName,
+  databaseName: app.env.string("LINKD_DATABASE_NAME"),
 });
