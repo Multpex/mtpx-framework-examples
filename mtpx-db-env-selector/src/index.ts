@@ -19,6 +19,13 @@ if (!isValidDatabaseName(databaseName)) {
   );
 }
 
+interface ItemRow extends Record<string, unknown> {
+  id: string;
+  name: string;
+  quantity: number;
+  updated_at?: string;
+}
+
 const app = createApp({
   name: "db-env-selector",
   namespace: "db-env-selector",
@@ -58,12 +65,7 @@ app.afterStart(async (ctx) => {
       [],
     );
 
-    const table = database.table<{
-      id: string;
-      name: string;
-      quantity: number;
-      updated_at?: string;
-    }>(tableName);
+    const table = database.table<ItemRow>(tableName);
 
     const inserted = await table.insertOrNull(
       { id: itemId, name: "sample-upsert", quantity: 42 },
