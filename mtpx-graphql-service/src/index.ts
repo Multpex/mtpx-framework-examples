@@ -12,6 +12,8 @@
 import {
   createService,
   z,
+  handleCommonStartupError,
+  env,
   // GraphQL helpers para definir metadata
   gqlQuery,
   gqlMutation,
@@ -328,4 +330,12 @@ service.beforeStart(async () => {
   });
 });
 
-await service.start();
+try {
+  await service.start();
+} catch (error) {
+  handleCommonStartupError(error, {
+    dependencyName: "Linkd",
+    endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
+    hint: "Inicie o Linkd e tente novamente.",
+  });
+}

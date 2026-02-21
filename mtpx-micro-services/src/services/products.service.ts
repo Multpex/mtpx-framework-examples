@@ -10,7 +10,7 @@
  */
 
 import { z } from "zod";
-import { createService } from "@multpex/typescript-sdk";
+import { createService, env } from "@multpex/typescript-sdk";
 import type { TypedServiceContext, EventContext } from "@multpex/typescript-sdk";
 import type { Schema } from "../db/schema.js";
 
@@ -42,7 +42,7 @@ const AdjustStockSchema = z.object({
   reason: z.string().optional(),
 });
 
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const IS_PRODUCTION = env.string("NODE_ENV", "development") === "production";
 
 // Create service with integrated logging
 const service = createService<Schema>({

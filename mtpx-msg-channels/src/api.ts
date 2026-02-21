@@ -1,6 +1,7 @@
 import {
 	configureReconnectCoordinator,
 	startServices,
+	env,
 } from "@multpex/typescript-sdk";
 
 function formatError(error: unknown): string {
@@ -23,15 +24,15 @@ function formatError(error: unknown): string {
 		maxRetryDelayMs: 5000,
 		jitterRatio: 0.3,
 		logger:
-			process.env.DEBUG === "true"
+			env.bool("DEBUG")
 				? (message) => console.log(`[ReconnectCoordinator] ${message}`)
 				: undefined,
 	});
 
 	const loader = await startServices({
 		servicesDir: "./src",
-		namespace: process.env.LINKD_NAMESPACE ?? "mtpx-msg-channels",
-		debug: process.env.DEBUG === "true",
+		namespace: env.string("LINKD_NAMESPACE", "mtpx-msg-channels"),
+		debug: env.bool("DEBUG"),
 		patterns: ["svc_*.ts"],
 	});
 

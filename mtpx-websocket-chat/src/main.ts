@@ -4,7 +4,11 @@
  * Demonstrates the WebSocket API following the same pattern as HTTP actions.
  */
 
-import { startServices, configureReconnectCoordinator } from "@multpex/typescript-sdk";
+import {
+  startServices,
+  configureReconnectCoordinator,
+  env,
+} from "@multpex/typescript-sdk";
 
 (async () => {
   console.log("\n🔌 Starting WebSocket Chat Example\n");
@@ -21,8 +25,8 @@ import { startServices, configureReconnectCoordinator } from "@multpex/typescrip
   // Load and start all services
   const loader = await startServices({
     servicesDir: "./src/services",
-    namespace: process.env.LINKD_NAMESPACE ?? "websocket-chat",
-    debug: process.env.DEBUG === "true",
+    namespace: env.string("LINKD_NAMESPACE", "websocket-chat"),
+    debug: env.bool("DEBUG"),
   });
 
   if (loader.size === 0) {

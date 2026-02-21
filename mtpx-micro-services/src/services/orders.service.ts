@@ -10,7 +10,7 @@
  */
 
 import { z } from "zod";
-import { createService } from "@multpex/typescript-sdk";
+import { createService, env } from "@multpex/typescript-sdk";
 import type { TypedServiceContext, EventContext } from "@multpex/typescript-sdk";
 import type { Schema } from "../db/schema.js";
 
@@ -64,7 +64,7 @@ const UpdateOrderStatusSchema = z.object({
 // Context type alias for convenience
 type Context = TypedServiceContext<Schema>;
 
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const IS_PRODUCTION = env.string("NODE_ENV", "development") === "production";
 
 // Create typed service - ctx.db is automatically TypedDatabase<Schema>
 const service = createService<Schema>({

@@ -3,14 +3,16 @@ import {
   setupGracefulShutdown,
   requestLogger,
   requireRole,
+  handleCommonStartupError,
+  env,
   z,
   type Context,
   type EventContext,
   type EventSubscriptionContext,
 } from "@multpex/typescript-sdk";
 
-const INSTANCE_ID = process.env.INSTANCE_ID || crypto.randomUUID().slice(0, 8);
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const INSTANCE_ID = env.string("INSTANCE_ID", crypto.randomUUID().slice(0, 8));
+const IS_PRODUCTION = env.string("NODE_ENV", "development") === "production";
 
 const service = createApp({
   name: "minimal-app",
@@ -192,7 +194,7 @@ service.addHealthCheck("database", async () => ({
   details: { connections: 5 },
 }));
 
-const mockMode = process.env.MOCK_MODE === "true";
+const mockMode = env.bool("MOCK_MODE");
 
 if (mockMode) {
   console.log(
@@ -205,25 +207,33 @@ if (mockMode) {
   console.log("Registered actions:", service.getActionNames().join(", "));
   console.log("Event subscriptions:", service.getEventNames().join(", "));
 } else {
-  await service.start();
+  try {
+    await service.start();
 
-  await service.cors({ allowAnyOrigin: true });
+    await service.cors({ allowAnyOrigin: true });
 
-  // Configurar cache DEPOIS de start() (requer conexão ao sidecar)
-  await service.cache({
-    defaultPolicy: {
-      enabled: true,
-      defaultTtlSeconds: 60,
-    },
-    endpoints: [
-      { action: "list", ttlSeconds: 60 },  // 5 min para listagem
-      { action: "create", ttlSeconds: -1 }, // Nunca cachear mutations
-      { action: "delete", ttlSeconds: -1 },
-    ],
-  });
+    // Configurar cache DEPOIS de start() (requer conexão ao sidecar)
+    await service.cache({
+      defaultPolicy: {
+        enabled: true,
+        defaultTtlSeconds: 60,
+      },
+      endpoints: [
+        { action: "list", ttlSeconds: 60 },  // 5 min para listagem
+        { action: "create", ttlSeconds: -1 }, // Nunca cachear mutations
+        { action: "delete", ttlSeconds: -1 },
+      ],
+    });
 
-  console.log(`🚀 Service running (Node: ${service.getNodeId()})`);
+    console.log(`🚀 Service running (Node: ${service.getNodeId()})`);
 
-  // Setup graceful shutdown (safe for hot reload - only registers once)
-  setupGracefulShutdown(service);
+    // Setup graceful shutdown (safe for hot reload - only registers once)
+    setupGracefulShutdown(service);
+  } catch (error) {
+    handleCommonStartupError(error, {
+      dependencyName: "Linkd",
+      endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
+      hint: "Inicie o Linkd e tente novamente.",
+    });
+  }
 }

@@ -9,7 +9,7 @@
  */
 
 import { z } from "zod";
-import { createService, ConflictError, NotFoundError } from "@multpex/typescript-sdk";
+import { createService, ConflictError, NotFoundError, env } from "@multpex/typescript-sdk";
 import type { TypedServiceContext, EventContext } from "@multpex/typescript-sdk";
 import type { Schema } from "../db/schema.js";
 
@@ -30,7 +30,7 @@ const UpdateUserSchema = z.object({
   status: z.enum(["active", "inactive", "suspended"]).optional(),
 });
 
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const IS_PRODUCTION = env.string("NODE_ENV", "development") === "production";
 
 // Create service with integrated logging
 const service = createService<Schema>({

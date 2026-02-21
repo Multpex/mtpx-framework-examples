@@ -10,7 +10,12 @@
  */
 
 import { z } from "zod";
-import { createService, ForbiddenError, UnauthorizedError } from "@multpex/typescript-sdk";
+import {
+  createService,
+  ForbiddenError,
+  UnauthorizedError,
+  env,
+} from "@multpex/typescript-sdk";
 import type {
   WebSocketContext,
   WebSocketMiddleware,
@@ -56,7 +61,7 @@ const HistorySchema = z.object({
 // Service Configuration
 // =============================================================================
 
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const IS_PRODUCTION = env.string("NODE_ENV", "development") === "production";
 
 const service = createService<Schema>({
   name: "chat",

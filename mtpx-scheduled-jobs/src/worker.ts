@@ -12,6 +12,8 @@ import {
   JobHandler,
   type JobHandlerContext,
   setupGracefulShutdown,
+  handleCommonStartupError,
+  env,
 } from "@multpex/typescript-sdk";
 
 // ============================================================================
@@ -175,7 +177,7 @@ function sleep(ms: number): Promise<void> {
 // Configuration
 // ============================================================================
 
-const QUEUE_NAME = process.env.QUEUE_NAME || "jobs";
+const QUEUE_NAME = env.string("QUEUE_NAME", "jobs");
 
 // ============================================================================
 // Service Setup
@@ -215,24 +217,9 @@ setupGracefulShutdown(service);
 try {
   await service.start();
 } catch (error) {
-  const err = error as { code?: string; message?: string };
-  const errorMessage = err?.message ?? String(error);
-  const linkdAddress = process.env.LINKD_URL || "unix:/tmp/linkd.sock";
-
-  const isLinkdConnectionError =
-    err?.code === "ENOENT" ||
-    errorMessage.includes("Connection timeout") ||
-    errorMessage.includes("Failed to connect") ||
-    errorMessage.includes("/tmp/linkd.sock");
-
-  if (isLinkdConnectionError) {
-    console.error("❌ Falha ao conectar com o Linkd.");
-    console.error(`   Endpoint configurado: ${linkdAddress}`);
-    console.error(
-      "   Inicie o Linkd e tente novamente. Exemplo: cargo run -- --redis-url redis://localhost:6379",
-    );
-    process.exit(1);
-  }
-
-  throw error;
+  handleCommonStartupError(error, {
+    dependencyName: "Linkd",
+    endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
+    hint: "Inicie o Linkd e tente novamente.",
+  });
 }

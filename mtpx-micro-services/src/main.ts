@@ -10,6 +10,7 @@
 import {
   configureReconnectCoordinator,
   startServices,
+  env,
 } from "@multpex/typescript-sdk";
 import { migrations } from "./db/migrations.js";
 
@@ -33,15 +34,15 @@ function formatError(error: unknown): string {
     maxRetryDelayMs: 5000,
     jitterRatio: 0.3,
     logger:
-      process.env.DEBUG === "true"
+      env.bool("DEBUG")
         ? (message) => console.log(`[ReconnectCoordinator] ${message}`)
         : undefined,
   });
 
   const loader = await startServices({
     servicesDir: "./src/services",
-    namespace: process.env.LINKD_NAMESPACE ?? "moleculer-demo",
-    debug: process.env.DEBUG === "true",
+    namespace: env.string("LINKD_NAMESPACE", "moleculer-demo"),
+    debug: env.bool("DEBUG"),
   });
 
   if (loader.size === 0) {

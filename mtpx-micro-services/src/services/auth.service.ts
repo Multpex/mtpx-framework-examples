@@ -14,12 +14,13 @@
  * Linkd handles all identity provider communication.
  */
 
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const IS_PRODUCTION = env.string("NODE_ENV", "development") === "production";
 
 import { z } from "zod";
 import {
   createService,
   UnauthorizedError,
+  env,
   type AuthUser,
 } from "@multpex/typescript-sdk";
 import type { TypedServiceContext } from "@multpex/typescript-sdk";
