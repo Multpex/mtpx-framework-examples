@@ -47,17 +47,10 @@ app.afterStart(async (ctx) => {
 
     const table = database.table<ItemRow>(tableName);
 
-    const inserted = await table.insertOrNull(
+    await table.upsert(
       { id: itemId, name: "sample-upsert", quantity: 42 },
       "id",
     );
-
-    if (!inserted) {
-      await table.whereEquals("id", itemId).update({
-        name: "sample-upsert",
-        quantity: 42,
-      });
-    }
 
     const selected = await table
       .select("id", "name", "quantity")
