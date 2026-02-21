@@ -219,11 +219,12 @@ service.action(
       returnType: { type: "Book", required: true },
     }),
   },
-  async (ctx: Context<CreateBookInput>) => {
+  async (ctx) => {
+    const input = createBookSchema.parse(ctx.body);
     const id = crypto.randomUUID();
     const book: Book = {
       id,
-      ...ctx.body,
+      ...input,
       createdAt: new Date(),
     };
     books.set(id, book);
