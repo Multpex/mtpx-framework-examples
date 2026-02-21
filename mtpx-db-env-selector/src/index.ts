@@ -3,8 +3,6 @@ import {
   isValidDatabaseName,
   resolveDatabaseNameFromEnv,
   setupGracefulShutdown,
-  type Context,
-  type ServiceContext,
 } from "@multpex/typescript-sdk";
 
 const databaseName = resolveDatabaseNameFromEnv();
@@ -17,13 +15,9 @@ if (!databaseName) {
 
 if (!isValidDatabaseName(databaseName)) {
   throw new Error(
-    `Database inválido: '${databaseName}'. Use <provider>-<db-server-type>-<database-name> (ex: rds-mysql-voucher, k8s-pg-voucher, local-pg-voucher, docker-mysql-voucher).`,
+    `Database inválido: '${databaseName}'. Use <provider>-<db-server-type>-<database-name> (ex: docker-pg-test, k8s-pg-voucher, local-pg-voucher, docker-mysql-voucher).`,
   );
 }
-
-const databaseServerName = process.env.MULTPEX_DB_SERVER ?? "default";
-const databaseCredentialName =
-  process.env.MULTPEX_DATABASE_KEYSTORE_NAME ?? `${databaseServerName}:${databaseName}`;
 
 const app = createApp({
   name: "db-env-selector",
@@ -39,56 +33,77 @@ const app = createApp({
   },
 });
 
-app.beforeStart(async () => {
-  const credential = await app.keystore.get("database", databaseCredentialName);
-  const credentialDatabase = String(credential.database ?? "");
+app.afterStart(async (ctx) => {
+  let exitCode = 0;
 
-  if (!credentialDatabase) {
-    throw new Error(
-      `Credencial 'database/${databaseCredentialName}' não possui campo 'database' no keystore.`,
-    );
-  }
+  try {
+    const database = ctx.db;
 
-  if (credentialDatabase !== databaseName) {
-    throw new Error(
-      `Mismatch de database: env='${databaseName}' keystore='${credentialDatabase}' (credential: database/${databaseCredentialName}).`,
-    );
-  }
-
-  app.logger.info("Database selecionado por env e validado no keystore", {
-    databaseName,
-    databaseCredentialName,
-  });
-});
-
-app.action(
-  "db-health",
-  { route: "/db-env-selector/db-health", method: "GET" },
-  async (ctx: Context) => {
-    const serviceCtx = ctx as ServiceContext;
-
-    if (!serviceCtx.db) {
-      return { ok: false, error: "ctx.db indisponível" };
+    if (!database) {
+      throw new Error("Database client indisponível no contexto de lifecycle.");
     }
 
-    const ping = await serviceCtx.db.raw<{ ok: number }>({
-      sql: "SELECT 1 AS ok",
-      bindings: [],
-    });
+    const tableName = "sample_items";
+    const itemId = "item-1";
 
-    return {
-      ok: true,
-      selectedDatabase: databaseName,
-      keystoreCredential: databaseCredentialName,
-      ping: ping[0]?.ok ?? 0,
-    };
-  },
-);
+    await database.raw(
+      `
+        CREATE TABLE IF NOT EXISTS ${tableName} (
+          id VARCHAR(64) PRIMARY KEY,
+          name VARCHAR(120) NOT NULL,
+          quantity INTEGER NOT NULL,
+          updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `,
+      [],
+    );
+
+    const table = database.table<{
+      id: string;
+      name: string;
+      quantity: number;
+      updated_at?: string;
+    }>(tableName);
+
+    const inserted = await table.insertOrNull(
+      { id: itemId, name: "sample-upsert", quantity: 42 },
+      "id",
+    );
+
+    if (!inserted) {
+      await table.whereEquals("id", itemId).update({
+        name: "sample-upsert",
+        quantity: 42,
+      });
+    }
+
+    const selected = await table
+      .select("id", "name", "quantity")
+      .whereEquals("id", itemId)
+      .first();
+
+    await table.whereEquals("id", itemId).delete();
+
+    app.logger.info("Fluxo SQL concluído", {
+      databaseName,
+      tableName,
+      selected,
+    });
+  } catch (error) {
+    exitCode = 1;
+    app.logger.error("Falha ao executar fluxo SQL", {
+      databaseName,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  } finally {
+    await app.stop();
+    process.exit(exitCode);
+  }
+});
 
 await app.start();
 setupGracefulShutdown(app);
 
 app.logger.info("db-env-selector iniciado", {
   databaseName,
-  databaseCredentialName,
 });
