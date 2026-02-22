@@ -11,7 +11,9 @@
  */
 
 import { createService } from "@multpex/typescript-sdk";
-import type { ChannelContext, EventContext } from "@multpex/typescript-sdk";
+import type { TypedServiceContext, ChannelContext, EventContext } from "@multpex/typescript-sdk";
+import type { Schema } from "../db/schema.js";
+
 
 // Notification payload types
 interface EmailNotification {
@@ -26,8 +28,10 @@ interface SmsNotification {
   message: string;
 }
 
+type Context = TypedServiceContext<Schema>;
+
 // Create service - SDK auto-configures health and logging from defaults
-const service = createService({
+const service = createService<Schema>({
   name: "notifications",
   version: "1.0.0",
   namespace: "microservice-demo"
@@ -41,7 +45,7 @@ const service = createService({
 service.action(
   "sendEmail",
   { route: "/notifications/email", method: "POST" },
-  async (ctx) => {
+  async (ctx: Context) => {
     const { to, subject, body, priority } = ctx.body as EmailNotification;
 
     if (!to || !subject || !body) {
@@ -68,7 +72,7 @@ service.action(
 service.action(
   "sendSms",
   { route: "/notifications/sms", method: "POST" },
-  async (ctx) => {
+  async (ctx: Context) => {
     const { phone, message } = ctx.body as SmsNotification;
 
     if (!phone || !message) {

@@ -165,7 +165,7 @@ service.action("get", { route: "/orders/:id", method: "GET", auth: true }, async
  * Create new order
  * POST /orders
  */
-service.post("/orders", { auth: true}, async (ctx) => {
+service.post("/orders", { auth: true}, async (ctx: Context) => {
   const data = CreateOrderSchema.parse(ctx.body);
 
   // Validate user exists via inter-service call

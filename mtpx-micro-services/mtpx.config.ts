@@ -3,31 +3,20 @@
  *
  * Notes:
  * - db:generate / db:push use schemaFile/output/url.
- * - db:migrate uses migrationsPath and can fan out with --all-tenants.
+ * - db:migrate uses migrationsPath and auto-syncs generated types after success.
  * - tenantSelector is used by mtpx db:migrate --all-tenants.
  */
-
-function parseCsv(value: string | undefined): string[] {
-  if (!value?.trim()) {
-    return [];
-  }
-  return value
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter((entry) => entry.length > 0);
-}
-
-const tenantInclude = parseCsv(process.env.MTPX_TENANT_DATABASES_INCLUDE);
-const tenantExclude = parseCsv(process.env.MTPX_TENANT_DATABASES_EXCLUDE);
+import { env, parseCsv } from "@multpex/typescript-sdk";
 
 export default {
   name: "mtpx-micro-services",
 
   database: {
     // Introspection target (db:generate)
-    url:
-      process.env.DATABASE_URL
-      || "postgresql://multpex:multpex_secret@localhost:5432/multpex",
+    url: env.string(
+      "DATABASE_URL",
+      "postgresql://multpex:multpex_secret@localhost:5432/multpex",
+    ),
     schema: "public",
     schemaFile: "./src/db/schema.ts",
     output: "./src/db/generated-types.ts",
@@ -38,19 +27,23 @@ export default {
     migrationsPath: "./migrations",
     dialect: "postgresql",
     migrationTableName: "_migrations",
+    syncAfterMigrate: true,
 
     // Multi-tenant fan-out selector for: mtpx db:migrate ... --all-tenants
     tenantSelector: {
-      namespace: process.env.LINKD_KEYSTORE_NAMESPACE || "default",
-      server: process.env.MTPX_DB_SERVER || "local-pg",
-      include: tenantInclude.length > 0 ? tenantInclude : ["local-pg-*"],
-      exclude: tenantExclude,
+      namespace: env.string("LINKD_KEYSTORE_NAMESPACE", "default"),
+      server: env.string("MTPX_DB_SERVER", "local-pg"),
+      include: (() => {
+        const include = parseCsv(env.string("MTPX_TENANT_DATABASES_INCLUDE"));
+        return include.length > 0 ? include : ["local-pg-*"];
+      })(),
+      exclude: parseCsv(env.string("MTPX_TENANT_DATABASES_EXCLUDE")),
     },
   },
 
-  // Current CLI key for sidecar socket path.
+  // Socket used by CLI commands that talk to linkd.
   linkd: {
-    socket: process.env.LINKD_SOCKET || "/tmp/linkd.sock",
+    socket: env.coalesce("MULTPEX_LINKD_SOCKET", "LINKD_SOCKET") || "/tmp/linkd.sock",
   },
 
   dev: {
