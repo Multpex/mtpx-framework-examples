@@ -24,6 +24,23 @@ function formatError(error: unknown): string {
   return parts.join(" | ");
 }
 
+function printMigrationHint(message: string): void {
+  const lower = message.toLowerCase();
+  const shouldHint =
+    lower.includes("default database pool") ||
+    lower.includes("database gateway") ||
+    lower.includes("database router") ||
+    lower.includes("connection");
+
+  if (!shouldHint) return;
+
+  console.error(
+    "\nHint: start linkd with local DB env loaded before running micro-services:\n" +
+      "  cd ../../linkd\n" +
+      "  set -a && source .env.local && set +a && cargo run\n",
+  );
+}
+
 (async () => {
   console.log("Starting microservices...\n");
 
@@ -53,7 +70,8 @@ function formatError(error: unknown): string {
   // Run migrations
   const migrationService =
     loader.getService("users") ?? loader.getServices()[0];
-  if (migrationService?.db?.runMigrations) {
+  const skipMigrations = env.bool("SKIP_MIGRATIONS", false);
+  if (!skipMigrations && migrationService?.db?.runMigrations) {
     try {
       await migrationService.db.runMigrations({
         migrations,
@@ -62,9 +80,13 @@ function formatError(error: unknown): string {
       });
       console.log("Migrations applied");
     } catch (error) {
-      console.error("Migration failed:", formatError(error));
+      const message = formatError(error);
+      console.error("Migration failed:", message);
+      printMigrationHint(message);
       throw error;
     }
+  } else if (skipMigrations) {
+    console.log("Migrations skipped (SKIP_MIGRATIONS=true)");
   }
 
   console.log(

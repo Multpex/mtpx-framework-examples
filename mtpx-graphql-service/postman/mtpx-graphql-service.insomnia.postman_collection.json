@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "mtpx-graphql-service-collection",
-    "name": "mtpx graphql service",
-    "description": "Collection para testar o exemplo graphql-service do Multpex Framework.\n\nDemonstra:\n1. Actions com metadata GraphQL para exposição automática pelo linkd\n2. GraphQL Client para consumir APIs externas\n3. Endpoints REST que também funcionam como GraphQL queries/mutations\n\n## REST Endpoints\n\n- GET /graphql-example/books\n- GET /graphql-example/books/:id\n- GET /graphql-example/books/author/:author\n- POST /graphql-example/books (editor/admin)\n- DELETE /graphql-example/books/:id (admin)\n- GET /graphql-example/external/countries\n\n## GraphQL (via linkd)\n\n- POST /graphql - Endpoint unificado gerado pelo linkd",
+    "name": "mtpx graphql service (Insomnia)",
+    "description": "Collection para testar o exemplo graphql-service do Multpex Framework.\n\nDemonstra:\n1. Actions com metadata GraphQL para exposição automática pelo linkd\n2. GraphQL Client para consumir APIs externas\n3. Endpoints REST que também funcionam como GraphQL queries/mutations\n\n## REST Endpoints\n\n- GET /graphql-example/books\n- GET /graphql-example/books/:id\n- GET /graphql-example/books/author/:author\n- POST /graphql-example/books (editor/admin)\n- DELETE /graphql-example/books/:id (admin)\n- GET /graphql-example/external/countries\n\n## GraphQL (via linkd)\n\n- POST /graphql - Endpoint unificado gerado pelo linkd\n\nGenerated for Insomnia import: GraphQL requests are sent as application/graphql raw body.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -614,15 +614,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "mutation AuthLogin($username: String!, $password: String!) { authLogin(username: $username, password: $password) }",
-                "variables": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
-              }
+              "mode": "raw",
+              "raw": "mutation AuthLogin { authLogin(username: \"{{username}}\", password: \"{{password}}\") }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -667,15 +664,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "mutation AuthRefresh($refreshToken: String!) { authRefresh(refreshToken: $refreshToken) }",
-                "variables": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
-              }
+              "mode": "raw",
+              "raw": "mutation AuthRefresh { authRefresh(refreshToken: \"{{refreshToken}}\") }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -695,15 +689,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "{ authMe }",
-                "variables": ""
-              }
+              "mode": "raw",
+              "raw": "{ authMe }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -738,15 +729,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "mutation AuthLogout($refreshToken: String!) { authLogout(refreshToken: $refreshToken) }",
-                "variables": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
-              }
+              "mode": "raw",
+              "raw": "mutation AuthLogout { authLogout(refreshToken: \"{{refreshToken}}\") }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -787,15 +775,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "{ books { id title author year isbn } }",
-                "variables": ""
-              }
+              "mode": "raw",
+              "raw": "{ books { id title author year isbn } }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -818,15 +803,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query GetBook($id: ID!) { book(id: $id) { id title author year isbn } }",
-                "variables": "{\n  \"id\": \"1\"\n}"
-              }
+              "mode": "raw",
+              "raw": "query GetBook { book(id: \"1\") { id title author year isbn } }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -849,15 +831,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query BooksByAuthor($author: String!) { booksByAuthor(author: $author) { id title author year } }",
-                "variables": "{\n  \"author\": \"{{author}}\"\n}"
-              }
+              "mode": "raw",
+              "raw": "query BooksByAuthor { booksByAuthor(author: \"{{author}}\") { id title author year } }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -898,15 +877,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "mutation CreateBook($input: CreateBookInput!) { createBook(input: $input) { id title author year } }",
-                "variables": "{\n  \"input\": {\n    \"title\": \"Refactoring\",\n    \"author\": \"Martin Fowler\",\n    \"year\": 2018\n  }\n}"
-              }
+              "mode": "raw",
+              "raw": "mutation CreateBook { createBook(input: { title: \"Refactoring\", author: \"Martin Fowler\", year: 2018 }) { id title author year } }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -947,15 +923,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "mutation DeleteBook($id: ID!) { deleteBook(id: $id) }",
-                "variables": "{\n  \"id\": \"{{bookId}}\"\n}"
-              }
+              "mode": "raw",
+              "raw": "mutation DeleteBook { deleteBook(id: \"{{bookId}}\") }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",
@@ -997,15 +970,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/graphql"
               }
             ],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "{ __schema { types { name kind } queryType { name fields { name } } mutationType { name fields { name } } } }",
-                "variables": ""
-              }
+              "mode": "raw",
+              "raw": "{ __schema { types { name kind } queryType { name fields { name } } mutationType { name fields { name } } } }"
             },
             "url": {
               "raw": "{{baseUrl}}/graphql",

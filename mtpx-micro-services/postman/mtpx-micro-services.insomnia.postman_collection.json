@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "mtpx-micro-services-collection",
-    "name": "mtpx-micro-services",
-    "description": "Collection for testing the Moleculer-style microservices example",
+    "name": "mtpx-micro-services (Insomnia)",
+    "description": "Collection for testing the Moleculer-style microservices example\n\nGenerated for Insomnia import: GraphQL requests are sent as application/graphql raw body.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -65,8 +65,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
           }
         },
@@ -76,8 +81,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/auth/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
             }
           }
         },
@@ -119,8 +129,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "refresh"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
             }
           }
         },
@@ -156,8 +171,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/logout",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "logout"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
             }
           }
         },
@@ -167,8 +187,13 @@
             "method": "POST",
             "url": {
               "raw": "{{baseUrl}}/auth/verify",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "verify"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "verify"
+              ]
             }
           }
         },
@@ -181,8 +206,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/auth/discovery",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "discovery"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "discovery"
+              ]
             },
             "description": "Returns the OIDC discovery document for the current realm."
           }
@@ -208,8 +238,12 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/users",
-              "host": ["{{baseUrl}}"],
-              "path": ["users"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
             }
           }
         },
@@ -219,8 +253,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/users/{{userId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "{{userId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
             }
           }
         },
@@ -259,8 +298,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/users",
-              "host": ["{{baseUrl}}"],
-              "path": ["users"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
             }
           }
         },
@@ -280,8 +323,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/users/{{userId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "{{userId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
             }
           }
         },
@@ -291,8 +339,13 @@
             "method": "DELETE",
             "url": {
               "raw": "{{baseUrl}}/users/{{userId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "{{userId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
             }
           }
         },
@@ -302,8 +355,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/users/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "stats"
+              ]
             }
           }
         }
@@ -328,8 +386,12 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/products",
-              "host": ["{{baseUrl}}"],
-              "path": ["products"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
             }
           }
         },
@@ -339,8 +401,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/products/{{productId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["products", "{{productId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{productId}}"
+              ]
             }
           }
         },
@@ -379,8 +446,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/products",
-              "host": ["{{baseUrl}}"],
-              "path": ["products"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
             }
           }
         },
@@ -400,8 +471,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/products/{{productId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["products", "{{productId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{productId}}"
+              ]
             }
           }
         },
@@ -421,8 +497,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/products/{{productId}}/stock",
-              "host": ["{{baseUrl}}"],
-              "path": ["products", "{{productId}}", "stock"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{productId}}",
+                "stock"
+              ]
             },
             "description": "Adjust product stock. Use positive values to add, negative to remove."
           }
@@ -433,8 +515,13 @@
             "method": "DELETE",
             "url": {
               "raw": "{{baseUrl}}/products/{{productId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["products", "{{productId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{productId}}"
+              ]
             }
           }
         },
@@ -444,8 +531,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/products/categories",
-              "host": ["{{baseUrl}}"],
-              "path": ["products", "categories"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "categories"
+              ]
             }
           }
         }
@@ -470,8 +562,12 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/orders",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
             }
           }
         },
@@ -481,8 +577,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/orders/{{orderId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders", "{{orderId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{orderId}}"
+              ]
             }
           }
         },
@@ -521,8 +622,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/orders",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
             }
           }
         },
@@ -542,8 +647,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/orders/{{orderId}}/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders", "{{orderId}}", "status"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{orderId}}",
+                "status"
+              ]
             },
             "description": "Update order status. Valid values: pending, confirmed, processing, shipped, delivered, cancelled"
           }
@@ -564,8 +675,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/orders/{{orderId}}/cancel",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders", "{{orderId}}", "cancel"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{orderId}}",
+                "cancel"
+              ]
             },
             "description": "Cancel an order."
           }
@@ -576,8 +693,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/orders/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders", "stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "stats"
+              ]
             }
           }
         }
@@ -602,8 +724,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/notifications/email",
-              "host": ["{{baseUrl}}"],
-              "path": ["notifications", "email"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "email"
+              ]
             },
             "description": "Queue an email notification for delivery via Channels (NATS JetStream)."
           }
@@ -624,8 +751,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/notifications/sms",
-              "host": ["{{baseUrl}}"],
-              "path": ["notifications", "sms"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "sms"
+              ]
             },
             "description": "Queue an SMS notification for delivery via Channels (NATS JetStream)."
           }
@@ -644,8 +776,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/auth/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "health"
+              ]
             }
           }
         },
@@ -658,8 +795,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/auth/ready",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "ready"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "ready"
+              ]
             }
           }
         },
@@ -672,8 +814,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/auth/live",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "live"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "live"
+              ]
             }
           }
         },
@@ -686,8 +833,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/users/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "health"
+              ]
             }
           }
         },
@@ -700,8 +852,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/products/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["products", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "health"
+              ]
             }
           }
         },
@@ -714,8 +871,13 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/orders/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["orders", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "health"
+              ]
             }
           }
         }

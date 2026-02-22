@@ -21,7 +21,7 @@
     { "key": "keycloakUrl", "value": "http://localhost:8180", "type": "string" },
     { "key": "keycloakRealm", "value": "multpex", "type": "string" },
     { "key": "keycloakClientId", "value": "multpex-services", "type": "string" },
-    { "key": "keycloakClientSecret", "value": "multpex-services-secret", "type": "string" },
+    { "key": "keycloakClientSecret", "value": "multpex", "type": "string" },
     { "key": "keycloakUsername", "value": "admin", "type": "string" },
     { "key": "keycloakPassword", "value": "admin", "type": "string" },
     { "key": "orderId", "value": "order-1001", "type": "string" },

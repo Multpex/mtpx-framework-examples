@@ -153,8 +153,8 @@ O realm do Keycloak vem pré-configurado com usuários de teste:
 
 | Usuário  | Senha       | Role  | Descrição          |
 | -------- | ----------- | ----- | ------------------ |
-| `admin`  | `Admin@123` | admin | Acesso total       |
-| `user`   | `User@123`  | user  | Usuário comum      |
+| `admin`  | `admin`     | admin | Acesso total       |
+| `testuser` | `multpex` | user  | Usuário comum      |
 
 **Keycloak Admin Console**: http://localhost:8180 (admin/admin)
 
@@ -165,10 +165,31 @@ O realm do Keycloak vem pré-configurado com usuários de teste:
 | Variável           | Padrão                   | Descrição                     |
 | ------------------ | ------------------------ | ----------------------------- |
 | `LINKD_CONNECT`    | `unix:///tmp/linkd.sock` | String de conexão do Linkd    |
-| `LINKD_NAMESPACE`  | `moleculer-demo`         | Namespace de serviços         |
+| `LINKD_NAMESPACE`  | `microservice-demo`      | Namespace de serviços         |
+| `AUTH_PROVIDER`    | `oidc/default`           | Provider OIDC no keystore (`oidc/<nome>` ou `<nome>`) |
+| `AUTH_REALM`       | `multpex`                | Realm OIDC padrão            |
+| `AUTH_CLIENT_ID`   | `multpex-services`       | Client ID OIDC padrão        |
 | `SERVICE`          | (all)                    | Serviço(s) específicos para subir |
+| `SKIP_MIGRATIONS`  | `false`                  | Pula migrações no startup (útil para teste rápido de auth) |
 | `DEBUG`            | `false`                  | Habilita logs de debug        |
 | `NODE_ENV`         | `development`            | Modo de ambiente              |
+
+### Setup rápido de OIDC via `.env`
+
+```bash
+cp .env.example .env
+```
+
+Garanta também que o provider exista no keystore do linkd:
+
+```bash
+mtpx oidc set default \
+  --provider oidc \
+  --issuer-url http://localhost:8180 \
+  --realm multpex \
+  --client-id multpex-services \
+  --client-secret multpex
+```
 
 ### Configuração do Linkd
 
@@ -195,7 +216,7 @@ redis_url = "redis://localhost:6379"
 # Login (retorna access_token e refresh_token)
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "Admin@123"}'
+  -d '{"username": "admin", "password": "admin"}'
 
 # Obter informações do usuário atual
 curl http://localhost:3000/auth/me \

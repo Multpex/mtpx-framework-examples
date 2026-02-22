@@ -11,18 +11,19 @@
 
 import {
   createService,
+  UnauthorizedError,
   z,
   handleCommonStartupError,
   env,
   // GraphQL helpers para definir metadata
   gqlQuery,
   gqlMutation,
+  gqlSubscription,
   GQL,
   gqlType,
   gqlInput,
   // GraphQL Client para consumir APIs
   createGraphQLClient,
-  type Context,
 } from "@multpex/typescript-sdk";
 
 // =============================================================================
@@ -38,6 +39,28 @@ const createBookSchema = z.object({
 
 type CreateBookInput = z.infer<typeof createBookSchema>;
 
+const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+  realm: z.string().min(1).optional(),
+  clientId: z.string().min(1).optional(),
+});
+
+const refreshSchema = z.object({
+  refreshToken: z.string().min(1, "Refresh token is required"),
+});
+
+const logoutSchema = z.object({
+  refreshToken: z.string().min(1, "Refresh token is required"),
+});
+
+function authErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+  return fallback;
+}
+
 interface Book {
   id: string;
   title: string;
@@ -45,6 +68,13 @@ interface Book {
   year: number;
   isbn?: string;
   createdAt: Date;
+}
+
+interface BookCreatedEvent {
+  bookId: string;
+  title: string;
+  author: string;
+  year: number;
 }
 
 // =============================================================================
@@ -83,6 +113,12 @@ const books = new Map<string, Book>([
 const service = createService({
   name: "graphql-example",
   logging: { level: "debug", pretty: true },
+  auth: {
+    enabled: true,
+    realm: env.string("AUTH_REALM", "multpex"),
+    clientId: env.string("AUTH_CLIENT_ID", "multpex-services"),
+    knownRealms: ["multpex", "multpex-test", "realm1", "realm2"],
+  },
 
   // Configuração GraphQL (opcional - linkd usa defaults sensatos)
   graphql: {
@@ -104,9 +140,214 @@ const service = createService({
         year: { type: GQL.Int, required: true },
         isbn: { type: GQL.String, required: false },
       }),
+      gqlType("BookCreatedEvent", {
+        bookId: { type: GQL.ID, required: true },
+        title: { type: GQL.String, required: true },
+        author: { type: GQL.String, required: true },
+        year: { type: GQL.Int, required: true },
+      }),
     ],
   },
 });
+
+// =============================================================================
+// Auth Endpoints (mesmo padrão do mtpx-micro-services)
+// =============================================================================
+
+service.action(
+  "auth.login",
+  {
+    route: "/auth/login",
+    method: "POST",
+    validate: loginSchema,
+    graphql: gqlMutation({
+      fieldName: "authLogin",
+      description: "Autentica com username/password e retorna tokens",
+      args: {
+        username: { type: GQL.String, required: true },
+        password: { type: GQL.String, required: true },
+        realm: { type: GQL.String, required: false },
+        clientId: { type: GQL.String, required: false },
+      },
+      returnType: { type: GQL.JSON, required: true },
+    }),
+  },
+  async (ctx) => {
+    const { username, password } = ctx.body as z.infer<typeof loginSchema>;
+    if (!ctx.auth) {
+      throw new UnauthorizedError("Authentication client is not available");
+    }
+
+    let result;
+    try {
+      result = await ctx.auth.login({ username, password });
+    } catch (error) {
+      ctx.logger.warn("Auth login failed", {
+        username,
+        tenant: ctx.tenant,
+        error: authErrorMessage(error, "Authentication failed"),
+      });
+      throw new UnauthorizedError(authErrorMessage(error, "Authentication failed"));
+    }
+
+    if (!result.accessToken || !result.refreshToken) {
+      throw new UnauthorizedError("Invalid login response from identity provider");
+    }
+
+    return {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      expiresIn: result.expiresIn,
+      refreshExpiresIn: result.refreshExpiresIn,
+      tokenType: result.tokenType,
+      user: result.user,
+      tenant: ctx.tenant,
+    };
+  }
+);
+
+service.action(
+  "auth.refresh",
+  {
+    route: "/auth/refresh",
+    method: "POST",
+    validate: refreshSchema,
+    graphql: gqlMutation({
+      fieldName: "authRefresh",
+      description: "Renova access token usando refresh token",
+      args: {
+        refreshToken: { type: GQL.String, required: true },
+      },
+      returnType: { type: GQL.JSON, required: true },
+    }),
+  },
+  async (ctx) => {
+    const { refreshToken } = ctx.body as z.infer<typeof refreshSchema>;
+    if (!ctx.auth) {
+      throw new UnauthorizedError("Authentication client is not available");
+    }
+
+    let result;
+    try {
+      result = await ctx.auth.refresh(refreshToken);
+    } catch (error) {
+      ctx.logger.warn("Auth refresh failed", {
+        tenant: ctx.tenant,
+        error: authErrorMessage(error, "Authentication failed"),
+      });
+      throw new UnauthorizedError(authErrorMessage(error, "Authentication failed"));
+    }
+
+    return {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      expiresIn: result.expiresIn,
+      refreshExpiresIn: result.refreshExpiresIn,
+      tokenType: result.tokenType,
+    };
+  }
+);
+
+service.action(
+  "auth.logout",
+  {
+    route: "/auth/logout",
+    method: "POST",
+    auth: true,
+    validate: logoutSchema,
+    graphql: gqlMutation({
+      fieldName: "authLogout",
+      description: "Invalida sessão (logout) usando refresh token",
+      args: {
+        refreshToken: { type: GQL.String, required: true },
+      },
+      returnType: { type: GQL.JSON, required: true },
+    }),
+  },
+  async (ctx) => {
+    const { refreshToken } = ctx.body as z.infer<typeof logoutSchema>;
+    if (!ctx.auth) {
+      throw new UnauthorizedError("Authentication client is not available");
+    }
+
+    try {
+      await ctx.auth.logout(refreshToken);
+    } catch (error) {
+      ctx.logger.warn("Auth logout failed", {
+        userId: ctx.user?.id,
+        tenant: ctx.tenant,
+        error: authErrorMessage(error, "Authentication failed"),
+      });
+      throw new UnauthorizedError(authErrorMessage(error, "Authentication failed"));
+    }
+
+    return { success: true, message: "Logged out successfully" };
+  }
+);
+
+service.action(
+  "auth.me",
+  {
+    route: "/auth/me",
+    method: "GET",
+    auth: true,
+    graphql: gqlQuery({
+      fieldName: "authMe",
+      description: "Retorna usuário autenticado atual",
+      returnType: { type: GQL.JSON, required: true },
+    }),
+  },
+  async (ctx) => {
+    if (!ctx.auth) {
+      throw new UnauthorizedError("Authentication client is not available");
+    }
+
+    if (!ctx.user) {
+      throw new UnauthorizedError("Not authenticated");
+    }
+
+    const authHeader = ctx.headers?.authorization;
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      try {
+        return await ctx.auth.getUserInfo(token);
+      } catch {
+        // fall back to context user
+      }
+    }
+
+    return {
+      id: ctx.user.id,
+      username:
+        (ctx.user.metadata?.preferred_username as string | undefined) ??
+        (ctx.user.metadata?.username as string | undefined) ??
+        "",
+      email: ctx.user.metadata?.email as string | undefined,
+      roles: ctx.user.roles ?? [],
+      groups: [],
+      metadata: ctx.user.metadata,
+    };
+  }
+);
+
+service.action(
+  "auth.discovery",
+  {
+    route: "/auth/discovery",
+    method: "GET",
+    graphql: gqlQuery({
+      fieldName: "authDiscovery",
+      description: "Retorna documento OIDC discovery",
+      returnType: { type: GQL.JSON, required: true },
+    }),
+  },
+  async (ctx) => {
+    if (!ctx.auth) {
+      throw new UnauthorizedError("Authentication client is not available");
+    }
+    return ctx.auth.getDiscovery();
+  }
+);
 
 // =============================================================================
 // GraphQL Queries (operações de leitura)
@@ -124,6 +365,7 @@ service.action(
     route: "/graphql-example/books",
     method: "GET",
     graphql: gqlQuery({
+      fieldName: "books",
       description: "Lista todos os livros disponíveis",
       returnType: { type: "Book", list: true, required: true },
     }),
@@ -145,6 +387,7 @@ service.action(
     route: "/graphql-example/books/:id",
     method: "GET",
     graphql: gqlQuery({
+      fieldName: "book",
       description: "Busca um livro específico pelo ID",
       args: {
         id: { type: GQL.ID, required: true, description: "ID do livro" },
@@ -173,6 +416,7 @@ service.action(
     route: "/graphql-example/books/author/:author",
     method: "GET",
     graphql: gqlQuery({
+      fieldName: "booksByAuthor",
       description: "Busca livros por nome do autor",
       args: {
         author: {
@@ -214,6 +458,7 @@ service.action(
     validate: createBookSchema,
     roles: ["editor", "admin"],
     graphql: gqlMutation({
+      fieldName: "createBook",
       description: "Cria um novo livro na biblioteca",
       args: {
         input: { type: "CreateBookInput", required: true },
@@ -232,9 +477,48 @@ service.action(
     books.set(id, book);
 
     service.logger.info("Book created", { bookId: id, title: book.title });
-    ctx.emit("book.created", { bookId: id });
+    const eventPayload: BookCreatedEvent = {
+      bookId: id,
+      title: book.title,
+      author: book.author,
+      year: book.year,
+    };
+    ctx.emit("book.created", eventPayload);
 
     return book;
+  }
+);
+
+/**
+ * Subscription metadata para stream de eventos de criação de livros.
+ *
+ * GraphQL Subscription:
+ *   subscription {
+ *     bookCreated {
+ *       bookId
+ *       title
+ *       author
+ *       year
+ *     }
+ *   }
+ */
+service.action(
+  "books.stream.created",
+  {
+    route: "/graphql-example/books/events/created",
+    method: "GET",
+    graphql: gqlSubscription({
+      fieldName: "bookCreated",
+      description: "Stream de eventos quando um livro é criado",
+      streamKind: "event",
+      streamPattern: "book.created",
+      returnType: { type: "BookCreatedEvent", required: true },
+    }),
+  },
+  async () => {
+    return {
+      info: "Use GraphQL subscription field `bookCreated` over WebSocket.",
+    };
   }
 );
 
@@ -251,6 +535,7 @@ service.action(
     method: "DELETE",
     roles: ["admin"],
     graphql: gqlMutation({
+      fieldName: "deleteBook",
       description: "Remove um livro da biblioteca",
       args: {
         id: { type: GQL.ID, required: true },

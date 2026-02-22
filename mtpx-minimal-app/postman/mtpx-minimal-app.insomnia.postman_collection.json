@@ -1,0 +1,513 @@
+{
+  "info": {
+    "_postman_id": "mtpx-minimal-app-collection",
+    "name": "mtpx minimal service api (Insomnia)",
+    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (com validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check\n\nGenerated for Insomnia import: GraphQL requests are sent as application/graphql raw body.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Health check returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Status is healthy', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal('healthy');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Readiness Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Readiness returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/ready",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "ready"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Liveness Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Liveness returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/live",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "live"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Items",
+      "item": [
+        {
+          "name": "List Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('List returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has items array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.items).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Response has instanceId', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.instanceId).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "items"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Items (Filter by Name)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/items?name=widget",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "items"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "widget"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Item by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Get item returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has item data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.equal('1');",
+                  "    pm.expect(jsonData.name).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/items/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "items",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Item Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns 404 or error', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.equal('Not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/items/nonexistent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "items",
+                "nonexistent"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Create returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has new item', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.expect(jsonData.name).to.equal('New Product');",
+                  "    pm.expect(jsonData.price).to.equal(49.99);",
+                  "});",
+                  "",
+                  "// Save item ID for later tests",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.environment.set('itemId', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Product\",\n  \"price\": 49.99,\n  \"tags\": [\"new\", \"featured\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "items"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Item (Validation Error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Validation fails', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"price\": -10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "items"
+              ]
+            },
+            "description": "Testa validação Zod: name vazio e price negativo devem falhar"
+          }
+        },
+        {
+          "name": "Delete Item (No Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns 401 unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/items/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "items",
+                "1"
+              ]
+            },
+            "description": "Deve falhar sem autenticação"
+          }
+        },
+        {
+          "name": "Delete Item (With Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Delete successful or not found', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/items/{{itemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "items",
+                "{{itemId}}"
+              ]
+            },
+            "description": "Requer auth com role admin. Usa itemId salvo do teste Create."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Stats (No Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns 401 unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/admin/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "admin",
+                "stats"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Stats (With Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Returns stats', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.totalItems).to.be.a('number');",
+                  "    pm.expect(jsonData.totalValue).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/admin/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "minimal-app",
+                "admin",
+                "stats"
+              ]
+            },
+            "description": "Requer auth com role admin"
+          }
+        }
+      ]
+    }
+  ]
+}

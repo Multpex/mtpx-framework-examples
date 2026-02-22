@@ -59,6 +59,22 @@ bun run dev
 
 Alguns exemplos usam scripts adicionais (`worker`, `test`, `postman:test`, etc). Veja o `package.json` e o `README.md` de cada pasta.
 
+## Collections (Postman + Insomnia)
+
+Cada exemplo continua com os arquivos oficiais em `postman/*.postman_collection.json` e `postman/*.postman_environment.json`.
+
+Para gerar versoes separadas para Insomnia em todos os projetos, execute:
+
+```bash
+cd /path/to/multpex-framework/mtpx-framework-examples
+node ./scripts/generate-insomnia-collections.mjs
+```
+
+Isso cria arquivos com sufixo:
+
+- `*.insomnia.postman_collection.json`
+- `*.insomnia.postman_environment.json`
+
 ## Fluxo recomendado de exploracao
 
 1. Comece em `mtpx-minimal-app`

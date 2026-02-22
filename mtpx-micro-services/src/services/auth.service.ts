@@ -84,6 +84,7 @@ service.beforeStart(async () => {
   service.logger.info("Starting authentication service", {
     defaultRealm: authConfig.realm,
     clientId: authConfig.clientId,
+    provider: authConfig.provider ?? "config/static",
     knownRealms: authConfig.knownRealms ?? [],
     authClientMode: "managed via ctx.auth",
   });

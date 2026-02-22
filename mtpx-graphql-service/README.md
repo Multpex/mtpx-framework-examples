@@ -3,6 +3,7 @@
 Demonstra como usar GraphQL no ecossistema Multpex:
 1. Definir actions com metadata GraphQL para exposição automática
 2. Usar o GraphQL Client para consumir APIs externas
+3. Expor subscriptions via WebSocket (`graphql-transport-ws`)
 
 ## Como Funciona
 
@@ -26,6 +27,33 @@ cargo run
 cd /path/to/multpex-framework/mtpx-framework-examples/mtpx-graphql-service
 bun install
 bun run dev
+```
+
+## OIDC via Keystore (provider)
+
+O SDK agora suporta selecionar o provider OIDC por variável de ambiente:
+
+```bash
+AUTH_PROVIDER=oidc/default
+```
+
+Formatos aceitos:
+- `oidc/<nome>` (service_type `oidc`)
+- `<nome>` (atalho para `oidc/<nome>`)
+
+Credencial esperada no keystore (exemplo):
+
+```json
+{
+  "service_type": "oidc",
+  "name": "default",
+  "data": {
+    "issuer_url": "http://localhost:8180",
+    "realm": "multpex",
+    "client_id": "multpex-services",
+    "client_secret": "multpex"
+  }
+}
 ```
 
 ## Endpoints
@@ -83,6 +111,33 @@ curl -X POST http://localhost:3000/graphql \
   }'
 ```
 
+### GraphQL Subscriptions (WebSocket)
+
+Endpoint WS do linkd:
+
+```text
+ws://localhost:3000/graphql/ws
+```
+
+Fluxo (`graphql-transport-ws`):
+
+1. `connection_init`
+2. `connection_ack`
+3. `subscribe` com query GraphQL
+
+Exemplo de subscription:
+
+```graphql
+subscription {
+  bookCreated {
+    bookId
+    title
+    author
+    year
+  }
+}
+```
+
 ## Definindo GraphQL Metadata
 
 ### Query
@@ -117,6 +172,23 @@ service.action("books.create", {
     },
     returnType: { type: "Book", required: true }
   })
+}, handler);
+```
+
+### Subscription
+
+```typescript
+import { gqlSubscription } from "@multpex/typescript-sdk";
+
+service.action("books.stream.created", {
+  route: "/books/events/created",
+  method: "GET",
+  graphql: gqlSubscription({
+    fieldName: "bookCreated",
+    streamKind: "event",
+    streamPattern: "book.created",
+    returnType: { type: "BookCreatedEvent", required: true },
+  }),
 }, handler);
 ```
 

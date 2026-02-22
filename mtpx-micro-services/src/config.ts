@@ -7,7 +7,11 @@
  * Priority: Code overrides > Environment variables > SDK defaults
  */
 
-import { createConfig, type ServiceEnvConfig } from "@multpex/typescript-sdk";
+import {
+  createConfig,
+  env,
+  type ServiceEnvConfig,
+} from "@multpex/typescript-sdk";
 
 /**
  * App-specific configuration.
@@ -15,13 +19,14 @@ import { createConfig, type ServiceEnvConfig } from "@multpex/typescript-sdk";
  */
 export const config = createConfig({
   auth: {
-    // App defaults (can be overridden by AUTH_REALM env var)
-    realm: "multpex",
-    clientId: "multpex-services",
+    // Explicitly sourced from env to keep .env as source-of-truth in local dev.
+    realm: env.string("AUTH_REALM", "multpex"),
+    clientId: env.string("AUTH_CLIENT_ID", "multpex-services"),
+    provider: env.string("AUTH_PROVIDER", "oidc/default"),
     // Multi-tenant realms - requests from realm1.localhost go to realm1
     knownRealms: ["realm1", "realm2", "multpex", "multpex-test"],
   },
-  namespace: "microservice-demo",
+  namespace: env.string("LINKD_NAMESPACE", "microservice-demo"),
 });
 
 // Export individual config sections for convenience
