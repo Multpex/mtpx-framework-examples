@@ -16,7 +16,7 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@multpex/typescript-sdk": "file:../../sdk-typescript"
+    "@multpex/typescript-sdk": "0.9.3"
   },
   "devDependencies": {
     "@types/bun": "^1.0.0",

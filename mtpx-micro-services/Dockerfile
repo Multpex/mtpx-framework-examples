@@ -17,9 +17,6 @@ COPY package.json bun.lock* ./
 # Install ALL dependencies (including devDependencies for build)
 RUN bun install --frozen-lockfile || bun install
 
-# Copy SDK dependency (linked locally)
-COPY ../../sdk-typescript /sdk-typescript
-
 # Copy source code
 COPY . .
 

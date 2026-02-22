@@ -4,7 +4,7 @@
     "": {
       "name": "websocket-chat-example",
       "dependencies": {
-        "@multpex/typescript-sdk": "file:../../sdk-typescript",
+        "@multpex/typescript-sdk": "0.9.3",
         "zod": "^3.23.8",
       },
       "devDependencies": {
@@ -69,7 +69,7 @@
 
     "@ioredis/commands": ["@ioredis/commands@1.5.0", "", {}, "sha512-eUgLqrMf8nJkZxT24JvVRrQya1vZkQh8BBeYNwGDqa5I0VUi8ACx7uFvAaLxintokpTenkK6DASvo/bvNbBGow=="],
 
-    "@multpex/typescript-sdk": ["@multpex/typescript-sdk@file:../../sdk-typescript", { "dependencies": { "@elastic/elasticsearch": "^8.15.0", "@protobuf-ts/runtime": "^2.11.1", "ioredis": "^5.4.1", "lz4-napi": "^2.9.0", "mysql2": "^3.12.0", "nats": "^2.28.2", "pino": "^8.18.0", "pino-pretty": "^10.3.0", "postgres": "^3.4.4", "reflect-metadata": "^0.2.2", "yaml": "^2.6.0", "zod": "^3.22.0" }, "devDependencies": { "@biomejs/biome": "^1.5.0", "@protobuf-ts/plugin": "^2.11.1", "@types/bun": "^1.0.0", "@types/node": "^20.0.0", "typescript": "^5.3.0" }, "peerDependencies": { "bun": ">=1.0.0" }, "bin": { "multpex-dev": "./src/cli/dev.ts" } }],
+    "@multpex/typescript-sdk": ["@multpex/typescript-sdk@0.9.3", { "dependencies": { "@elastic/elasticsearch": "^8.15.0", "@protobuf-ts/runtime": "^2.11.1", "ioredis": "^5.4.1", "lz4-napi": "^2.9.0", "mysql2": "^3.12.0", "nats": "^2.28.2", "pino": "^8.18.0", "pino-pretty": "^10.3.0", "postgres": "^3.4.4", "reflect-metadata": "^0.2.2", "yaml": "^2.6.0", "zod": "^3.22.0" }, "devDependencies": { "@biomejs/biome": "^1.5.0", "@protobuf-ts/plugin": "^2.11.1", "@types/bun": "^1.0.0", "@types/node": "^20.0.0", "typescript": "^5.3.0" }, "peerDependencies": { "bun": ">=1.0.0" }, "bin": { "multpex-dev": "./src/cli/dev.ts" } }],
 
     "@napi-rs/triples": ["@napi-rs/triples@1.2.0", "", {}, "sha512-HAPjR3bnCsdXBsATpDIP5WCrw0JcACwhhrwIAQhiR46n+jm+a2F8kBsfseAuWtSyQ+H3Yebt2k43B5dy+04yMA=="],
 

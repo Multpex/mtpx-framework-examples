@@ -17,7 +17,7 @@
     "postman:test:verbose": "bunx newman run postman/mtpx-minimal-app.postman_collection.json -e postman/mtpx-minimal-app.postman_environment.json --verbose"
   },
   "dependencies": {
-    "@multpex/typescript-sdk": "file:../../sdk-typescript"
+    "@multpex/typescript-sdk": "0.9.3"
   },
   "devDependencies": {
     "@types/bun": "^1.0.0",

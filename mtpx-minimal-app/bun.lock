@@ -4,7 +4,7 @@
     "": {
       "name": "minimal-app-example",
       "dependencies": {
-        "@multpex/typescript-sdk": "file:../../sdk-typescript",
+        "@multpex/typescript-sdk": "0.9.3",
       },
       "devDependencies": {
         "@types/bun": "^1.0.0",
@@ -33,7 +33,7 @@
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@1.9.4", "", { "os": "win32", "cpu": "x64" }, "sha512-8Y5wMhVIPaWe6jw2H+KlEm4wP/f7EW3810ZLmDlrEEy5KvBsb9ECEfu/kMWD484ijfQ8+nIi0giMgu9g1UAuuA=="],
 
-    "@multpex/typescript-sdk": ["@multpex/typescript-sdk@file:../../sdk-typescript", { "dependencies": { "pino": "^8.18.0", "pino-pretty": "^10.3.0", "protobufjs": "^7.2.6", "reflect-metadata": "^0.2.2", "zod": "^3.22.0" }, "devDependencies": { "@biomejs/biome": "^1.5.0", "@types/bun": "^1.0.0", "@types/node": "^20.0.0", "typescript": "^5.3.0" }, "peerDependencies": { "bun": ">=1.0.0" }, "bin": { "multpex-dev": "./src/cli/dev.ts" } }],
+    "@multpex/typescript-sdk": ["@multpex/typescript-sdk@0.9.3", { "dependencies": { "pino": "^8.18.0", "pino-pretty": "^10.3.0", "protobufjs": "^7.2.6", "reflect-metadata": "^0.2.2", "zod": "^3.22.0" }, "devDependencies": { "@biomejs/biome": "^1.5.0", "@types/bun": "^1.0.0", "@types/node": "^20.0.0", "typescript": "^5.3.0" }, "peerDependencies": { "bun": ">=1.0.0" }, "bin": { "multpex-dev": "./src/cli/dev.ts" } }],
 
     "@oven/bun-darwin-aarch64": ["@oven/bun-darwin-aarch64@1.3.6", "", { "os": "darwin", "cpu": "arm64" }, "sha512-27rypIapNkYboOSylkf1tD9UW9Ado2I+P1NBL46Qz29KmOjTL6WuJ7mHDC5O66CYxlOkF5r93NPDAC3lFHYBXw=="],
 

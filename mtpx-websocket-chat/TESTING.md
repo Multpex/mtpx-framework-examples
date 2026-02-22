@@ -239,7 +239,7 @@ bun install
 
 # Verificar que o workspace está configurado
 bun --version
-cat package.json  # Deve ter "workspaces": ["sdk-typescript", "examples/*"]
+cat package.json  # Deve conter "@multpex/typescript-sdk": "0.9.3" em dependencies
 ```
 
 ## Passo 5: Executar o WebSocket Chat Service
@@ -804,6 +804,6 @@ Se você deseja implementar o gateway WebSocket no Linkd:
 ## Referências
 
 - [Multpex Framework README](../../README.md)
-- [TypeScript SDK Documentation](../../sdk-typescript/README.md)
+- [TypeScript SDK Documentation](https://docusaurus.devops.multpex.com.br/docs/mtpx-framework/intro)
 - [Linkd Documentation](../../linkd/README.md)
 - [WebSocket Protocol RFC 6455](https://tools.ietf.org/html/rfc6455)
