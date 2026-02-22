@@ -11,7 +11,6 @@
 
 import {
   createService,
-  setupGracefulShutdown,
   UnauthorizedError,
   z,
   StartupErrorHandler,
@@ -615,8 +614,6 @@ service.beforeStart(async () => {
     booksCount: books.size,
   });
 });
-
-setupGracefulShutdown(service.raw);
 
 await service.start().catch((error) =>
   StartupErrorHandler.fail(error, {

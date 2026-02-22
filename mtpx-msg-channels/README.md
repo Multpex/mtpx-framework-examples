@@ -75,7 +75,7 @@ Esse comando usa `src/api.ts` com `startServices` para subir `svc-a`, `svc-b` e 
 
 ### Graceful Shutdown (automático)
 
-No modo `bun run dev` (bootstrap via `startServices`), o `ServiceLoader` já habilita graceful shutdown com `setupGracefulShutdown`.
+No modo `bun run dev` (bootstrap via `startServices`), o SDK já habilita graceful shutdown automaticamente.
 
 - Sinais suportados: `SIGINT` e `SIGTERM`
 - `Ctrl+C` encerra os serviços carregados sem precisar de handlers manuais

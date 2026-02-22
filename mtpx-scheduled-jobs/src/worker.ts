@@ -11,7 +11,6 @@ import {
   createApp,
   JobHandler,
   type JobHandlerContext,
-  setupGracefulShutdown,
   StartupErrorHandler,
   env,
 } from "@multpex/typescript-sdk";
@@ -211,8 +210,6 @@ service.afterStart(async () => {
 // ============================================================================
 // Startup
 // ============================================================================
-
-setupGracefulShutdown(service);
 
 await service.start().catch((error) =>
   StartupErrorHandler.fail(error, {

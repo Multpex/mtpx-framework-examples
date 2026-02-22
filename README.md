@@ -9,8 +9,9 @@ Cada pasta neste repositorio mostra um caso de uso pratico do `@multpex/typescri
 | Projeto | Objetivo | README |
 |---|---|---|
 | [mtpx-minimal-app](./mtpx-minimal-app) | Servico minimo com actions HTTP e testes basicos | [Abrir](./mtpx-minimal-app/README.md) |
-| [mtpx-micro-services](./mtpx-micro-services) | Arquitetura estilo microservicos com loader, eventos e banco | [Abrir](./mtpx-micro-services/README.md) |
+| [mtpx-micro-services](./mtpx-micro-services) | Arquitetura estilo microservicos com loader, eventos, banco e migrations multi-tenant via CLI | [Abrir](./mtpx-micro-services/README.md) |
 | [mtpx-auth-rbac](./mtpx-auth-rbac) | Autenticacao e autorizacao (RBAC) com roles | [Abrir](./mtpx-auth-rbac/README.md) |
+| [mtpx-keycloak-admin-basics](./mtpx-keycloak-admin-basics) | Operacoes basicas de administracao do Keycloak (users/roles) | [Abrir](./mtpx-keycloak-admin-basics/README.md) |
 | [mtpx-graphql-service](./mtpx-graphql-service) | Exposicao/consumo GraphQL no ecossistema | [Abrir](./mtpx-graphql-service/README.md) |
 | [mtpx-msg-channels](./mtpx-msg-channels) | Diferenca entre `emit` e `sendToChannel` | [Abrir](./mtpx-msg-channels/README.md) |
 | [mtpx-scheduled-jobs](./mtpx-scheduled-jobs) | Jobs agendados, scheduler e worker | [Abrir](./mtpx-scheduled-jobs/README.md) |
@@ -61,10 +62,10 @@ Alguns exemplos usam scripts adicionais (`worker`, `test`, `postman:test`, etc).
 
 ### Nota sobre encerramento dos apps
 
-Exemplos que fazem bootstrap com `startServices(...)` usam `ServiceLoader`, que já configura graceful shutdown automaticamente via `setupGracefulShutdown`.
+`createApp`, `createService` e `startServices(...)` já configuram graceful shutdown automaticamente via SDK.
 
 - Sinais suportados: `SIGINT` e `SIGTERM`
-- `Ctrl+C` para os serviços carregados de forma ordenada
+- `Ctrl+C` encerra os serviços de forma ordenada
 
 ## Collections (Postman + Insomnia)
 
@@ -86,7 +87,7 @@ Isso cria arquivos com sufixo:
 
 1. Comece em `mtpx-minimal-app`
 2. Depois avance para `mtpx-micro-services`
-3. Explore `mtpx-auth-rbac` e `mtpx-graphql-service`
+3. Explore `mtpx-auth-rbac`, `mtpx-keycloak-admin-basics` e `mtpx-graphql-service`
 4. Siga para `mtpx-msg-channels` e `mtpx-scheduled-jobs`
 5. Por fim, veja `mtpx-websocket-chat`
 

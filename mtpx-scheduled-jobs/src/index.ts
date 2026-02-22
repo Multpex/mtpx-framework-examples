@@ -9,7 +9,6 @@
 
 import {
   createApp,
-  setupGracefulShutdown,
   requestLogger,
   z,
   type Context,
@@ -555,8 +554,6 @@ service.action("health", { route: "/health", method: "GET" }, async () => {
 // ============================================================================
 // Startup
 // ============================================================================
-
-setupGracefulShutdown(service);
 
 await service.start().catch((error) =>
   StartupErrorHandler.fail(error, {

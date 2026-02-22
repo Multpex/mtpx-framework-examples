@@ -1,33 +1,55 @@
 /**
- * Multpex Configuration
- * 
- * This file configures the Multpex CLI for this project.
+ * Multpex CLI project configuration for mtpx-micro-services.
+ *
+ * Notes:
+ * - db:generate / db:push use schemaFile/output/url.
+ * - db:migrate uses migrationsPath and can fan out with --all-tenants.
+ * - tenantSelector is used by mtpx db:migrate --all-tenants.
  */
 
+function parseCsv(value: string | undefined): string[] {
+  if (!value?.trim()) {
+    return [];
+  }
+  return value
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+}
+
+const tenantInclude = parseCsv(process.env.MTPX_TENANT_DATABASES_INCLUDE);
+const tenantExclude = parseCsv(process.env.MTPX_TENANT_DATABASES_EXCLUDE);
+
 export default {
-  name: "moleculer-demo",
+  name: "mtpx-micro-services",
 
   database: {
-    // Database URL for introspection (used by db:generate)
-    url: process.env.DATABASE_URL || "postgresql://multpex:multpex_secret@localhost:5432/multpex",
-    
-    // Schema definition file (used by db:push)
-    schemaFile: "./src/db/schema.ts",
-    
-    // Schema to introspect
+    // Introspection target (db:generate)
+    url:
+      process.env.DATABASE_URL
+      || "postgresql://multpex:multpex_secret@localhost:5432/multpex",
     schema: "public",
-    
-    // Output path for generated types (used by db:generate)
+    schemaFile: "./src/db/schema.ts",
     output: "./src/db/generated-types.ts",
-    
-    // Tables to include (glob patterns)
     include: ["*"],
-    
-    // Tables to exclude
-    exclude: ["_prisma_migrations", "schema_migrations"],
+    exclude: ["_prisma_migrations", "schema_migrations", "_migrations"],
+
+    // CLI migration source (db:migrate)
+    migrationsPath: "./migrations",
+    dialect: "postgresql",
+    migrationTableName: "_migrations",
+
+    // Multi-tenant fan-out selector for: mtpx db:migrate ... --all-tenants
+    tenantSelector: {
+      namespace: process.env.LINKD_KEYSTORE_NAMESPACE || "default",
+      server: process.env.MTPX_DB_SERVER || "local-pg",
+      include: tenantInclude.length > 0 ? tenantInclude : ["local-pg-*"],
+      exclude: tenantExclude,
+    },
   },
 
-  sidecar: {
+  // Current CLI key for sidecar socket path.
+  linkd: {
     socket: process.env.LINKD_SOCKET || "/tmp/linkd.sock",
   },
 

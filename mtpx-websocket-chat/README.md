@@ -92,7 +92,7 @@ bun run dev
 ### Graceful Shutdown (automático)
 
 Este exemplo sobe serviços com `startServices(...)` em `src/main.ts`.
-O `ServiceLoader` já registra graceful shutdown automaticamente via `setupGracefulShutdown`.
+O SDK já registra graceful shutdown automaticamente.
 
 - Sinais suportados: `SIGINT` e `SIGTERM`
 - `Ctrl+C` encerra os serviços carregados de forma ordenada

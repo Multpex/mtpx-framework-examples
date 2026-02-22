@@ -18,7 +18,6 @@
 
 import {
   createService,
-  setupGracefulShutdown,
   z,
   StartupErrorHandler,
   env,
@@ -412,8 +411,6 @@ service.beforeStart(async () => {
     seedDocuments: documents.size,
   });
 });
-
-setupGracefulShutdown(service.raw);
 
 await service.start().catch((error) =>
   StartupErrorHandler.fail(error, {

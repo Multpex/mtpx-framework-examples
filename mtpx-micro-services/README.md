@@ -12,6 +12,7 @@ Este exemplo demonstra:
 - **Channels (JetStream)**: mensageria com balanceamento e controle ack/nack
 - **Cache de resposta HTTP**: cache em Redis com TTL configurável
 - **Autenticação OIDC**: integração com Keycloak para validação de JWT
+- **Migrations multi-tenant via CLI**: execução em lote com `mtpx db:migrate --all-tenants`
 - **Health Checks**: endpoints `/health`, `/ready`, `/live` prontos para Kubernetes
 
 ### Serviços
@@ -136,8 +137,7 @@ SERVICE=products bun run src/main.ts
 
 ### Graceful Shutdown (automático)
 
-Este exemplo usa `startServices(...)` no bootstrap (`src/main.ts`).
-Com isso, o `ServiceLoader` configura graceful shutdown automaticamente via `setupGracefulShutdown`.
+Este exemplo usa `startServices(...)` no bootstrap (`src/main.ts`) e o SDK registra graceful shutdown automaticamente.
 
 - Sinais suportados: `SIGINT` e `SIGTERM`
 - Ao encerrar (`Ctrl+C`), os serviços carregados são parados de forma ordenada
@@ -174,10 +174,15 @@ O realm do Keycloak vem pré-configurado com usuários de teste:
 | Variável           | Padrão                   | Descrição                     |
 | ------------------ | ------------------------ | ----------------------------- |
 | `LINKD_CONNECT`    | `unix:///tmp/linkd.sock` | String de conexão do Linkd    |
+| `LINKD_SOCKET`     | `/tmp/linkd.sock`        | Socket path usado pelo `mtpx.config.ts` |
+| `LINKD_KEYSTORE_NAMESPACE` | `default`        | Namespace do keystore para resolver DB server |
 | `LINKD_NAMESPACE`  | `microservice-demo`      | Namespace de serviços         |
 | `AUTH_PROVIDER`    | `oidc/default`           | Provider OIDC no keystore (`oidc/<nome>` ou `<nome>`) |
 | `AUTH_REALM`       | `multpex`                | Realm OIDC padrão            |
 | `AUTH_CLIENT_ID`   | `multpex-services`       | Client ID OIDC padrão        |
+| `MTPX_DB_SERVER`   | `local-pg`               | Nome do DB server para operações `--all-tenants` |
+| `MTPX_TENANT_DATABASES_INCLUDE` | `local-pg-*` | Filtro include (glob) para databases de tenant |
+| `MTPX_TENANT_DATABASES_EXCLUDE` | (vazio)      | Filtro exclude (glob) para databases de tenant |
 | `SERVICE`          | (all)                    | Serviço(s) específicos para subir |
 | `SKIP_MIGRATIONS`  | `false`                  | Pula migrações no startup (útil para teste rápido de auth) |
 | `DEBUG`            | `false`                  | Habilita logs de debug        |
@@ -200,22 +205,46 @@ mtpx oidc set default \
   --client-secret multpex
 ```
 
+### Migrations multi-tenant com mtpx CLI
+
+As operações de banco devem ser executadas **dentro do diretório do projeto**.
+
+O arquivo `mtpx.config.ts` deste exemplo já inclui:
+
+- `database.migrationsPath = "./migrations"`
+- `database.migrationTableName = "_migrations"`
+- `database.tenantSelector` com `namespace`, `server`, `include` e `exclude`
+
+Comandos principais:
+
+```bash
+cd /path/to/multpex-framework/mtpx-framework-examples/mtpx-micro-services
+
+# Estado atual da database padrão
+mtpx db:migrate status
+
+# Executa migrations em todas as databases de tenant resolvidas pelo tenantSelector
+mtpx db:migrate up --all-tenants
+
+# Verifica estado em todas as databases de tenant
+mtpx db:migrate status --all-tenants
+
+# Rollback de 1 migration em todas as databases de tenant
+mtpx db:migrate down --step 1 --all-tenants
+```
+
+Para limitar o fan-out de tenants:
+
+```bash
+MTPX_TENANT_DATABASES_INCLUDE=local-pg-orders,local-pg-users \
+MTPX_TENANT_DATABASES_EXCLUDE=local-pg-control \
+mtpx db:migrate up --all-tenants
+```
+
 ### Configuração do Linkd
 
-O Linkd é configurado via `../../linkd/linkd.toml`. Principais ajustes:
-
-```toml
-socket_path = "/tmp/linkd.sock"
-http_addr = "0.0.0.0:3000"
-nats_url = "nats://localhost:4222"
-
-[database]
-url = "postgres://multpex:multpex_secret@localhost:5432/multpex"
-
-[cache]
-type = "redis"
-redis_url = "redis://localhost:6379"
-```
+Use o `linkd.toml` apenas para parâmetros base de runtime (socket/HTTP/NATS/cache).
+Para OIDC e credenciais de banco multi-tenant, o fluxo recomendado é keystore (`mtpx oidc ...`, `mtpx db ...`) em vez de hardcode de providers no `linkd.toml`.
 
 ## Referência da API
 

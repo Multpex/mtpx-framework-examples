@@ -1,6 +1,5 @@
 import {
   createApp,
-  setupGracefulShutdown,
   StartupErrorHandler,
   env,
 } from "@multpex/typescript-sdk";
@@ -85,7 +84,6 @@ await app.start().catch((error) =>
     hint: "Inicie o Linkd e tente novamente.",
   }),
 );
-setupGracefulShutdown(app);
 
 app.logger.info("db-env-selector iniciado", {
   databaseName: app.env.string("LINKD_DATABASE_NAME"),
