@@ -2,17 +2,8 @@ import {
 	configureReconnectCoordinator,
 	startServices,
 	env,
+	StartupErrorHandler,
 } from "@multpex/typescript-sdk";
-
-function formatError(error: unknown): string {
-	if (!(error instanceof Error)) return String(error);
-
-	const err = error as Error & { code?: number; type?: string };
-	const parts = [err.message];
-	if (err.code) parts.push(`code=${err.code}`);
-	if (err.type) parts.push(`type=${err.type}`);
-	return parts.join(" | ");
-}
 
 (async () => {
 	console.log("Iniciando mtpx-msg-channels...\n");
@@ -37,8 +28,7 @@ function formatError(error: unknown): string {
 	});
 
 	if (loader.size === 0) {
-		console.error("Nenhum serviço encontrado");
-		process.exit(1);
+		throw new Error("Nenhum serviço encontrado");
 	}
 
 	console.log(
@@ -46,6 +36,9 @@ function formatError(error: unknown): string {
 	);
 	console.log("Pressione Ctrl+C para encerrar.\n");
 })().catch((error) => {
-	console.error("Fatal:", formatError(error));
-	process.exit(1);
+	StartupErrorHandler.fail(error, {
+		dependencyName: "Linkd",
+		endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
+		hint: "Inicie o Linkd e tente novamente.",
+	});
 });

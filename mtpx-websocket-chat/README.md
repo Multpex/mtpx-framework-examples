@@ -89,6 +89,15 @@ bun install
 bun run dev
 ```
 
+### Graceful Shutdown (automático)
+
+Este exemplo sobe serviços com `startServices(...)` em `src/main.ts`.
+O `ServiceLoader` já registra graceful shutdown automaticamente via `setupGracefulShutdown`.
+
+- Sinais suportados: `SIGINT` e `SIGTERM`
+- `Ctrl+C` encerra os serviços carregados de forma ordenada
+- Não é necessário adicionar handlers de sinal manualmente
+
 ## API WebSocket (Proposta - Aguardando Implementação no Linkd)
 
 > ⚠️ A API abaixo está implementada no SDK TypeScript, mas **não funcionará** até que o gateway WebSocket seja implementado no Linkd.

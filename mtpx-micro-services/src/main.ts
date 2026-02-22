@@ -11,6 +11,7 @@ import {
   configureReconnectCoordinator,
   startServices,
   env,
+  StartupErrorHandler,
 } from "@multpex/typescript-sdk";
 import { migrations } from "./db/migrations.js";
 
@@ -41,37 +42,63 @@ function printMigrationHint(message: string): void {
   );
 }
 
-(async () => {
-  console.log("Starting microservices...\n");
+class MicroservicesBootstrap {
+  static async run(): Promise<void> {
+    console.log("Starting microservices...\n");
+    this.configureReconnectCoordinator();
 
-  configureReconnectCoordinator({
-    debounceMs: 100,
-    maxBatchDelayMs: 500,
-    retryBaseDelayMs: 250,
-    maxRetryDelayMs: 5000,
-    jitterRatio: 0.3,
-    logger:
-      env.bool("DEBUG")
-        ? (message) => console.log(`[ReconnectCoordinator] ${message}`)
-        : undefined,
-  });
+    const loader = await this.startServices();
+    await this.runMigrations(loader);
 
-  const loader = await startServices({
-    servicesDir: "./src/services",
-    namespace: env.string("LINKD_NAMESPACE", "moleculer-demo"),
-    debug: env.bool("DEBUG"),
-  });
-
-  if (loader.size === 0) {
-    console.error("No services found");
-    process.exit(1);
+    console.log(
+      `\n${loader.size} service(s) running: ${loader.getServiceNames().join(", ")}`,
+    );
+    console.log("Press Ctrl+C to stop.\n");
   }
 
-  // Run migrations
-  const migrationService =
-    loader.getService("users") ?? loader.getServices()[0];
-  const skipMigrations = env.bool("SKIP_MIGRATIONS", false);
-  if (!skipMigrations && migrationService?.db?.runMigrations) {
+  private static configureReconnectCoordinator(): void {
+    configureReconnectCoordinator({
+      debounceMs: 100,
+      maxBatchDelayMs: 500,
+      retryBaseDelayMs: 250,
+      maxRetryDelayMs: 5000,
+      jitterRatio: 0.3,
+      logger:
+        env.bool("DEBUG")
+          ? (message) => console.log(`[ReconnectCoordinator] ${message}`)
+          : undefined,
+    });
+  }
+
+  private static async startServices() {
+    const loader = await startServices({
+      servicesDir: "./src/services",
+      namespace: env.string("LINKD_NAMESPACE", "moleculer-demo"),
+      debug: env.bool("DEBUG"),
+    });
+
+    if (loader.size === 0) {
+      throw new Error("No services found");
+    }
+
+    return loader;
+  }
+
+  private static async runMigrations(
+    loader: Awaited<ReturnType<typeof startServices>>,
+  ): Promise<void> {
+    const migrationService = loader.getService("users") ?? loader.getServices()[0];
+    const skipMigrations = env.bool("SKIP_MIGRATIONS", false);
+
+    if (skipMigrations) {
+      console.log("Migrations skipped (SKIP_MIGRATIONS=true)");
+      return;
+    }
+
+    if (!migrationService?.db?.runMigrations) {
+      return;
+    }
+
     try {
       await migrationService.db.runMigrations({
         migrations,
@@ -85,15 +112,14 @@ function printMigrationHint(message: string): void {
       printMigrationHint(message);
       throw error;
     }
-  } else if (skipMigrations) {
-    console.log("Migrations skipped (SKIP_MIGRATIONS=true)");
   }
+}
 
-  console.log(
-    `\n${loader.size} service(s) running: ${loader.getServiceNames().join(", ")}`,
-  );
-  console.log("Press Ctrl+C to stop.\n");
-})().catch((error) => {
-  console.error("Fatal:", formatError(error));
-  process.exit(1);
-});
+MicroservicesBootstrap.run().catch((error) =>
+  StartupErrorHandler.fail(error, {
+    dependencyName: "Linkd",
+    endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
+    hint: "Inicie o Linkd e tente novamente.",
+    formatError,
+  }),
+);

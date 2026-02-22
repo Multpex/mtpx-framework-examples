@@ -1,7 +1,7 @@
 import {
   createApp,
   setupGracefulShutdown,
-  handleCommonStartupError,
+  StartupErrorHandler,
   env,
 } from "@multpex/typescript-sdk";
 
@@ -78,15 +78,13 @@ app.afterStart(async (ctx) => {
   }
 });
 
-try {
-  await app.start();
-} catch (error) {
-  handleCommonStartupError(error, {
+await app.start().catch((error) =>
+  StartupErrorHandler.fail(error, {
     dependencyName: "Linkd",
     endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
     hint: "Inicie o Linkd e tente novamente.",
-  });
-}
+  }),
+);
 setupGracefulShutdown(app);
 
 app.logger.info("db-env-selector iniciado", {

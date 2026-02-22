@@ -73,6 +73,13 @@ bun run dev
 
 Esse comando usa `src/api.ts` com `startServices` para subir `svc-a`, `svc-b` e `svc-c` juntos.
 
+### Graceful Shutdown (automático)
+
+No modo `bun run dev` (bootstrap via `startServices`), o `ServiceLoader` já habilita graceful shutdown com `setupGracefulShutdown`.
+
+- Sinais suportados: `SIGINT` e `SIGTERM`
+- `Ctrl+C` encerra os serviços carregados sem precisar de handlers manuais
+
 ### Filtro de serviços (igual ao mtpx-micro-services)
 
 ```bash

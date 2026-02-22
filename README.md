@@ -59,6 +59,13 @@ bun run dev
 
 Alguns exemplos usam scripts adicionais (`worker`, `test`, `postman:test`, etc). Veja o `package.json` e o `README.md` de cada pasta.
 
+### Nota sobre encerramento dos apps
+
+Exemplos que fazem bootstrap com `startServices(...)` usam `ServiceLoader`, que já configura graceful shutdown automaticamente via `setupGracefulShutdown`.
+
+- Sinais suportados: `SIGINT` e `SIGTERM`
+- `Ctrl+C` para os serviços carregados de forma ordenada
+
 ## Collections (Postman + Insomnia)
 
 Cada exemplo continua com os arquivos oficiais em `postman/*.postman_collection.json` e `postman/*.postman_environment.json`.

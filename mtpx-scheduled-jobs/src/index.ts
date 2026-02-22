@@ -15,7 +15,7 @@ import {
   type Context,
   BadRequestError,
   NotFoundError,
-  handleCommonStartupError,
+  StartupErrorHandler,
   env,
 } from "@multpex/typescript-sdk";
 
@@ -558,12 +558,10 @@ service.action("health", { route: "/health", method: "GET" }, async () => {
 
 setupGracefulShutdown(service);
 
-try {
-  await service.start();
-} catch (error) {
-  handleCommonStartupError(error, {
+await service.start().catch((error) =>
+  StartupErrorHandler.fail(error, {
     dependencyName: "Linkd",
     endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
     hint: "Inicie o Linkd e tente novamente.",
-  });
-}
+  }),
+);

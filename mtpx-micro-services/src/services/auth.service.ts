@@ -153,6 +153,7 @@ service.action(
       timestamp: new Date().toISOString(),
     });
 
+    const now = ctx.datetime.now();
     return {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
@@ -161,6 +162,7 @@ service.action(
       tokenType: result.tokenType,
       user: result.user,
       tenant: ctx.tenant, // Include tenant info in response for client awareness
+      issuedAt: now.display
     };
   },
 );

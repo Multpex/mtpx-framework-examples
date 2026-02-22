@@ -3,7 +3,7 @@ import {
   setupGracefulShutdown,
   requestLogger,
   requireRole,
-  handleCommonStartupError,
+  StartupErrorHandler,
   env,
   z,
   type Context,
@@ -40,7 +40,7 @@ const service = createApp({
   },
 
   // Connection examples:
-  // connect: "tcp://localhost:9999?token=dev-secret",  // TCP for development/remote debugging
+  // connect: "tcp://localhost:9999",  // TCP for development/remote debugging
   // connect: "/tmp/multpex.sock",                      // Unix socket (default)
   // bulkhead: { maxConcurrent: 200 },                  // Override defaults
   // bulkhead: false,                                   // Or disable entirely
@@ -207,33 +207,31 @@ if (mockMode) {
   console.log("Registered actions:", service.getActionNames().join(", "));
   console.log("Event subscriptions:", service.getEventNames().join(", "));
 } else {
-  try {
-    await service.start();
-
-    await service.cors({ allowAnyOrigin: true });
-
-    // Configurar cache DEPOIS de start() (requer conexão ao sidecar)
-    await service.cache({
-      defaultPolicy: {
-        enabled: true,
-        defaultTtlSeconds: 60,
-      },
-      endpoints: [
-        { action: "list", ttlSeconds: 60 },  // 5 min para listagem
-        { action: "create", ttlSeconds: -1 }, // Nunca cachear mutations
-        { action: "delete", ttlSeconds: -1 },
-      ],
-    });
-
-    console.log(`🚀 Service running (Node: ${service.getNodeId()})`);
-
-    // Setup graceful shutdown (safe for hot reload - only registers once)
-    setupGracefulShutdown(service);
-  } catch (error) {
-    handleCommonStartupError(error, {
+  await service.start().catch((error) =>
+    StartupErrorHandler.fail(error, {
       dependencyName: "Linkd",
       endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
       hint: "Inicie o Linkd e tente novamente.",
-    });
-  }
+    }),
+  );
+
+  await service.cors({ allowAnyOrigin: true });
+
+  // Configurar cache DEPOIS de start() (requer conexão ao sidecar)
+  await service.cache({
+    defaultPolicy: {
+      enabled: true,
+      defaultTtlSeconds: 60,
+    },
+    endpoints: [
+      { action: "list", ttlSeconds: 60 }, // 5 min para listagem
+      { action: "create", ttlSeconds: -1 }, // Nunca cachear mutations
+      { action: "delete", ttlSeconds: -1 },
+    ],
+  });
+
+  console.log(`🚀 Service running (Node: ${service.getNodeId()})`);
+
+  // Setup graceful shutdown (safe for hot reload - only registers once)
+  setupGracefulShutdown(service);
 }

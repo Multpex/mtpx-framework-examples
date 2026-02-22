@@ -8,6 +8,7 @@ import {
   startServices,
   configureReconnectCoordinator,
   env,
+  StartupErrorHandler,
 } from "@multpex/typescript-sdk";
 
 (async () => {
@@ -30,8 +31,7 @@ import {
   });
 
   if (loader.size === 0) {
-    console.error("❌ No services found");
-    process.exit(1);
+    throw new Error("No services found");
   }
 
   console.log(`\n✅ ${loader.size} service(s) running: ${loader.getServiceNames().join(", ")}`);
@@ -41,6 +41,9 @@ import {
   console.log("   - POST /chat/rooms       - Create a new room");
   console.log("\nPress Ctrl+C to stop.\n");
 })().catch((error) => {
-  console.error("Fatal error:", error);
-  process.exit(1);
+  StartupErrorHandler.fail(error, {
+    dependencyName: "Linkd",
+    endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
+    hint: "Inicie o Linkd e tente novamente.",
+  });
 });

@@ -134,6 +134,15 @@ SERVICE=products bun run src/main.ts
 | **Redis**      | Cache distribuído e backend de filas                         |
 | **Keycloak**   | Provedor de identidade para autenticação OIDC/OAuth2         |
 
+### Graceful Shutdown (automático)
+
+Este exemplo usa `startServices(...)` no bootstrap (`src/main.ts`).
+Com isso, o `ServiceLoader` configura graceful shutdown automaticamente via `setupGracefulShutdown`.
+
+- Sinais suportados: `SIGINT` e `SIGTERM`
+- Ao encerrar (`Ctrl+C`), os serviços carregados são parados de forma ordenada
+- Não é necessário registrar handlers de sinal manualmente neste exemplo
+
 ### Eventos vs Channels
 
 Este exemplo demonstra os dois padrões de mensageria:

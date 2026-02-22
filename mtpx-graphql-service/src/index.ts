@@ -11,9 +11,10 @@
 
 import {
   createService,
+  setupGracefulShutdown,
   UnauthorizedError,
   z,
-  handleCommonStartupError,
+  StartupErrorHandler,
   env,
   // GraphQL helpers para definir metadata
   gqlQuery,
@@ -615,12 +616,12 @@ service.beforeStart(async () => {
   });
 });
 
-try {
-  await service.start();
-} catch (error) {
-  handleCommonStartupError(error, {
+setupGracefulShutdown(service.raw);
+
+await service.start().catch((error) =>
+  StartupErrorHandler.fail(error, {
     dependencyName: "Linkd",
     endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
     hint: "Inicie o Linkd e tente novamente.",
-  });
-}
+  }),
+);
