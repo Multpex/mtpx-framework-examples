@@ -203,7 +203,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"queue\": \"{{queueName}}\",\n  \"name\": \"SendNotification\",\n  \"data\": {\n    \"userId\": \"user-123\",\n    \"message\": \"Delayed notification\"\n  },\n  \"delay\": 30000,\n  \"priority\": 2,\n  \"attempts\": 3\n}"
+              "raw": "{\n  \"queue\": \"{{queueName}}\",\n  \"name\": \"SendNotification\",\n  \"data\": {\n    \"userId\": \"user-123\",\n    \"message\": \"Delayed notification\"\n  },\n  \"delay\": 10000,\n  \"priority\": 2,\n  \"attempts\": 3\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/jobs",
