@@ -16,7 +16,7 @@ import {
 		jitterRatio: 0.3,
 		logger:
 			env.bool("DEBUG")
-				? (message) => console.log(`[ReconnectCoordinator] ${message}`)
+				? (message: string) => console.log(`[ReconnectCoordinator] ${message}`)
 				: undefined,
 	});
 
