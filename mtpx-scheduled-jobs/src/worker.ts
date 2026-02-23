@@ -189,11 +189,11 @@ const service = createApp({
 });
 
 // Registrar handlers usando o nome da classe como job name
-service.job(ProcessData);
-service.job(GenerateReport);
-service.job(SendNotification);
-service.job(Cleanup);
-service.job(TestJob);
+service.queue.handler(ProcessData);
+service.queue.handler(GenerateReport);
+service.queue.handler(SendNotification);
+service.queue.handler(Cleanup);
+service.queue.handler(TestJob);
 
 service.beforeStart(async () => {
   console.log("⏳ Iniciando Worker de jobs agendados...");

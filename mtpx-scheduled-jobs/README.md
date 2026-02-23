@@ -218,7 +218,7 @@ class MyNewJob extends JobHandler<{ field1: string; field2?: number }, JobResult
 ### 2. Registrar no worker
 
 ```typescript
-service.job(MyNewJob);
+service.queue.handler(MyNewJob);
 ```
 
 ### 3. Criar o scheduler via API
