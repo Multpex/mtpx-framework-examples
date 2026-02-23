@@ -1,6 +1,6 @@
 # mtpx-framework-examples
 
-Colecao de exemplos oficiais do ecossistema Multpex.
+Colecao de exemplos do ecossistema Multpex Framework, demonstrando casos de uso práticos e integrações comuns.
 
 Cada pasta neste repositorio mostra um caso de uso pratico do `@multpex/sdk-typescript`.
 
@@ -69,7 +69,7 @@ Alguns exemplos usam scripts adicionais (`worker`, `test`, `postman:test`, etc).
 
 ## Collections (Postman + Insomnia)
 
-Cada exemplo continua com os arquivos oficiais em `postman/*.postman_collection.json` e `postman/*.postman_environment.json`.
+Cada exemplo continua com os arquivos em `postman/*.postman_collection.json` e `postman/*.postman_environment.json`.
 
 Para gerar versoes separadas para Insomnia em todos os projetos, execute:
 
