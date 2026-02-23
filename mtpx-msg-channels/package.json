@@ -13,6 +13,7 @@
     "start:svc_a": "SERVICE=svc_a bun run src/api.ts",
     "start:svc_b": "SERVICE=svc_b bun run src/api.ts",
     "start:svc_c": "SERVICE=svc_c bun run src/api.ts",
+    "typecheck": "tsc --noEmit",
     "test": "bun test"
   },
   "dependencies": {

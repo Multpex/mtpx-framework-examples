@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "bun run --hot src/main.ts",
     "start": "bun run src/main.ts",
+    "typecheck": "tsc --noEmit",
     "start:users": "SERVICE=users bun run src/main.ts",
     "start:orders": "SERVICE=orders bun run src/main.ts",
     "start:products": "SERVICE=products bun run src/main.ts",

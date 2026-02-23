@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "start": "bun run src/index.ts",
+    "typecheck": "tsc --noEmit",
     "build": "bun build ./src/index.ts --target=bun --outdir=./dist --minify --bytecode --sourcemap=linked",
     "build:prod": "NODE_ENV=production bun run build",
     "start:prod": "bun run ./dist/index.js",
