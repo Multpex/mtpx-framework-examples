@@ -804,6 +804,6 @@ Se você deseja implementar o gateway WebSocket no Linkd:
 ## Referências
 
 - [Multpex Framework README](../../README.md)
-- [TypeScript SDK Documentation](https://docusaurus.devops.multpex.com.br/docs/mtpx-framework/intro)
+- [TypeScript SDK Documentation](https://docs.devops.multpex.com.br/)
 - [Linkd Documentation](../../linkd/README.md)
 - [WebSocket Protocol RFC 6455](https://tools.ietf.org/html/rfc6455)
