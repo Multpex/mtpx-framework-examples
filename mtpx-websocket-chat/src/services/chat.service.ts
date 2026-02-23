@@ -15,13 +15,13 @@ import {
   ForbiddenError,
   UnauthorizedError,
   env,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 import type {
   WebSocketContext,
   WebSocketMiddleware,
   WebSocketGroupAPI,
   TypedServiceContext,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 import type { Schema } from "../db/schema.js";
 
 // Type alias for WebSocket context with our schema

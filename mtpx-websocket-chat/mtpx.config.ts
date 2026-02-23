@@ -1,4 +1,4 @@
-import { env } from "@multpex/typescript-sdk";
+import { env } from "@multpex/sdk-typescript";
 
 export default {
   name: "mtpx-websocket-chat",

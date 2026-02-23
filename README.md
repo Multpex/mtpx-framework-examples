@@ -2,7 +2,7 @@
 
 Colecao de exemplos oficiais do ecossistema Multpex.
 
-Cada pasta neste repositorio mostra um caso de uso pratico do `@multpex/typescript-sdk`.
+Cada pasta neste repositorio mostra um caso de uso pratico do `@multpex/sdk-typescript`.
 
 ## Exemplos disponiveis
 

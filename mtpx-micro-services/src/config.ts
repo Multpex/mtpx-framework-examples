@@ -11,7 +11,7 @@ import {
   createConfig,
   env,
   type ServiceEnvConfig,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 
 /**
  * App-specific configuration.

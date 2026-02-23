@@ -239,7 +239,7 @@ bun install
 
 # Verificar que o workspace está configurado
 bun --version
-cat package.json  # Deve conter "@multpex/typescript-sdk": "0.9.3" em dependencies
+cat package.json  # Deve conter "@multpex/sdk-typescript": "0.1.0" em dependencies
 ```
 
 ## Passo 5: Executar o WebSocket Chat Service

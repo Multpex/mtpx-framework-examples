@@ -2,7 +2,7 @@ import {
   createService,
   requestLogger,
   z,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 
 interface DemoMessageInput {
   orderId: string;

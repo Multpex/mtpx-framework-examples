@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Basic Keycloak admin operations example with @multpex/typescript-sdk",
+  "description": "Basic Keycloak admin operations example with @multpex/sdk-typescript",
   "main": "src/index.ts",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@multpex/typescript-sdk": "0.9.3"
+    "@multpex/sdk-typescript": "0.1.0"
   },
   "devDependencies": {
     "@types/bun": "latest",

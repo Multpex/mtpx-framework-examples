@@ -22,8 +22,8 @@ import {
   UnauthorizedError,
   env,
   type AuthUser,
-} from "@multpex/typescript-sdk";
-import type { TypedServiceContext } from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
+import type { TypedServiceContext } from "@multpex/sdk-typescript";
 import type { Schema } from "../db/schema.js";
 import { authConfig, config } from "../config.js";
 

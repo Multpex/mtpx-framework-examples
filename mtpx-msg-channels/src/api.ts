@@ -3,7 +3,7 @@ import {
 	startServices,
 	env,
 	StartupErrorHandler,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 
 (async () => {
 	console.log("Iniciando mtpx-msg-channels...\n");

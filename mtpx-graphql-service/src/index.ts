@@ -24,7 +24,7 @@ import {
   gqlInput,
   // GraphQL Client para consumir APIs
   createGraphQLClient,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 
 // =============================================================================
 // Schema Definitions

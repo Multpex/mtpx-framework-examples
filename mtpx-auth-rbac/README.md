@@ -121,7 +121,7 @@ service.action(
 ### 2. Via Wrappers
 
 ```typescript
-import { adminOnly, authenticated } from "@multpex/typescript-sdk";
+import { adminOnly, authenticated } from "@multpex/sdk-typescript";
 
 service.action("admin.settings", { ... }, adminOnly(handler));
 service.action("profile.me", { ... }, authenticated(handler));
@@ -130,7 +130,7 @@ service.action("profile.me", { ... }, authenticated(handler));
 ### 3. Via withAuthorization
 
 ```typescript
-import { withAuthorization } from "@multpex/typescript-sdk";
+import { withAuthorization } from "@multpex/sdk-typescript";
 
 service.action(
   "documents.update",
@@ -142,7 +142,7 @@ service.action(
 ### 4. Via Verificação Manual
 
 ```typescript
-import { requireAdmin, assertRole, getAuthInfo } from "@multpex/typescript-sdk";
+import { requireAdmin, assertRole, getAuthInfo } from "@multpex/sdk-typescript";
 
 service.action("admin.stats", { authRequired: true }, async (ctx) => {
   requireAdmin(ctx);  // Throws se não for admin

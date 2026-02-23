@@ -12,7 +12,7 @@ import {
   startServices,
   env,
   StartupErrorHandler,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 import { migrations } from "./db/migrations.js";
 
 function formatError(error: unknown): string {

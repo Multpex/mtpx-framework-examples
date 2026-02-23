@@ -2,7 +2,7 @@
   "name": "minimal-app-example",
   "version": "1.0.0",
   "type": "module",
-  "description": "Minimal example of @multpex/typescript-sdk features",
+  "description": "Minimal example of @multpex/sdk-typescript features",
   "main": "src/index.ts",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
@@ -17,7 +17,7 @@
     "postman:test:verbose": "bunx newman run postman/mtpx-minimal-app.postman_collection.json -e postman/mtpx-minimal-app.postman_environment.json --verbose"
   },
   "dependencies": {
-    "@multpex/typescript-sdk": "0.9.3"
+    "@multpex/sdk-typescript": "0.1.0"
   },
   "devDependencies": {
     "@types/bun": "^1.0.0",

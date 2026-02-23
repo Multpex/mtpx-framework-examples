@@ -10,8 +10,8 @@
  */
 
 import { z } from "zod";
-import { createService, env } from "@multpex/typescript-sdk";
-import type { TypedServiceContext, EventContext } from "@multpex/typescript-sdk";
+import { createService, env } from "@multpex/sdk-typescript";
+import type { TypedServiceContext, EventContext } from "@multpex/sdk-typescript";
 import type { Schema } from "../db/schema.js";
 
 // Order item as stored in JSON (different from the order_items table)

@@ -16,7 +16,7 @@ import {
   NotFoundError,
   StartupErrorHandler,
   env,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 
 const service = createApp({
   name: "scheduler-api",

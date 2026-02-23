@@ -9,7 +9,7 @@ import {
   configureReconnectCoordinator,
   env,
   StartupErrorHandler,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 
 (async () => {
   console.log("\n🔌 Starting WebSocket Chat Example\n");

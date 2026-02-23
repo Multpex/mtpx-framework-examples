@@ -6,7 +6,7 @@
  * - db:migrate uses migrationsPath and auto-syncs generated types after success.
  * - tenantSelector is used by mtpx db:migrate --all-tenants.
  */
-import { env, parseCsv } from "@multpex/typescript-sdk";
+import { env, parseCsv } from "@multpex/sdk-typescript";
 
 export default {
   name: "mtpx-micro-services",

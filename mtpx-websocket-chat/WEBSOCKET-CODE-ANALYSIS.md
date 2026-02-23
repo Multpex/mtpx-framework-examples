@@ -3,7 +3,7 @@
 **Analyzed by**: AI Code Reviewer  
 **Date**: February 1, 2026  
 **Scope**: SDK TypeScript, Sidecar/Linkd, WebSocket Chat Example  
-**Version**: 0.9.3
+**Version**: 0.1.0
 
 ---
 

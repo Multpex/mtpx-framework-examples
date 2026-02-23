@@ -10,8 +10,8 @@
  * JetStream provides: durable messaging, ack/nack flow control, DLQ
  */
 
-import { createService } from "@multpex/typescript-sdk";
-import type { TypedServiceContext, ChannelContext, EventContext } from "@multpex/typescript-sdk";
+import { createService } from "@multpex/sdk-typescript";
+import type { TypedServiceContext, ChannelContext, EventContext } from "@multpex/sdk-typescript";
 import type { Schema } from "../db/schema.js";
 
 

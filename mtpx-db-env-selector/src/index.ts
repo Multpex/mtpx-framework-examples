@@ -2,7 +2,7 @@ import {
   createApp,
   StartupErrorHandler,
   env,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 
 interface ItemRow extends Record<string, unknown> {
   id: string;

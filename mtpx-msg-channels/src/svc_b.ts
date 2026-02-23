@@ -2,7 +2,7 @@ import {
   createService,
   type ChannelContext,
   type EventContext,
-} from "@multpex/typescript-sdk";
+} from "@multpex/sdk-typescript";
 
 interface DemoMessagePayload {
   orderId: string;

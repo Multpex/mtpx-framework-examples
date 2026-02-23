@@ -1,0 +1,5 @@
+[install]
+registry = "https://registry.npmjs.org/"
+
+[install.scopes]
+"@multpex" = { token = "$VERDACCIO_NPM_TOKEN", url = "https://verdaccio.devops.multpex.com.br" }
