@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "mtpx-minimal-app-collection",
     "name": "mtpx minimal service api",
-    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (com validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check",
+    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Auth\n\nExecute **Auth > Set Dev Token** primeiro para configurar o `accessToken` no environment.\nIsso habilita os endpoints protegidos (DELETE, Admin).\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (com validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -23,6 +23,56 @@
     }
   ],
   "item": [
+    {
+      "name": "Auth",
+      "description": "Configuração de autenticação para endpoints protegidos.\n\nO token de dev está no `.env` da infra (`DEV_TOKEN`).\nEste request seta a variável `accessToken` no environment para uso automático nos demais requests.",
+      "item": [
+        {
+          "name": "Set Dev Token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// DEV_TOKEN pré-gerado (admin role, 10-year expiry, signed with dev-secret)",
+                  "// Regenere com: cd mtpx-framework-dev-infra && bun run gen-dev-token.ts",
+                  "const devToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlciIsInRlbmFudF9pZCI6ImRlZmF1bHQiLCJyb2xlcyI6WyJhZG1pbiIsInVzZXIiXSwicGVybWlzc2lvbnMiOlsicmVhZCIsIndyaXRlIl0sImlhdCI6MTc3MTg5MDI0OCwiZXhwIjoyMDg3MjUwMjQ4fQ.Ub_eCs6TPm-Hcj283y7s2_E6iSf9kA9Kc_LkfQcYOYs';",
+                  "",
+                  "pm.environment.set('accessToken', devToken);",
+                  "console.log('accessToken configurado com DEV_TOKEN (admin role)');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Health returns 200 (token validation)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('accessToken is set', function () {",
+                  "    pm.expect(pm.environment.get('accessToken')).to.not.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/minimal-app/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["minimal-app", "health"]
+            },
+            "description": "Faz um health check e configura o accessToken no environment.\n\nExecute este request primeiro para autenticar os endpoints protegidos (DELETE items, Admin Stats)."
+          }
+        }
+      ]
+    },
     {
       "name": "Health",
       "item": [
