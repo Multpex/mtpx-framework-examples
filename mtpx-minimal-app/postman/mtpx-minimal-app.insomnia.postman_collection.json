@@ -1,66 +1,15 @@
 {
   "info": {
-    "_postman_id": "mtpx-minimal-app-collection",
+    "_postman_id": "22864664-715d-4cf7-a9ed-9d8bfea938eb",
     "name": "mtpx minimal service api (Insomnia)",
-    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Autenticação\n\nUse o grupo **Auth (Keycloak)** para obter token e preencher `accessToken` automaticamente.\n\nEndpoints de mutation (POST/DELETE) e Admin exigem Bearer token.\nDefina o valor da variável `accessToken` no environment.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (requer auth + validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check\n\nGenerated for Insomnia import: GraphQL requests are sent as application/graphql raw body.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Autenticação\n\nUse o grupo **Auth (Keycloak)** para obter token e preencher `accessToken` automaticamente.\n\nEndpoints protegidos (DELETE, Admin) exigem Bearer token.\nDefina o valor da variável `accessToken` no environment.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (com validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check\n\nGenerated for Insomnia import: GraphQL requests are sent as application/graphql raw body.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "20667599",
+    "_collection_link": "https://go.postman.co/collection/20667599-22864664-715d-4cf7-a9ed-9d8bfea938eb?source=collection_link"
   },
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{accessToken}}",
-        "type": "string"
-      }
-    ]
-  },
-  "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:3000",
-      "type": "string"
-    },
-    {
-      "key": "accessToken",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "keycloakUrl",
-      "value": "http://localhost:8180",
-      "type": "string"
-    },
-    {
-      "key": "keycloakRealm",
-      "value": "multpex",
-      "type": "string"
-    },
-    {
-      "key": "keycloakClientId",
-      "value": "multpex-services",
-      "type": "string"
-    },
-    {
-      "key": "keycloakClientSecret",
-      "value": "multpex",
-      "type": "string"
-    },
-    {
-      "key": "keycloakUsername",
-      "value": "admin",
-      "type": "string"
-    },
-    {
-      "key": "keycloakPassword",
-      "value": "admin",
-      "type": "string"
-    }
-  ],
   "item": [
     {
       "name": "Auth (Keycloak)",
-      "description": "Obtenha token de acesso no Keycloak para usar nos endpoints autenticados.",
       "item": [
         {
           "name": "Get Access Token (Password Grant)",
@@ -153,7 +102,8 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Obtenha token de acesso no Keycloak para usar nos endpoints autenticados."
     },
     {
       "name": "Health",
@@ -183,6 +133,7 @@
               "type": "noauth"
             },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/health",
               "host": [
@@ -193,7 +144,8 @@
                 "health"
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Readiness Check",
@@ -215,6 +167,7 @@
               "type": "noauth"
             },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/ready",
               "host": [
@@ -225,7 +178,8 @@
                 "ready"
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Liveness Check",
@@ -247,6 +201,7 @@
               "type": "noauth"
             },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/live",
               "host": [
@@ -257,7 +212,8 @@
                 "live"
               ]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
@@ -294,6 +250,7 @@
               "type": "noauth"
             },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/items",
               "host": [
@@ -304,7 +261,8 @@
                 "items"
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "List Items (Filter by Name)",
@@ -313,6 +271,7 @@
               "type": "noauth"
             },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/items?name=widget",
               "host": [
@@ -329,7 +288,8 @@
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Item by ID",
@@ -357,6 +317,7 @@
               "type": "noauth"
             },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/items/1",
               "host": [
@@ -368,7 +329,8 @@
                 "1"
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Item Not Found",
@@ -391,6 +353,7 @@
               "type": "noauth"
             },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/items/nonexistent",
               "host": [
@@ -402,7 +365,8 @@
                 "nonexistent"
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Item",
@@ -428,21 +392,13 @@
                   "    pm.environment.set('itemId', jsonData.id);",
                   "}"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "POST",
             "header": [
               {
@@ -464,7 +420,8 @@
                 "items"
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Item (Validation Error)",
@@ -477,21 +434,13 @@
                   "    pm.response.to.have.status(400);",
                   "});"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "POST",
             "header": [
               {
@@ -514,41 +463,8 @@
               ]
             },
             "description": "Testa validação Zod: name vazio e price negativo devem falhar"
-          }
-        },
-        {
-          "name": "Delete Item (No Auth)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Returns 401 unauthorized', function () {",
-                  "    pm.response.to.have.status(401);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "DELETE",
-            "url": {
-              "raw": "{{baseUrl}}/minimal-app/items/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "minimal-app",
-                "items",
-                "1"
-              ]
-            },
-            "description": "Deve falhar sem autenticação"
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Item (With Auth)",
@@ -561,22 +477,15 @@
                   "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
                   "});"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "DELETE",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/items/{{itemId}}",
               "host": [
@@ -589,7 +498,8 @@
               ]
             },
             "description": "Requer auth com role admin. Usa itemId salvo do teste Create."
-          }
+          },
+          "response": []
         }
       ]
     },
@@ -616,6 +526,7 @@
               "type": "noauth"
             },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/admin/stats",
               "host": [
@@ -627,7 +538,8 @@
                 "stats"
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Stats (With Auth)",
@@ -649,6 +561,7 @@
           ],
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/minimal-app/admin/stats",
               "host": [
@@ -661,9 +574,62 @@
               ]
             },
             "description": "Requer auth com role admin"
-          }
+          },
+          "response": []
         }
       ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "keycloakUrl",
+      "value": "http://localhost:8180",
+      "type": "string"
+    },
+    {
+      "key": "keycloakRealm",
+      "value": "multpex",
+      "type": "string"
+    },
+    {
+      "key": "keycloakClientId",
+      "value": "multpex-services",
+      "type": "string"
+    },
+    {
+      "key": "keycloakClientSecret",
+      "value": "multpex",
+      "type": "string"
+    },
+    {
+      "key": "keycloakUsername",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "keycloakPassword",
+      "value": "admin",
+      "type": "string"
     }
   ]
 }
