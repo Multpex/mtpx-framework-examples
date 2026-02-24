@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "mtpx-minimal-app-collection",
     "name": "mtpx minimal service api (Insomnia)",
-    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (com validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check\n\nGenerated for Insomnia import: GraphQL requests are sent as application/graphql raw body.",
+    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Autenticação\n\nUse o grupo **Auth (Keycloak)** para obter token e preencher `accessToken` automaticamente.\n\nEndpoints protegidos (DELETE, Admin) exigem Bearer token.\nDefina o valor da variável `accessToken` no environment.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (com validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check\n\nGenerated for Insomnia import: GraphQL requests are sent as application/graphql raw body.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -20,9 +20,141 @@
       "key": "baseUrl",
       "value": "http://localhost:3000",
       "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "keycloakUrl",
+      "value": "http://localhost:8180",
+      "type": "string"
+    },
+    {
+      "key": "keycloakRealm",
+      "value": "multpex",
+      "type": "string"
+    },
+    {
+      "key": "keycloakClientId",
+      "value": "multpex-services",
+      "type": "string"
+    },
+    {
+      "key": "keycloakClientSecret",
+      "value": "multpex",
+      "type": "string"
+    },
+    {
+      "key": "keycloakUsername",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "keycloakPassword",
+      "value": "admin",
+      "type": "string"
     }
   ],
   "item": [
+    {
+      "name": "Auth (Keycloak)",
+      "description": "Obtenha token de acesso no Keycloak para usar nos endpoints autenticados.",
+      "item": [
+        {
+          "name": "Get Access Token (Password Grant)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set('keycloakClientId', 'multpex-services');",
+                  "pm.variables.set('keycloakClientSecret', 'multpex');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('token retornado', function () { pm.expect(json.access_token).to.be.a('string'); });",
+                  "if (json.access_token) {",
+                  "  pm.environment.set('accessToken', json.access_token);",
+                  "  pm.collectionVariables.set('accessToken', json.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{keycloakClientId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{keycloakClientSecret}}",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "{{keycloakUsername}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{keycloakPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid profile email roles offline_access",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{keycloakRealm}}/protocol/openid-connect/token",
+              "host": [
+                "{{keycloakUrl}}"
+              ],
+              "path": [
+                "realms",
+                "{{keycloakRealm}}",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            },
+            "description": "Obtém um access token no Keycloak e salva em `accessToken`."
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "Health",
       "item": [
