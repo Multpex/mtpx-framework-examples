@@ -74,12 +74,13 @@ service.action(
   },
 );
 
-// Create (with validation)
+// Create (auth + validation)
 service.action(
   "create",
   {
     route: "/minimal-app/items",
     method: "POST",
+    auth: true,
     validate: createItemSchema,
   },
   async (ctx: Context<CreateItemInput>) => {
