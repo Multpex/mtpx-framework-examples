@@ -19,6 +19,7 @@ const IS_PRODUCTION = env.string("NODE_ENV", "development") === "production";
 import { z } from "zod";
 import {
   createService,
+  datetime,
   UnauthorizedError,
   env,
   type AuthUser,
@@ -153,7 +154,7 @@ service.action(
       timestamp: new Date().toISOString(),
     });
 
-    const now = ctx.datetime.now();
+    const now = datetime.now();
     return {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
@@ -162,7 +163,7 @@ service.action(
       tokenType: result.tokenType,
       user: result.user,
       tenant: ctx.tenant, // Include tenant info in response for client awareness
-      issuedAt: now.display
+      issuedAt: now.display,
     };
   },
 );
