@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "mtpx-minimal-app-collection",
     "name": "mtpx minimal service api (Insomnia)",
-    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Autenticação\n\nUse o grupo **Auth (Keycloak)** para obter token e preencher `accessToken` automaticamente.\n\nEndpoints protegidos (DELETE, Admin) exigem Bearer token.\nDefina o valor da variável `accessToken` no environment.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (com validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check\n\nGenerated for Insomnia import: GraphQL requests are sent as application/graphql raw body.",
+    "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Autenticação\n\nUse o grupo **Auth (Keycloak)** para obter token e preencher `accessToken` automaticamente.\n\nEndpoints de mutation (POST/DELETE) e Admin exigem Bearer token.\nDefina o valor da variável `accessToken` no environment.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (requer auth + validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check\n\nGenerated for Insomnia import: GraphQL requests are sent as application/graphql raw body.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -434,7 +434,14 @@
           ],
           "request": {
             "auth": {
-              "type": "noauth"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -476,7 +483,14 @@
           ],
           "request": {
             "auth": {
-              "type": "noauth"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -552,6 +566,16 @@
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "url": {
               "raw": "{{baseUrl}}/minimal-app/items/{{itemId}}",
