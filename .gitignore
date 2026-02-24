@@ -1,2 +1,8 @@
 **/node_modules/
 **/.DS_Store
+
+# .env é gerado pelo install.sh a partir do .env.example
+# Contém token local (LINKD_TCP_TOKEN) — não commitar
+**/.env
+**/.env.local
+**/.env.*.local
