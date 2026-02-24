@@ -1,5 +1,5 @@
 {
-  "name": "websocket-chat-example",
+  "name": "mtpx-websocket-chat",
   "version": "1.0.0",
   "type": "module",
   "scripts": {

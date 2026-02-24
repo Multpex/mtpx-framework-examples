@@ -1,5 +1,5 @@
 {
-  "name": "@multpex/example-auth-rbac",
+  "name": "mtpx-auth-rbac",
   "version": "1.0.0",
   "private": true,
   "type": "module",

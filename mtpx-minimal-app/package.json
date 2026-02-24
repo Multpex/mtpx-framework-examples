@@ -1,5 +1,5 @@
 {
-  "name": "minimal-app-example",
+  "name": "mtpx-minimal-app",
   "version": "1.0.0",
   "type": "module",
   "description": "Minimal example of @multpex/sdk-typescript features",

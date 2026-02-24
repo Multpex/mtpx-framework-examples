@@ -1,5 +1,5 @@
 {
-  "name": "scheduled-jobs-example",
+  "name": "mtpx-scheduled-jobs",
   "version": "1.0.0",
   "type": "module",
   "description": "Example of scheduled/cron jobs with @multpex/sdk-typescript",

@@ -1,5 +1,5 @@
 {
-  "name": "moleculer-style-example",
+  "name": "mtpx-micro-services",
   "version": "1.0.0",
   "type": "module",
   "description": "Moleculer-style microservices example with service loader, PostgreSQL, NATS events and caching",
