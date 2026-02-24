@@ -166,7 +166,8 @@ if (mockMode) {
   await service.start().catch((error) =>
     StartupErrorHandler.fail(error, {
       dependencyName: "Linkd",
-      endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
+      endpoint:
+        env.coalesce("LINKD_CONNECT", "LINKD_URL") || "unix:/tmp/linkd.sock",
       hint: "Inicie o Linkd e tente novamente.",
     }),
   );
