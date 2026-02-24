@@ -91,6 +91,7 @@ describe("Minimal Service Integration", async () => {
     });
 
     it("POST /items should create new item with valid data", async () => {
+      const userToken = generateToken("user");
       const newItem = {
         name: "Test Item",
         price: 49.99,
@@ -99,7 +100,10 @@ describe("Minimal Service Integration", async () => {
 
       const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
         body: JSON.stringify(newItem),
       });
 
@@ -115,11 +119,15 @@ describe("Minimal Service Integration", async () => {
 
   describe("Validation", () => {
     it("POST /items should return validation error for missing name", async () => {
+      const userToken = generateToken("user");
       const invalidItem = { price: 10 };
 
       const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
         body: JSON.stringify(invalidItem),
       });
 
@@ -133,11 +141,15 @@ describe("Minimal Service Integration", async () => {
     });
 
     it("POST /items should return validation error for negative price", async () => {
+      const userToken = generateToken("user");
       const invalidItem = { name: "Test", price: -10 };
 
       const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
         body: JSON.stringify(invalidItem),
       });
 
@@ -149,11 +161,15 @@ describe("Minimal Service Integration", async () => {
     });
 
     it("POST /items should return validation error for empty name", async () => {
+      const userToken = generateToken("user");
       const invalidItem = { name: "", price: 10 };
 
       const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
         body: JSON.stringify(invalidItem),
       });
 
@@ -164,11 +180,15 @@ describe("Minimal Service Integration", async () => {
     });
 
     it("POST /items should return validation error for name too long", async () => {
+      const userToken = generateToken("user");
       const invalidItem = { name: "x".repeat(101), price: 10 };
 
       const response = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
         body: JSON.stringify(invalidItem),
       });
 
@@ -180,6 +200,20 @@ describe("Minimal Service Integration", async () => {
   });
 
   describe("Authentication", () => {
+    it("POST /items should return 401 without token", async () => {
+      const response = await fetch(`${BASE_URL}/minimal-app/items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "No Auth", price: 10 }),
+      });
+
+      expect(response.status).toBe(401);
+
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+      expect(data.error.type).toBe("UNAUTHORIZED");
+    });
+
     it("DELETE /items/:id should return 401 without token", async () => {
       const response = await fetch(`${BASE_URL}/minimal-app/items/1`, {
         method: "DELETE",
@@ -207,9 +241,13 @@ describe("Minimal Service Integration", async () => {
     });
 
     it("DELETE /items/:id should succeed with admin token", async () => {
+      const userToken = generateToken("user");
       const createResponse = await fetch(`${BASE_URL}/minimal-app/items`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
         body: JSON.stringify({ name: "To Delete", price: 1 }),
       });
 

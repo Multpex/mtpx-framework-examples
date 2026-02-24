@@ -1,6 +1,6 @@
 # mtpx-minimal-app
 
-Exemplo mínimo do `@multpex/sdk-typescript` com rotas básicas, autenticação opcional e testes de integração.
+Exemplo mínimo do `@multpex/sdk-typescript` com rotas básicas, autenticação em mutations e testes de integração.
 
 ## Pré-requisitos
 
