@@ -177,7 +177,6 @@ O realm do Keycloak vem pré-configurado com usuários de teste:
 | `LINKD_SOCKET`     | `/tmp/linkd.sock`        | Socket path usado pelo `mtpx.config.ts` |
 | `LINKD_KEYSTORE_NAMESPACE` | `default`        | Namespace do keystore para resolver DB server |
 | `LINKD_NAMESPACE`  | `microservice-demo`      | Namespace de serviços         |
-| `AUTH_PROVIDER`    | (vazio)                  | Vazio/ausente = usa OIDC do linkd |
 | `AUTH_REALM`       | `multpex`                | Realm OIDC padrão            |
 | `AUTH_CLIENT_ID`   | `multpex-services`       | Client ID OIDC padrão        |
 | `MTPX_DB_SERVER`   | `local-pg`               | Nome do DB server para operações `--all-tenants` |
@@ -195,12 +194,8 @@ cp .env.example .env
 ```
 
 O OIDC é configurado estaticamente no `linkd.toml` (seção `[oidc]`) ou via env vars `LINKD_OIDC__*`.
-Não é necessário provisionar providers no keystore para ambientes fixos (local, staging, prod).
-
-Para omitir `AUTH_PROVIDER` e usar a config estática do linkd, basta removê-lo do `.env`:
 
 ```bash
-# AUTH_PROVIDER=  # vazio ou ausente = usa OIDC estático do linkd
 AUTH_REALM=multpex
 AUTH_CLIENT_ID=multpex-services
 ```

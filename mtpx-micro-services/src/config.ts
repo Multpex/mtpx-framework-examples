@@ -22,7 +22,6 @@ export const config = createConfig({
     // Explicitly sourced from env to keep .env as source-of-truth in local dev.
     realm: env.string("AUTH_REALM", "multpex"),
     clientId: env.string("AUTH_CLIENT_ID", "multpex-services"),
-    provider: env.string("AUTH_PROVIDER", "oidc/default"),
     // Multi-tenant realms - requests from realm1.localhost go to realm1
     knownRealms: ["realm1", "realm2", "multpex", "multpex-test"],
   },

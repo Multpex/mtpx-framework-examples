@@ -136,7 +136,6 @@ const service = createService({
   namespace: env.string("LINKD_NAMESPACE", "keycloak-admin-example"),
   auth: {
     enabled: true,
-    provider: env.string("AUTH_PROVIDER", "oidc/default"),
     realm: env.string("AUTH_REALM", "multpex"),
     clientId: env.string("AUTH_CLIENT_ID", "multpex-services"),
   },
