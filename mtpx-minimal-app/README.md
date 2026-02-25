@@ -14,6 +14,13 @@ bun install
 bun run dev
 ```
 
+## Modos de conexão com linkd
+
+- TCP: `LINKD_CONNECT=tcp://localhost:9999` + `LINKD_TCP_TOKEN` (recomendado para host -> Docker)
+- Unix socket: `LINKD_CONNECT=unix:///tmp/linkd.sock` (quando o linkd roda local no host)
+
+Se o linkd estiver em Docker no macOS, prefira TCP.
+
 ## Executar em modo normal
 
 ```bash
