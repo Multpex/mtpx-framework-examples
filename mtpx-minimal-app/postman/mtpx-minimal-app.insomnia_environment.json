@@ -1,0 +1,45 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-02-24T21:07:46.927Z",
+  "__export_source": "multpex-postman-to-insomnia",
+  "resources": [
+    {
+      "_id": "wrk_mtpx_minimal_app",
+      "_type": "workspace",
+      "name": "mtpx minimal service api",
+      "description": "Collection para testar o exemplo minimal-app do Multpex Framework.\n\n## Autenticação\n\nUse o grupo **Auth (Keycloak)** para obter token e preencher `accessToken` automaticamente.\n\nEndpoints protegidos (DELETE, Admin) exigem Bearer token.\nDefina o valor da variável `accessToken` no environment.\n\n## Endpoints\n\n- **GET /minimal-app/items** - Listar items\n- **GET /minimal-app/items/:id** - Buscar item por ID\n- **POST /minimal-app/items** - Criar item (com validação Zod)\n- **DELETE /minimal-app/items/:id** - Deletar item (requer auth + role admin)\n\n## Admin\n\n- **GET /minimal-app/admin/stats** - Estatísticas (requer role admin)\n\n## Health\n\n- **GET /minimal-app/health** - Health check\n- **GET /minimal-app/ready** - Readiness check\n- **GET /minimal-app/live** - Liveness check",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_mtpx_minimal_local",
+      "_type": "environment",
+      "parentId": "wrk_mtpx_minimal_app",
+      "name": "mtpx-minimal-app - Local",
+      "data": {
+        "baseUrl": "http://localhost:3000",
+        "accessToken": "",
+        "itemId": "1",
+        "keycloakUrl": "http://localhost:8180",
+        "keycloakRealm": "multpex",
+        "keycloakClientId": "multpex-services",
+        "keycloakClientSecret": "multpex",
+        "keycloakUsername": "admin",
+        "keycloakPassword": "admin"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "baseUrl",
+          "accessToken",
+          "itemId",
+          "keycloakUrl",
+          "keycloakRealm",
+          "keycloakClientId",
+          "keycloakClientSecret",
+          "keycloakUsername",
+          "keycloakPassword"
+        ]
+      }
+    }
+  ]
+}

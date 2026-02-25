@@ -93,4 +93,4 @@ curl -X POST http://localhost:3000/keycloak-admin/users/<USER_ID>/roles/support 
 ## Observações
 
 - Os endpoints são protegidos por `roles: ["admin"]`.
-- O app usa OIDC estático configurado no linkd para autenticar no Admin API.
+- O app usa OIDC configurado no linkd para autenticar no Admin API.
