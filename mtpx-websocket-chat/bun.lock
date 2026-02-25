@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "mtpx-micro-services",
+      "name": "mtpx-websocket-chat",
       "dependencies": {
         "@multpex/sdk-typescript": "0.1.0",
         "zod": "^4.3.6",

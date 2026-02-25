@@ -2,14 +2,13 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "mtpx-micro-services",
+      "name": "mtpx-scheduled-jobs",
       "dependencies": {
         "@multpex/sdk-typescript": "0.1.0",
         "zod": "^4.3.6",
       },
       "devDependencies": {
         "@types/bun": "^1.3.9",
-        "@types/node": "^25.3.0",
         "typescript": "^5.9.3",
       },
     },
