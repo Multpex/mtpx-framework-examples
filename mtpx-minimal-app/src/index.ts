@@ -37,6 +37,8 @@ const createItemSchema = z.object({
 
 type CreateItemInput = z.infer<typeof createItemSchema>;
 
+// NOTA: armazenamento em memória — dados são perdidos ao reiniciar o processo.
+// Em um app real, substitua por service.db() para persistência.
 const items = new Map<
   string,
   { id: string; name: string; price: number; tags?: string[] }
@@ -88,6 +90,9 @@ service.action(
     const item = { id, ...ctx.body };
     items.set(id, item);
 
+    // Invalida o cache do list para que a próxima leitura reflita o novo item.
+    service.invalidateCache({ action: "list" });
+
     ctx.emit("item.created", { itemId: id, name: ctx.body.name });
 
     return item;
@@ -102,6 +107,8 @@ service.action(
     if (!items.delete(ctx.params.id)) {
       return { error: "Not found", statusCode: 404 };
     }
+    // Invalida o cache do list para que a próxima leitura reflita a remoção.
+    service.invalidateCache({ action: "list" });
     ctx.emit("item.deleted", { itemId: ctx.params.id });
     return { success: true };
   },
@@ -181,7 +188,7 @@ if (mockMode) {
       defaultTtlSeconds: 60,
     },
     endpoints: [
-      { action: "list", ttlSeconds: 60 }, // 5 min para listagem
+      { action: "list", ttlSeconds: 60 }, // 60s para listagem
       { action: "create", ttlSeconds: -1 }, // Nunca cachear mutations
       { action: "delete", ttlSeconds: -1 },
     ],
