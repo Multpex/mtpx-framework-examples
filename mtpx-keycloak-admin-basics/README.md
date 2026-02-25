@@ -17,12 +17,11 @@ Exemplo de operações básicas de administração do Keycloak via SDK:
 Exemplo de provider local:
 
 ```bash
-mtpx oidc set default \
-  --provider oidc \
-  --issuer-url http://localhost:8180 \
-  --realm multpex \
-  --client-id multpex-services \
-  --client-secret multpex
+mtpx keystore set oidc default \
+  --field issuer_url=http://localhost:8180 \
+  --field realm=multpex \
+  --field client_id=multpex-services \
+  --field client_secret=multpex
 ```
 
 ## Configuração
