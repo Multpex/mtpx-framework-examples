@@ -12,17 +12,6 @@ Exemplo de operações básicas de administração do Keycloak via SDK:
 
 - Linkd em execução
 - Keycloak disponível
-- Provider OIDC cadastrado no keystore
-
-Exemplo de provider local:
-
-```bash
-mtpx keystore set oidc default \
-  --field issuer_url=http://localhost:8180 \
-  --field realm=multpex \
-  --field client_id=multpex-services \
-  --field client_secret=multpex
-```
 
 ## Configuração
 
@@ -32,7 +21,6 @@ cp .env.example .env
 
 Principais variáveis:
 
-- `AUTH_PROVIDER`: provider usado para autenticar requisições HTTP da API
 - `OIDC_ADMIN_PROVIDER`: provider usado para chamadas Admin API no Keycloak
 - `OIDC_ADMIN_REALM`: realm alvo das operações de usuário/role
 
@@ -105,5 +93,4 @@ curl -X POST http://localhost:3000/keycloak-admin/users/<USER_ID>/roles/support 
 ## Observações
 
 - Os endpoints são protegidos por `roles: ["admin"]`.
-- O app usa credenciais `oidc/<provider>` do keystore para autenticar no Admin API.
-- O `issuer_url` do provider é normalizado automaticamente para `baseUrl` do cliente Keycloak.
+- O app usa OIDC estático configurado no linkd para autenticar no Admin API.

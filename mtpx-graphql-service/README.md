@@ -29,32 +29,9 @@ bun install
 bun run dev
 ```
 
-## OIDC via Keystore (provider)
+## OIDC no linkd
 
-O SDK agora suporta selecionar o provider OIDC por variável de ambiente:
-
-```bash
-AUTH_PROVIDER=oidc/default
-```
-
-Formatos aceitos:
-- `oidc/<nome>` (service_type `oidc`)
-- `<nome>` (atalho para `oidc/<nome>`)
-
-Credencial esperada no keystore (exemplo):
-
-```json
-{
-  "service_type": "oidc",
-  "name": "default",
-  "data": {
-    "issuer_url": "http://localhost:8180",
-    "realm": "multpex",
-    "client_id": "multpex-services",
-    "client_secret": "multpex"
-  }
-}
-```
+Use OIDC configurado no linkd (`[oidc]` no `linkd.toml` ou `LINKD_OIDC__*` por ambiente).
 
 ## Endpoints
 

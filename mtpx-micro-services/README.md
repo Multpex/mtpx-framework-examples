@@ -177,7 +177,7 @@ O realm do Keycloak vem pré-configurado com usuários de teste:
 | `LINKD_SOCKET`     | `/tmp/linkd.sock`        | Socket path usado pelo `mtpx.config.ts` |
 | `LINKD_KEYSTORE_NAMESPACE` | `default`        | Namespace do keystore para resolver DB server |
 | `LINKD_NAMESPACE`  | `microservice-demo`      | Namespace de serviços         |
-| `AUTH_PROVIDER`    | (vazio)                  | Provider OIDC. Vazio = usa config estática do linkd. `oidc/<nome>` = resolve via keystore (legado) |
+| `AUTH_PROVIDER`    | (vazio)                  | Vazio/ausente = usa OIDC do linkd |
 | `AUTH_REALM`       | `multpex`                | Realm OIDC padrão            |
 | `AUTH_CLIENT_ID`   | `multpex-services`       | Client ID OIDC padrão        |
 | `MTPX_DB_SERVER`   | `local-pg`               | Nome do DB server para operações `--all-tenants` |
@@ -204,9 +204,6 @@ Para omitir `AUTH_PROVIDER` e usar a config estática do linkd, basta removê-lo
 AUTH_REALM=multpex
 AUTH_CLIENT_ID=multpex-services
 ```
-
-> **Legado:** Se `AUTH_PROVIDER=oidc/default` estiver definido, o linkd resolve via keystore.
-> Para isso, o provider precisa existir: `mtpx keystore set oidc default --field issuer_url=http://localhost:8180 --field realm=multpex --field client_id=multpex-services --field client_secret=multpex`
 
 ### Migrations multi-tenant com mtpx CLI
 
