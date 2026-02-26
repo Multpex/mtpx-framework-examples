@@ -1,6 +1,6 @@
 {
   "name": "mtpx-auth-rbac",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@multpex/sdk-typescript": "0.1.0"
+    "@multpex/sdk-typescript": "0.1.1"
   },
   "devDependencies": {
     "@types/bun": "^1.3.9",
