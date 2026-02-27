@@ -1,7 +1,6 @@
 import {
   createApp,
   StartupErrorHandler,
-  env,
 } from "@multpex/sdk-typescript";
 
 interface ItemRow extends Record<string, unknown> {
@@ -11,11 +10,26 @@ interface ItemRow extends Record<string, unknown> {
   updated_at?: string;
 }
 
+function inferDbServerNameFromDatabaseName(databaseName: string): string | null {
+  const match = /^(?<provider>[a-z0-9]+)-(?<serverType>mysql|pg|postgres)-[a-z0-9]+(?:-[a-z0-9]+)*$/i.exec(
+    databaseName.trim(),
+  );
+  if (!match?.groups) {
+    return null;
+  }
+
+  const provider = String(match.groups.provider).toLowerCase();
+  const serverType = String(match.groups.serverType).toLowerCase();
+  const normalizedType = serverType === "postgres" ? "pg" : serverType;
+  return `${provider}-${normalizedType}`;
+}
+
 const app = createApp({
   name: "db-env-selector",
   namespace: "db-env-selector",
   database: {
     allowRaw: true,
+    multiTenant: mtpx.env.bool("MTPX_DB_MULTI_TENANT", true),
   },
   logging: {
     level: "info",
@@ -26,7 +40,7 @@ const app = createApp({
 
 app.afterStart(async (ctx) => {
   let exitCode = 0;
-  const databaseName = ctx.env.required("LINKD_DATABASE_NAME");
+  const databaseName = mtpx.env.required("LINKD_DATABASE_NAME");
 
   try {
     const database = ctx.db;
@@ -67,9 +81,22 @@ app.afterStart(async (ctx) => {
     });
   } catch (error) {
     exitCode = 1;
+    const message = error instanceof Error ? error.message : String(error);
+    const serverName = inferDbServerNameFromDatabaseName(databaseName);
+    const provisioningHint = serverName
+      ? [
+          `Database '${databaseName}' não está registrado no linkd/keystore.`,
+          "Provisione antes de rodar o exemplo:",
+          `  mtpx db server add ${serverName} --dialect postgresql --host localhost --port 5432 --admin-user multpex --admin-password multpex`,
+          `  mtpx db database create ${databaseName} --server ${serverName}`,
+          "Depois aguarde o watcher do linkd sincronizar (intervalo padrão: até 5s).",
+        ].join("\n")
+      : undefined;
+
     app.logger.error("Falha ao executar fluxo SQL", {
       databaseName,
-      error: error instanceof Error ? error.message : String(error),
+      error: message,
+      hint: message.includes("Database not found") ? provisioningHint : undefined,
     });
   } finally {
     await app.stop();
@@ -80,11 +107,11 @@ app.afterStart(async (ctx) => {
 await app.start().catch((error) =>
   StartupErrorHandler.fail(error, {
     dependencyName: "Linkd",
-    endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
+    endpoint: mtpx.env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
     hint: "Inicie o Linkd e tente novamente.",
   }),
 );
 
 app.logger.info("db-env-selector iniciado", {
-  databaseName: app.env.string("LINKD_DATABASE_NAME"),
+  databaseName: mtpx.env.string("LINKD_DATABASE_NAME"),
 });

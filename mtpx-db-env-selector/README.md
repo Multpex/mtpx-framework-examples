@@ -15,6 +15,19 @@ Crie/ajuste o arquivo `.env`:
 LINKD_DATABASE_NAME=docker-pg-test
 # LINKD_CONNECT=unix:///tmp/linkd.sock
 ```
+`LINKD_DATABASE_NAME` usa o formato composto `<provider>-<db-server-type>-<database-name>`.
+
+## Provisionamento (obrigatório no modo registro full via keystore)
+
+Antes de executar o exemplo, registre o server e o database no keystore:
+
+```bash
+mtpx db server add docker-pg --dialect postgresql --host localhost --port 5432 --admin-user multpex --admin-password multpex
+mtpx db database create docker-pg-test --server docker-pg
+```
+
+Depois disso, aguarde o watcher de DB do linkd sincronizar (padrão: até 5s).  
+Se quiser reduzir esse tempo no ambiente, ajuste `LINKD_DB_WATCHER_INTERVAL_SECS`.
 
 ## Executar
 
@@ -38,7 +51,7 @@ bun run typecheck
 ## O que o exemplo demonstra
 
 - Autoload de `.env` no SDK
-- Uso de `ctx.env` para acessar variáveis de ambiente
+- Uso de `mtpx.env` para acessar variáveis de ambiente
 - Criação de tabela com `database.schema.createTableIfNotExists`
 - Escrita com `table.upsert(...)`
 - Leitura e remoção de registro

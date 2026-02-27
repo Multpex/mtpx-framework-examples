@@ -1,2 +1,4 @@
+preload = ["@multpex/sdk-typescript/preload"]
+
 [install]
 registry = "https://registry.npmjs.org/"
