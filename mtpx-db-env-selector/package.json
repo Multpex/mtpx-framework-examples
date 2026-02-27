@@ -1,6 +1,6 @@
 {
   "name": "mtpx-db-env-selector",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Example app selecting linkd database by environment variable and keystore credential",
   "main": "src/index.ts",

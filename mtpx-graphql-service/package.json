@@ -1,6 +1,6 @@
 {
   "name": "mtpx-graphql-service",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@multpex/sdk-typescript": "0.1.1"
+    "@multpex/sdk-typescript": "0.1.2"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
