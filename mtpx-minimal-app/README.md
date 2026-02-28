@@ -19,6 +19,12 @@ bun run dev
 - TCP: `LINKD_CONNECT=tcp://localhost:9999` com a sessão atual do `mtpx login` (recomendado para host -> Docker)
 - Unix socket: `LINKD_CONNECT=unix:///tmp/linkd.sock` (quando o linkd roda local no host)
 
+## Autenticação HTTP
+
+- Os endpoints protegidos do exemplo usam `AUTH_REALM=multpex`
+- O `client_id` esperado para os tokens do app é `multpex-services`
+- Um token válido do realm `multpex` deve funcionar em `POST /minimal-app/items` e nos endpoints admin, sem cair em fallback para `default`
+
 Se o linkd estiver em Docker no macOS, prefira TCP.
 
 ## Executar em modo normal

@@ -16,6 +16,10 @@ const service = createApp({
   name: "minimal-app",
   instanceId: INSTANCE_ID,
   namespace: "minimal-app",  // Namespace isolado para evitar conflitos
+  auth: {
+    realm: env.string("AUTH_REALM", "multpex"),
+    clientId: env.string("AUTH_CLIENT_ID", "multpex-services"),
+  },
 
   // Connection examples:
   // connect: "tcp://localhost:9999",  // TCP for development/remote debugging

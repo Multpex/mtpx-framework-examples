@@ -1,6 +1,6 @@
 import {
-  ForbiddenError,
   createService,
+  decodeJwtPayload,
   env,
   requestLogger,
   StartupErrorHandler,
@@ -29,10 +29,6 @@ interface ExampleSchema {
 type AppContext<TBody = unknown> = TypedServiceContext<ExampleSchema, TBody>;
 
 const KNOWN_REALMS = ["realm1", "realm2"] as const;
-const REALM_DATABASES: Record<(typeof KNOWN_REALMS)[number], string> = {
-  realm1: "local_pg_realm1",
-  realm2: "local_pg_realm2",
-};
 
 const loginSchema = z.object({
   username: z.string().min(1, "username is required"),
@@ -69,25 +65,6 @@ function requireDb(ctx: AppContext) {
   return ctx.db;
 }
 
-function decodeJwtPayload(token: string): Record<string, unknown> {
-  try {
-    const payload = token.split(".")[1];
-    if (!payload) return {};
-
-    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const padding = normalized.length % 4;
-    const padded =
-      padding === 0 ? normalized : `${normalized}${"=".repeat(4 - padding)}`;
-
-    return JSON.parse(Buffer.from(padded, "base64").toString("utf8")) as Record<
-      string,
-      unknown
-    >;
-  } catch {
-    return {};
-  }
-}
-
 function buildTokenPreview(accessToken: string) {
   const claims = decodeJwtPayload(accessToken);
   return {
@@ -97,76 +74,6 @@ function buildTokenPreview(accessToken: string) {
     tenantId: claims.tenant_id ?? null,
     preferredUsername: claims.preferred_username ?? null,
   };
-}
-
-function extractBearerToken(authorization: string | null | undefined): string | null {
-  if (!authorization) return null;
-  if (authorization.startsWith("Bearer ")) {
-    return authorization.slice(7).trim();
-  }
-  if (authorization.startsWith("bearer ")) {
-    return authorization.slice(7).trim();
-  }
-  return null;
-}
-
-function extractRealmFromIssuer(issuer: unknown): string | null {
-  if (typeof issuer !== "string" || issuer.length === 0) return null;
-
-  const match = /\/realms\/([^/]+)\/?$/.exec(issuer.trim());
-  return match?.[1] ?? null;
-}
-
-function expectedTenantIdForRealm(realm: string): string | null {
-  if (realm in REALM_DATABASES) {
-    return REALM_DATABASES[realm as keyof typeof REALM_DATABASES];
-  }
-  return null;
-}
-
-function assertRequestRealmMatchesToken(ctx: AppContext): void {
-  if (!ctx.user) return;
-
-  const requestRealm = ctx.tenant.realm.trim();
-  const expectedTenantId = expectedTenantIdForRealm(requestRealm);
-  const authorization = ctx.header("authorization");
-  const accessToken = extractBearerToken(authorization);
-  const claims = accessToken ? decodeJwtPayload(accessToken) : {};
-
-  const tokenRealm =
-    typeof claims.tenant === "string" && claims.tenant.trim().length > 0
-      ? claims.tenant.trim()
-      : null;
-  const issuerRealm = extractRealmFromIssuer(claims.iss);
-  const tokenTenantId =
-    typeof claims.tenant_id === "string" && claims.tenant_id.trim().length > 0
-      ? claims.tenant_id.trim()
-      : null;
-  const userTenantId = ctx.user.tenantId?.trim() || null;
-
-  if (tokenRealm && tokenRealm !== requestRealm) {
-    throw new ForbiddenError(
-      `Cross-tenant token rejected: host realm '${requestRealm}' does not match token tenant '${tokenRealm}'`,
-    );
-  }
-
-  if (issuerRealm && issuerRealm !== requestRealm) {
-    throw new ForbiddenError(
-      `Cross-tenant token rejected: host realm '${requestRealm}' does not match token issuer realm '${issuerRealm}'`,
-    );
-  }
-
-  if (expectedTenantId && tokenTenantId && tokenTenantId !== expectedTenantId) {
-    throw new ForbiddenError(
-      `Cross-tenant token rejected: host realm '${requestRealm}' expects tenant_id '${expectedTenantId}', got '${tokenTenantId}'`,
-    );
-  }
-
-  if (expectedTenantId && userTenantId && userTenantId !== expectedTenantId) {
-    throw new ForbiddenError(
-      `Cross-tenant token rejected: host realm '${requestRealm}' expects routed tenant '${expectedTenantId}', got '${userTenantId}'`,
-    );
-  }
 }
 
 function currentUsername(ctx: AppContext): string {
@@ -226,11 +133,6 @@ service.afterStart(async () => {
     discoveryRealm2:
       "http://realm2.localhost:3000/tenant-routing/auth/discovery",
   });
-});
-
-service.use(["context", "notes.list", "notes.create", "notes.clear"], async (ctx, next) => {
-  assertRequestRealmMatchesToken(ctx as AppContext);
-  await next();
 });
 
 service.action(
