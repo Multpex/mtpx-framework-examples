@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "9f98d131-d506-41b6-b82d-9c9312be2f0b",
     "name": "mtpx keycloak multi tenant routing",
-    "description": "Collection para validar o exemplo mtpx-keycloak-multi-tenant-routing.\n\nFluxo coberto:\n\n- health check\n- discovery por host multi-tenant\n- login em realm1 e realm2 via app\n- leitura do contexto resolvido pelo SDK\n- escrita de notas sem tenant explicito nas queries\n- verificacao de isolamento entre local-pg-realm1 e local-pg-realm2\n- rejeicao de token de um realm em host de outro realm\n\nObservacao: a collection usa os hosts realm1.localhost e realm2.localhost, portanto as entradas devem existir no /etc/hosts.",
+    "description": "Collection para validar o exemplo mtpx-keycloak-multi-tenant-routing.\n\nFluxo coberto:\n\n- health check\n- discovery por host multi-tenant\n- login em realm1 e realm2 via app\n- leitura do contexto resolvido pelo SDK\n- escrita de notas sem tenant explicito nas queries\n- verificacao de isolamento entre local_pg_realm1 e local_pg_realm2\n- rejeicao de token de um realm em host de outro realm\n\nObservacao: a collection usa os hosts realm1.localhost e realm2.localhost, portanto as entradas devem existir no /etc/hosts.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -145,11 +145,11 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test('Token preview points to realm1 and local-pg-realm1', function () {",
+                  "pm.test('Token preview points to realm1 and local_pg_realm1', function () {",
                   "  pm.expect(json.tenant.realm).to.equal('realm1');",
                   "  pm.expect(json.tenant.source).to.equal('hostname');",
                   "  pm.expect(json.tokenPreview.tenant).to.equal('realm1');",
-                  "  pm.expect(json.tokenPreview.tenantId).to.equal('local-pg-realm1');",
+                  "  pm.expect(json.tokenPreview.tenantId).to.equal('local_pg_realm1');",
                   "});",
                   "",
                   "if (json.accessToken) {",
@@ -204,10 +204,10 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test('Realm1 context is routed to local-pg-realm1', function () {",
+                  "pm.test('Realm1 context is routed to local_pg_realm1', function () {",
                   "  pm.expect(json.tenant.realm).to.equal('realm1');",
-                  "  pm.expect(json.user.tenantId).to.equal('local-pg-realm1');",
-                  "  pm.expect(json.tenant.currentDatabase).to.equal('local-pg-realm1');",
+                  "  pm.expect(json.user.tenantId).to.equal('local_pg_realm1');",
+                  "  pm.expect(json.tenant.currentDatabase).to.equal('local_pg_realm1');",
                   "});"
                 ]
               }
@@ -263,8 +263,8 @@
                   "pm.test('Saved note belongs to realm1 database', function () {",
                   "  pm.expect(json.note.message).to.equal(pm.environment.get('realm1NoteMessage'));",
                   "  pm.expect(json.note.realm).to.equal('realm1');",
-                  "  pm.expect(json.note.db_tenant).to.equal('local-pg-realm1');",
-                  "  pm.expect(json.tenant.currentDatabase).to.equal('local-pg-realm1');",
+                  "  pm.expect(json.note.db_tenant).to.equal('local_pg_realm1');",
+                  "  pm.expect(json.tenant.currentDatabase).to.equal('local_pg_realm1');",
                   "});"
                 ]
               }
@@ -330,8 +330,8 @@
                   "  }",
                   "});",
                   "",
-                  "pm.test('Realm1 list is still routed to local-pg-realm1', function () {",
-                  "  pm.expect(json.tenant.currentDatabase).to.equal('local-pg-realm1');",
+                  "pm.test('Realm1 list is still routed to local_pg_realm1', function () {",
+                  "  pm.expect(json.tenant.currentDatabase).to.equal('local_pg_realm1');",
                   "});"
                 ]
               }
@@ -380,11 +380,11 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test('Token preview points to realm2 and local-pg-realm2', function () {",
+                  "pm.test('Token preview points to realm2 and local_pg_realm2', function () {",
                   "  pm.expect(json.tenant.realm).to.equal('realm2');",
                   "  pm.expect(json.tenant.source).to.equal('hostname');",
                   "  pm.expect(json.tokenPreview.tenant).to.equal('realm2');",
-                  "  pm.expect(json.tokenPreview.tenantId).to.equal('local-pg-realm2');",
+                  "  pm.expect(json.tokenPreview.tenantId).to.equal('local_pg_realm2');",
                   "});",
                   "",
                   "if (json.accessToken) {",
@@ -439,10 +439,10 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test('Realm2 context is routed to local-pg-realm2', function () {",
+                  "pm.test('Realm2 context is routed to local_pg_realm2', function () {",
                   "  pm.expect(json.tenant.realm).to.equal('realm2');",
-                  "  pm.expect(json.user.tenantId).to.equal('local-pg-realm2');",
-                  "  pm.expect(json.tenant.currentDatabase).to.equal('local-pg-realm2');",
+                  "  pm.expect(json.user.tenantId).to.equal('local_pg_realm2');",
+                  "  pm.expect(json.tenant.currentDatabase).to.equal('local_pg_realm2');",
                   "});"
                 ]
               }
@@ -498,8 +498,8 @@
                   "pm.test('Saved note belongs to realm2 database', function () {",
                   "  pm.expect(json.note.message).to.equal(pm.environment.get('realm2NoteMessage'));",
                   "  pm.expect(json.note.realm).to.equal('realm2');",
-                  "  pm.expect(json.note.db_tenant).to.equal('local-pg-realm2');",
-                  "  pm.expect(json.tenant.currentDatabase).to.equal('local-pg-realm2');",
+                  "  pm.expect(json.note.db_tenant).to.equal('local_pg_realm2');",
+                  "  pm.expect(json.tenant.currentDatabase).to.equal('local_pg_realm2');",
                   "});"
                 ]
               }
@@ -565,8 +565,8 @@
                   "  }",
                   "});",
                   "",
-                  "pm.test('Realm2 list is still routed to local-pg-realm2', function () {",
-                  "  pm.expect(json.tenant.currentDatabase).to.equal('local-pg-realm2');",
+                  "pm.test('Realm2 list is still routed to local_pg_realm2', function () {",
+                  "  pm.expect(json.tenant.currentDatabase).to.equal('local_pg_realm2');",
                   "});"
                 ]
               }

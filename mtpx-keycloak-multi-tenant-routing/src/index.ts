@@ -30,8 +30,8 @@ type AppContext<TBody = unknown> = TypedServiceContext<ExampleSchema, TBody>;
 
 const KNOWN_REALMS = ["realm1", "realm2"] as const;
 const REALM_DATABASES: Record<(typeof KNOWN_REALMS)[number], string> = {
-  realm1: "local-pg-realm1",
-  realm2: "local-pg-realm2",
+  realm1: "local_pg_realm1",
+  realm2: "local_pg_realm2",
 };
 
 const loginSchema = z.object({
@@ -390,6 +390,6 @@ await service.start().catch((error) =>
     dependencyName: "Linkd",
     endpoint:
       env.coalesce("LINKD_CONNECT", "LINKD_URL") || "unix:/tmp/linkd.sock",
-    hint: "Start linkd with the OIDC client secret for realm1/realm2 and try again.",
+    hint: "Ensure linkd TCP auth is using the default 'multpex' realm and refresh the local CLI session with 'mtpx login' after reseeding Keycloak.",
   }),
 );
