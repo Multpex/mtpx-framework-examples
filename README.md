@@ -68,31 +68,6 @@ Alguns exemplos usam scripts adicionais (`worker`, `test`, `postman:test`, etc).
 - Sinais suportados: `SIGINT` e `SIGTERM`
 - `Ctrl+C` encerra os serviços de forma ordenada
 
-## Collections (Postman + Insomnia)
+## Collections (Postman)
 
 Cada exemplo continua com os arquivos em `postman/*.postman_collection.json` e `postman/*.postman_environment.json`.
-
-Para gerar versoes separadas para Insomnia em todos os projetos, execute:
-
-```bash
-cd /path/to/multpex-framework/mtpx-framework-examples
-node ./scripts/generate-insomnia-collections.mjs
-```
-
-Isso cria arquivos com sufixo:
-
-- `*.insomnia.postman_collection.json`
-- `*.insomnia.postman_environment.json`
-
-## Fluxo recomendado de exploracao
-
-1. Comece em `mtpx-minimal-app`
-2. Depois avance para `mtpx-micro-services`
-3. Explore `mtpx-auth-rbac`, `mtpx-keycloak-multi-tenant-routing`, `mtpx-keycloak-admin-basics` e `mtpx-graphql-service`
-4. Siga para `mtpx-msg-channels` e `mtpx-scheduled-jobs`
-5. Por fim, veja `mtpx-websocket-chat`
-
-## Observacoes
-
-- Este repositorio contem apenas exemplos. Codigo de SDK e sidecar estao em repositorios/pastas proprias.
-- O exemplo `mtpx-websocket-chat` documenta o estado atual do suporte WebSocket no ambiente.
