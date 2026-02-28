@@ -18,8 +18,8 @@ O ponto central deste exemplo e:
 ## Arquitetura do exemplo
 
 ```
-realm1.localhost -> realm = realm1 -> token tenant_id = local-pg-realm1 -> DB local-pg-realm1
-realm2.localhost -> realm = realm2 -> token tenant_id = local-pg-realm2 -> DB local-pg-realm2
+realm1.localhost -> realm = realm1 -> token tenant_id = local_pg_realm1 -> DB local_pg_realm1
+realm2.localhost -> realm = realm2 -> token tenant_id = local_pg_realm2 -> DB local_pg_realm2
 ```
 
 O app nao passa tenant para as queries. O banco certo e escolhido antes da query executar.
@@ -29,8 +29,11 @@ Tambem existe uma protecao explicita no app: se o host resolver `realm1` e o bea
 
 - Bun
 - Docker
-- `linkd` rodando localmente
-- `mtpx-cli` disponivel no workspace
+- `mtpx` instalado e autenticado
+
+## Setup do zero
+
+Siga exatamente esta ordem para deixar o exemplo 100% funcional.
 
 ## 1. Adicione os hosts locais
 
@@ -47,50 +50,121 @@ Use o dev-infra do workspace:
 
 ```bash
 cd /path/to/multpex-framework/mtpx-framework-dev-infra
-docker compose -f docker-compose-full.yml up -d pg redis nats keycloak
+
+docker compose -f docker-compose-full.yml down -v --remove-orphans
+
+LINKD_KEYSTORE_ENCRYPTION_KEY="bXVsdHBleG11bHRwZXhtdWx0cGV4bXVsdHBleDEyMzQ=" \
+docker compose -f docker-compose-full.yml --profile elasticsearch up -d
 ```
 
-## 3. Suba o linkd com o client secret dos realms `realm1`/`realm2`
+O `docker-compose-full.yml` ja sobe:
 
-Este exemplo usa o client `multpex-services` nos dois realms. Como o login/refresh do `linkd`
-usa OIDC estatico, suba o processo local com o secret correto:
+- Postgres
+- Redis
+- NATS
+- Keycloak
+- Elasticsearch
+- `linkd`
+
+O `linkd` do compose completo ja vem alinhado com OIDC/JWKS do Keycloak. Nao e necessario subir outro `linkd` local para este exemplo.
+
+## 3. Rode o seed
+
+Ainda no repo `mtpx-framework-dev-infra`:
 
 ```bash
-cd /path/to/multpex-framework/linkd
-LINKD_OIDC__ISSUER_URL=http://localhost:8180 \
-LINKD_OIDC__REALM=realm1 \
-LINKD_OIDC__CLIENT_ID=multpex-services \
-LINKD_OIDC__CLIENT_SECRET=multpex \
-cargo run
+LINKD_KEYSTORE_ENCRYPTION_KEY="bXVsdHBleG11bHRwZXhtdWx0cGV4bXVsdHBleDEyMzQ=" \
+./seed.sh
 ```
 
-Observacao:
+## 4. Limpe overrides legados de TCP
 
-- a validacao JWT ja pode ser dinamica por issuer no `linkd.toml` local
-- o realm estatico acima so serve como base para operacoes OIDC como `login`
+Se o seu shell ja teve setup antigo do workspace, remova overrides deprecated antes de subir o app:
 
-## 4. Provisione os bancos dos tenants
+```bash
+unset LINKD_TCP_TOKEN
+unset TCP_TOKEN
+```
+
+Essas envs nao devem mais ser usadas. A autenticacao TCP do app com o `linkd` deve usar a sessao do `mtpx login`.
+
+## 5. Renove e valide a sessao da CLI
+
+```bash
+mtpx logout
+mtpx login
+mtpx whoami
+```
+
+Importante:
+
+- a conexao TCP do app com o `linkd` usa o token salvo pela CLI em `mtpx login`
+- esse token deve vir do realm padrao `multpex`
+- os realms `realm1` e `realm2` sao usados para os endpoints HTTP do exemplo, nao para autenticar o socket TCP do app
+- depois de rodar `seed.sh` ou recriar os realms do Keycloak, rode `mtpx login` de novo para renovar a sessao local
+
+## 6. Valide o keystore antes de provisionar
+
+```bash
+mtpx keystore info
+mtpx keystore list
+```
+
+O esperado:
+
+- `Enabled: true`
+- `Supports namespaces: true`
+
+## 7. Cadastre o server de banco corretamente
 
 Este exemplo usa databases fisicos diferentes para cada tenant autenticado:
+
+- `local_pg_realm1`
+- `local_pg_realm2`
+
+Cadastre um server profile com host de admin no host e host de runtime dentro do Docker:
+
+```bash
+mtpx db server add docker-pg \
+  --dialect postgresql \
+  --host localhost \
+  --runtime-host postgres \
+  --port 5432 \
+  --admin-user multpex \
+  --admin-password multpex
+```
+
+Use:
+
+- `--host localhost` para a CLI conectar no Postgres exposto no host
+- `--runtime-host postgres` para a credencial gravada no keystore funcionar dentro do container do `linkd`
+
+Nao use `localhost` como `runtime-host` quando o `linkd` estiver em Docker.
+
+Se ja houver um cadastro errado anterior, remova e recrie:
+
+```bash
+mtpx db server remove docker-pg
+```
+
+## 8. Provisione os bancos dos tenants
+
+```bash
+mtpx provision local_pg_realm1 --server docker-pg
+mtpx provision local_pg_realm2 --server docker-pg
+```
+
+Os nomes corretos sao com underscore:
+
+- `local_pg_realm1`
+- `local_pg_realm2`
+
+Nao use mais:
 
 - `local-pg-realm1`
 - `local-pg-realm2`
 
-Cadastre o server e provisione os dois bancos com o CLI:
-
-```bash
-cd /path/to/multpex-framework/mtpx-cli
-mtpx db server add local-pg --dialect postgresql --host localhost --runtime-host postgres --port 5432 --admin-user postgres --admin-password postgres
-mtpx provision local-pg-realm1 --server local-pg
-mtpx provision local-pg-realm2 --server local-pg
-```
-
-Quando o `linkd` roda em Docker e o CLI roda no host, use:
-
-- `--host localhost` para o CLI conseguir provisionar no Postgres local
-- `--runtime-host postgres` para a credencial gravada no keystore funcionar dentro do container do `linkd`
-
-## 5. Rode o exemplo
+## 9. Rode o exemplo
 
 ```bash
 cd /path/to/multpex-framework/mtpx-framework-examples/mtpx-keycloak-multi-tenant-routing
@@ -102,7 +176,7 @@ bun run dev
 `DEFAULT_AUTH_REALM` existe apenas como fallback quando a request nao trouxer tenant por host, header ou body.
 Para `realm1.localhost` e `realm2.localhost`, o SDK continua resolvendo o realm a partir do host.
 
-## 6. Usuarios disponiveis apos o seed
+## 10. Usuarios disponiveis apos o seed
 
 Logo apos rodar `./seed.sh`, estes usuarios ja existem:
 
@@ -113,7 +187,7 @@ Logo apos rodar `./seed.sh`, estes usuarios ja existem:
 
 O environment da collection Postman usa esses usuarios seeded por padrao.
 
-## 7. Opcional: crie usuarios extras com `mtpx`
+## 11. Opcional: crie usuarios extras com `mtpx`
 
 Os realms agora incluem um client admin dedicado:
 
@@ -157,6 +231,61 @@ Base URL:
 - `http://realm1.localhost:3000`
 - `http://realm2.localhost:3000`
 
+## 12. Checklist de validacao
+
+O ambiente esta correto quando:
+
+- `mtpx whoami` funciona
+- `mtpx db server list` funciona
+- `mtpx provision local_pg_realm1 --server docker-pg` funciona
+- `mtpx provision local_pg_realm2 --server docker-pg` funciona
+- login em `realm1.localhost` retorna token
+- login em `realm2.localhost` retorna token
+- `GET /tenant-routing/context` em `realm1.localhost` mostra `userTenantId = local_pg_realm1` e `currentDatabase = local_pg_realm1`
+- `GET /tenant-routing/context` em `realm2.localhost` mostra `userTenantId = local_pg_realm2` e `currentDatabase = local_pg_realm2`
+- token de `realm2` em `realm1.localhost` e rejeitado
+- token de `realm1` em `realm2.localhost` e rejeitado
+
+## 13. Ordem rapida de comandos
+
+Se voce quer apenas o caminho curto que funcionou limpo no fim desta sessao:
+
+```bash
+cd /path/to/multpex-framework/mtpx-framework-dev-infra
+
+docker compose -f docker-compose-full.yml down -v --remove-orphans
+
+LINKD_KEYSTORE_ENCRYPTION_KEY="bXVsdHBleG11bHRwZXhtdWx0cGV4bXVsdHBleDEyMzQ=" \
+docker compose -f docker-compose-full.yml --profile elasticsearch up -d
+
+LINKD_KEYSTORE_ENCRYPTION_KEY="bXVsdHBleG11bHRwZXhtdWx0cGV4bXVsdHBleDEyMzQ=" \
+./seed.sh
+
+unset LINKD_TCP_TOKEN
+unset TCP_TOKEN
+
+mtpx logout
+mtpx login
+
+mtpx db server remove docker-pg || true
+
+mtpx db server add docker-pg \
+  --dialect postgresql \
+  --host localhost \
+  --runtime-host postgres \
+  --port 5432 \
+  --admin-user multpex \
+  --admin-password multpex
+
+mtpx provision local_pg_realm1 --server docker-pg
+mtpx provision local_pg_realm2 --server docker-pg
+
+cd /path/to/multpex-framework/mtpx-framework-examples/mtpx-keycloak-multi-tenant-routing
+cp .env.example .env
+bun install
+bun run dev
+```
+
 ## Endpoints
 
 ### Health
@@ -198,7 +327,7 @@ O retorno inclui um `tokenPreview` com os claims mais importantes:
 
 - `iss` -> issuer do realm correto
 - `tenant` -> tenant de autenticacao (`realm1` ou `realm2`)
-- `tenantId` -> tenant de banco (`local-pg-realm1` ou `local-pg-realm2`)
+- `tenantId` -> tenant de banco (`local_pg_realm1` ou `local_pg_realm2`)
 
 ## Fluxo de demonstracao
 
@@ -228,7 +357,7 @@ O esperado:
 
 - `realm1.localhost` retorna `realm = realm1`
 - `realm2.localhost` retorna `realm = realm2`
-- `userTenantId` e `currentDatabase` mudam entre `local-pg-realm1` e `local-pg-realm2`
+- `userTenantId` e `currentDatabase` mudam entre `local_pg_realm1` e `local_pg_realm2`
 
 ### 2.1. Token de outro realm deve ser rejeitado
 
@@ -316,10 +445,14 @@ Se o realm foi importado antes desta mudanca, reimporte/recrie o Keycloak para q
 Confira se os tenants foram provisionados:
 
 ```bash
-cd /path/to/multpex-framework/mtpx-cli
-mtpx provision local-pg-realm1 --server local-pg
-mtpx provision local-pg-realm2 --server local-pg
+mtpx provision local_pg_realm1 --server docker-pg
+mtpx provision local_pg_realm2 --server docker-pg
 ```
+
+Tambem confirme que o `db-server` foi cadastrado com:
+
+- `--host localhost`
+- `--runtime-host postgres`
 
 ### `403 Cross-tenant token rejected`
 
@@ -331,3 +464,31 @@ O host e o token precisam pertencer ao mesmo realm:
 ### `Could not resolve host`
 
 Faltam as entradas `realm1.localhost` e `realm2.localhost` no `/etc/hosts`.
+
+### `Invalid token` na subida do app
+
+Quase sempre e um destes casos:
+
+- faltou rodar `mtpx logout && mtpx login` depois do `seed.sh`
+- ainda existe `LINKD_TCP_TOKEN` ou `TCP_TOKEN` exportada no shell
+- o app ainda esta usando uma versao antiga do SDK que respeita essas envs
+
+Limpe as envs e reinstale as dependencias do app se necessario:
+
+```bash
+unset LINKD_TCP_TOKEN
+unset TCP_TOKEN
+rm -rf node_modules bun.lock
+bun install
+```
+
+### `JWKS error` tentando acessar `localhost:8080`
+
+Recrie `keycloak` e `linkd` com o compose atualizado:
+
+```bash
+cd /path/to/multpex-framework/mtpx-framework-dev-infra
+
+LINKD_KEYSTORE_ENCRYPTION_KEY="bXVsdHBleG11bHRwZXhtdWx0cGV4bXVsdHBleDEyMzQ=" \
+docker compose -f docker-compose-full.yml up -d --force-recreate keycloak linkd
+```
