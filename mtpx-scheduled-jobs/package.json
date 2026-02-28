@@ -1,6 +1,6 @@
 {
   "name": "mtpx-scheduled-jobs",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "description": "Example of scheduled/cron jobs with @multpex/sdk-typescript",
   "main": "src/index.ts",
@@ -16,7 +16,7 @@
     "postman:test:verbose": "bunx newman run postman/mtpx-scheduled-jobs.postman_collection.json -e postman/mtpx-scheduled-jobs.postman_environment.json --verbose"
   },
   "dependencies": {
-    "@multpex/sdk-typescript": "0.1.2",
+    "@multpex/sdk-typescript": "0.1.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {

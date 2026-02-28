@@ -77,18 +77,7 @@ LINKD_KEYSTORE_ENCRYPTION_KEY="bXVsdHBleG11bHRwZXhtdWx0cGV4bXVsdHBleDEyMzQ=" \
 ./seed.sh
 ```
 
-## 4. Limpe overrides legados de TCP
-
-Se o seu shell ja teve setup antigo do workspace, remova overrides deprecated antes de subir o app:
-
-```bash
-unset LINKD_TCP_TOKEN
-unset TCP_TOKEN
-```
-
-Essas envs nao devem mais ser usadas. A autenticacao TCP do app com o `linkd` deve usar a sessao do `mtpx login`.
-
-## 5. Renove e valide a sessao da CLI
+## 4. Renove e valide a sessao da CLI
 
 ```bash
 mtpx logout
@@ -103,7 +92,7 @@ Importante:
 - os realms `realm1` e `realm2` sao usados para os endpoints HTTP do exemplo, nao para autenticar o socket TCP do app
 - depois de rodar `seed.sh` ou recriar os realms do Keycloak, rode `mtpx login` de novo para renovar a sessao local
 
-## 6. Valide o keystore antes de provisionar
+## 5. Valide o keystore antes de provisionar
 
 ```bash
 mtpx keystore info
@@ -115,7 +104,7 @@ O esperado:
 - `Enabled: true`
 - `Supports namespaces: true`
 
-## 7. Cadastre o server de banco corretamente
+## 6. Cadastre o server de banco corretamente
 
 Este exemplo usa databases fisicos diferentes para cada tenant autenticado:
 
@@ -147,7 +136,7 @@ Se ja houver um cadastro errado anterior, remova e recrie:
 mtpx db server remove docker-pg
 ```
 
-## 8. Provisione os bancos dos tenants
+## 7. Provisione os bancos dos tenants
 
 ```bash
 mtpx provision local_pg_realm1 --server docker-pg
@@ -164,7 +153,7 @@ Nao use mais:
 - `local-pg-realm1`
 - `local-pg-realm2`
 
-## 9. Rode o exemplo
+## 8. Rode o exemplo
 
 ```bash
 cd /path/to/multpex-framework/mtpx-framework-examples/mtpx-keycloak-multi-tenant-routing
@@ -176,7 +165,7 @@ bun run dev
 `DEFAULT_AUTH_REALM` existe apenas como fallback quando a request nao trouxer tenant por host, header ou body.
 Para `realm1.localhost` e `realm2.localhost`, o SDK continua resolvendo o realm a partir do host.
 
-## 10. Usuarios disponiveis apos o seed
+## 9. Usuarios disponiveis apos o seed
 
 Logo apos rodar `./seed.sh`, estes usuarios ja existem:
 
@@ -187,7 +176,7 @@ Logo apos rodar `./seed.sh`, estes usuarios ja existem:
 
 O environment da collection Postman usa esses usuarios seeded por padrao.
 
-## 11. Opcional: crie usuarios extras com `mtpx`
+## 10. Opcional: crie usuarios extras com `mtpx`
 
 Os realms agora incluem um client admin dedicado:
 
@@ -231,7 +220,7 @@ Base URL:
 - `http://realm1.localhost:3000`
 - `http://realm2.localhost:3000`
 
-## 12. Checklist de validacao
+## 11. Checklist de validacao
 
 O ambiente esta correto quando:
 
@@ -246,7 +235,7 @@ O ambiente esta correto quando:
 - token de `realm2` em `realm1.localhost` e rejeitado
 - token de `realm1` em `realm2.localhost` e rejeitado
 
-## 13. Ordem rapida de comandos
+## 12. Ordem rapida de comandos
 
 Se voce quer apenas o caminho curto que funcionou limpo no fim desta sessao:
 
@@ -260,9 +249,6 @@ docker compose -f docker-compose-full.yml --profile elasticsearch up -d
 
 LINKD_KEYSTORE_ENCRYPTION_KEY="bXVsdHBleG11bHRwZXhtdWx0cGV4bXVsdHBleDEyMzQ=" \
 ./seed.sh
-
-unset LINKD_TCP_TOKEN
-unset TCP_TOKEN
 
 mtpx logout
 mtpx login
@@ -470,14 +456,11 @@ Faltam as entradas `realm1.localhost` e `realm2.localhost` no `/etc/hosts`.
 Quase sempre e um destes casos:
 
 - faltou rodar `mtpx logout && mtpx login` depois do `seed.sh`
-- ainda existe `LINKD_TCP_TOKEN` ou `TCP_TOKEN` exportada no shell
-- o app ainda esta usando uma versao antiga do SDK que respeita essas envs
+- o app ainda esta usando uma versao antiga do SDK
 
-Limpe as envs e reinstale as dependencias do app se necessario:
+Reinstale as dependencias do app se necessario:
 
 ```bash
-unset LINKD_TCP_TOKEN
-unset TCP_TOKEN
 rm -rf node_modules bun.lock
 bun install
 ```
