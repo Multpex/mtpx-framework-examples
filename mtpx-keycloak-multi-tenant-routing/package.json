@@ -1,0 +1,21 @@
+{
+  "name": "mtpx-keycloak-multi-tenant-routing",
+  "version": "0.1.2",
+  "private": true,
+  "type": "module",
+  "description": "Example app for host-based multi-tenant Keycloak auth with automatic database routing",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "postman:test": "bunx newman run postman/mtpx-keycloak-multi-tenant-routing.postman_collection.json -e postman/mtpx-keycloak-multi-tenant-routing.postman_environment.json",
+    "postman:test:verbose": "bunx newman run postman/mtpx-keycloak-multi-tenant-routing.postman_collection.json -e postman/mtpx-keycloak-multi-tenant-routing.postman_environment.json --verbose"
+  },
+  "dependencies": {
+    "@multpex/sdk-typescript": "0.1.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.9",
+    "typescript": "^5.9.3"
+  }
+}
