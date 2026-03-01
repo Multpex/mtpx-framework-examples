@@ -1,6 +1,6 @@
 {
   "name": "mtpx-websocket-chat",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "scripts": {
     "dev": "bun run src/main.ts",
@@ -10,7 +10,7 @@
     "postman:test:verbose": "bunx newman run postman/mtpx-websocket-chat.postman_collection.json -e postman/mtpx-websocket-chat.postman_environment.json --verbose"
   },
   "dependencies": {
-    "@multpex/sdk-typescript": "0.1.3",
+    "@multpex/sdk-typescript": "0.1.4",
     "zod": "^4.3.6"
   },
   "devDependencies": {
