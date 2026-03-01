@@ -16,12 +16,12 @@
 
 const IS_PRODUCTION = env.string("NODE_ENV", "development") === "production";
 
-import { z } from "zod";
 import {
   createService,
   datetime,
   UnauthorizedError,
   env,
+  z,
   type AuthUser,
 } from "@multpex/sdk-typescript";
 import type { TypedServiceContext } from "@multpex/sdk-typescript";
@@ -85,7 +85,7 @@ service.beforeStart(async () => {
   service.logger.info("Starting authentication service", {
     defaultRealm: authConfig.realm,
     clientId: authConfig.clientId,
-    provider: authConfig.provider ?? "config/static",
+    configSource: "env/sdk defaults",
     knownRealms: authConfig.knownRealms ?? [],
     authClientMode: "managed via ctx.auth",
   });

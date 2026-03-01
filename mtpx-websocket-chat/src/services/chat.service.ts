@@ -9,12 +9,12 @@
  * - ctx.to(room).emit() for broadcasting
  */
 
-import { z } from "zod";
 import {
   createService,
   ForbiddenError,
   UnauthorizedError,
   env,
+  z,
 } from "@multpex/sdk-typescript";
 import type {
   WebSocketContext,
@@ -35,7 +35,7 @@ const SendMessageSchema = z.object({
   room: z.string().uuid("Room ID must be a valid UUID"),
   message: z.string().min(1, "Message cannot be empty").max(4000, "Message too long"),
   type: z.enum(["text", "image", "file"]).default("text"),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 const JoinRoomSchema = z.object({

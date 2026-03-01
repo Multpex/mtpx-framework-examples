@@ -68,6 +68,26 @@ describe("Scheduled Jobs Integration", async () => {
   }
 
   describe("Scheduler CRUD", () => {
+    it("POST /jobs should create a job with arbitrary object data", async () => {
+      const response = await fetch(`${BASE_URL}/jobs`, {
+        method: "POST",
+        headers: withAuth({ "Content-Type": "application/json" }),
+        body: JSON.stringify({
+          name: "ProcessData",
+          data: { message: "Test message", count: 1, nested: { ok: true } },
+        }),
+      });
+
+      expect(response.status).toBe(200);
+
+      const data = await response.json();
+      expect(data.success).toBe(true);
+      expect(data.name).toBe("ProcessData");
+      expect(data.queue).toBe("jobs");
+      expect(data.delay).toBe(0);
+      expect(typeof data.jobId).toBe("string");
+    });
+
     it("POST /schedulers should create a scheduler with 'every' interval", async () => {
       const schedulerKey = `test-every-${Date.now()}`;
       createdSchedulerKeys.push(schedulerKey);

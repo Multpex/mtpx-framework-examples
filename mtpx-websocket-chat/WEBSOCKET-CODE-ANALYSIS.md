@@ -461,7 +461,7 @@ const SendMessageSchema = z.object({
   room: z.string().uuid("Room ID must be a valid UUID"),
   message: z.string().min(1).max(4000, "Message too long"),
   type: z.enum(["text", "image", "file"]).default("text"),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 ```
 

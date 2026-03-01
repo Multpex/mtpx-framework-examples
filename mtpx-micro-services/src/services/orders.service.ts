@@ -9,8 +9,7 @@
  * - HTTP endpoint caching
  */
 
-import { z } from "zod";
-import { createService, env } from "@multpex/sdk-typescript";
+import { createService, env, z } from "@multpex/sdk-typescript";
 import type { TypedServiceContext, EventContext } from "@multpex/sdk-typescript";
 import type { Schema } from "../db/schema.js";
 
