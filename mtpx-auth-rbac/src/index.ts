@@ -46,6 +46,10 @@ const updateDocumentSchema = z.object({
   tags: z.array(z.string()).optional(),
 });
 
+const documentParamsSchema = z.object({
+  id: z.string().uuid("ID do documento deve ser um UUID válido"),
+});
+
 type CreateDocumentInput = z.infer<typeof createDocumentSchema>;
 type UpdateDocumentInput = z.infer<typeof updateDocumentSchema>;
 
@@ -135,7 +139,7 @@ service.action(
  */
 service.action(
   "documents.get",
-  { route: "/auth-example/documents/:id", method: "GET" },
+  { route: "/auth-example/documents/:id", method: "GET", validateParams: documentParamsSchema },
   withAuthorization({ roles: ["viewer", "editor", "admin"] }, async (ctx) => {
     const doc = documents.get(ctx.params.id);
     if (!doc) {
@@ -197,6 +201,7 @@ service.action(
     route: "/auth-example/documents/:id",
     method: "PUT",
     validate: updateDocumentSchema,
+    validateParams: documentParamsSchema,
   },
   withAuthorization({ roles: ["editor", "admin"] }, async (ctx) => {
     const doc = documents.get(ctx.params.id);
@@ -237,6 +242,7 @@ service.action(
     route: "/auth-example/documents/:id",
     method: "DELETE",
     roles: ["admin"],
+    validateParams: documentParamsSchema,
   },
   async (ctx) => {
     const doc = documents.get(ctx.params.id);
