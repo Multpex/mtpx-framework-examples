@@ -1,0 +1,23 @@
+{
+  "name": "mtpx-elasticsearch",
+  "version": "0.1.4",
+  "type": "module",
+  "description": "Example app demonstrating Elasticsearch operations via the Multpex SDK sidecar client",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "bun build ./src/index.ts --target=bun --outdir=./dist --minify --bytecode --sourcemap=linked",
+    "build:prod": "NODE_ENV=production bun run build",
+    "start:prod": "bun run ./dist/index.js",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@multpex/sdk-typescript": "0.1.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.9",
+    "typescript": "^5.9.3"
+  }
+}
