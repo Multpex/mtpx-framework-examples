@@ -1,0 +1,956 @@
+{
+  "info": {
+    "_postman_id": "mtpx-elasticsearch-collection",
+    "name": "mtpx-elasticsearch",
+    "description": "Collection para testar o exemplo Elasticsearch do Multpex Framework.\n\n## Autenticação\n\nUse o grupo **Auth (Keycloak)** para obter token e preencher `accessToken` automaticamente.\n\nTodos os endpoints de ES exigem Bearer token.\nDefina o valor da variável `accessToken` no environment.\n\n## Fluxo\n\n1. Execute **Get Access Token** para autenticar\n2. Execute **Setup Index** para criar o índice `products`\n3. Use os endpoints CRUD e Search normalmente\n\n## Endpoints\n\n- **POST /es/admin/index/setup** — Criar índice products\n- **DELETE /es/admin/index** — Deletar índice products\n- **POST /es/products** — Indexar produto\n- **GET /es/products/:id** — Buscar produto por ID\n- **PUT /es/products/:id** — Atualizar produto\n- **DELETE /es/products/:id** — Deletar produto\n- **GET /es/products** — Search com filtros e paginação\n- **POST /es/products/bulk** — Bulk indexing\n- **GET /es/products/count** — Contagem de documentos\n\n## Health\n\n- **GET /mtpx-elasticsearch/health** — Health check\n- **GET /mtpx-elasticsearch/ready** — Readiness check\n- **GET /mtpx-elasticsearch/live** — Liveness check",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "keycloakUrl",
+      "value": "http://localhost:8180",
+      "type": "string"
+    },
+    {
+      "key": "keycloakRealm",
+      "value": "multpex",
+      "type": "string"
+    },
+    {
+      "key": "keycloakClientId",
+      "value": "multpex-services",
+      "type": "string"
+    },
+    {
+      "key": "keycloakClientSecret",
+      "value": "multpex",
+      "type": "string"
+    },
+    {
+      "key": "keycloakUsername",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "keycloakPassword",
+      "value": "admin",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth (Keycloak)",
+      "description": "Obtenha token de acesso no Keycloak para usar nos endpoints autenticados.",
+      "item": [
+        {
+          "name": "Get Access Token (Password Grant)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set('keycloakClientId', 'multpex-services');",
+                  "pm.variables.set('keycloakClientSecret', 'multpex');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('token retornado', function () { pm.expect(json.access_token).to.be.a('string'); });",
+                  "if (json.access_token) {",
+                  "  pm.environment.set('accessToken', json.access_token);",
+                  "  pm.collectionVariables.set('accessToken', json.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{keycloakClientId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{keycloakClientSecret}}",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "{{keycloakUsername}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{keycloakPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid profile email roles offline_access",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{keycloakRealm}}/protocol/openid-connect/token",
+              "host": [
+                "{{keycloakUrl}}"
+              ],
+              "path": [
+                "realms",
+                "{{keycloakRealm}}",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            },
+            "description": "Obtém um access token no Keycloak e salva em `accessToken`."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "description": "Endpoints de monitoramento (não requerem autenticação).",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Health check returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Status is healthy', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal('healthy');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mtpx-elasticsearch/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "mtpx-elasticsearch",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Readiness Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Readiness returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mtpx-elasticsearch/ready",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "mtpx-elasticsearch",
+                "ready"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Liveness Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Liveness returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mtpx-elasticsearch/live",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "mtpx-elasticsearch",
+                "live"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Index Management",
+      "description": "Criar e deletar o índice Elasticsearch `products`. Execute Setup Index antes de usar os endpoints CRUD/search.",
+      "item": [
+        {
+          "name": "Setup Index",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Index setup successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has message and created flag', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.be.a('string');",
+                  "    pm.expect(jsonData.created).to.be.a('boolean');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/admin/index/setup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "admin",
+                "index",
+                "setup"
+              ]
+            },
+            "description": "Cria o índice `products` no Elasticsearch com todos os mappings e settings. Seguro para chamar com índice existente — retorna `created: false`."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Index",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Index deleted', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has message', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/admin/index",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "admin",
+                "index"
+              ]
+            },
+            "description": "Deleta permanentemente o índice `products` e todos os documentos. Retorna 404 se o índice não existir."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products - CRUD",
+      "description": "Criar, ler, atualizar e deletar documentos de produto no índice `products`.",
+      "item": [
+        {
+          "name": "Create Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Product created', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has product id', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.expect(jsonData.result).to.be.a('string');",
+                  "    pm.expect(jsonData.product).to.be.an('object');",
+                  "});",
+                  "",
+                  "// Save product ID for later tests",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.environment.set('productId', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gaming Laptop Pro\",\n  \"description\": \"High-performance gaming laptop with RTX 4080 and 32GB RAM\",\n  \"category\": \"Electronics\",\n  \"price\": 2499.99,\n  \"stock\": 15,\n  \"tags\": [\"gaming\", \"laptop\", \"high-performance\"],\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/es/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products"
+              ]
+            },
+            "description": "Indexa um novo produto. O `id` da resposta é salvo automaticamente na variável `productId`."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Product retrieved', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has product data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.expect(jsonData.product).to.be.an('object');",
+                  "    pm.expect(jsonData.product.name).to.be.a('string');",
+                  "    pm.expect(jsonData.product.price).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products",
+                "{{productId}}"
+              ]
+            },
+            "description": "Busca um produto pelo ID do Elasticsearch. Requer `productId` definido (execute Create Product primeiro)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Product updated', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has id and result', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.expect(jsonData.result).to.equal('updated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 2299.99,\n  \"stock\": 10,\n  \"tags\": [\"gaming\", \"laptop\", \"high-performance\", \"sale\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/es/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products",
+                "{{productId}}"
+              ]
+            },
+            "description": "Atualiza parcialmente um produto. Apenas os campos enviados são modificados."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Product deleted', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has id and result', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.expect(jsonData.result).to.equal('deleted');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products",
+                "{{productId}}"
+              ]
+            },
+            "description": "Deleta um produto pelo ID. Retorna 404 se não existir."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products - Search & Bulk",
+      "description": "Full-text search com filtros, paginação, sorting, bulk indexing e contagem de documentos.",
+      "item": [
+        {
+          "name": "Search All Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Search returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has pagination and hits', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.total).to.be.a('number');",
+                  "    pm.expect(jsonData.hits).to.be.an('array');",
+                  "    pm.expect(jsonData).to.have.property('from');",
+                  "    pm.expect(jsonData).to.have.property('size');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products"
+              ]
+            },
+            "description": "Retorna todos os produtos com paginação padrão (from=0, size=10)."
+          },
+          "response": []
+        },
+        {
+          "name": "Search by Text",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Search returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has hits array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.hits).to.be.an('array');",
+                  "    pm.expect(jsonData.total).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/products?q=laptop",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "laptop",
+                  "description": "Full-text search em name, description e tags (fuzzy, name com boost 2x)"
+                }
+              ]
+            },
+            "description": "Busca fuzzy full-text em `name` (boost 2×), `description` e `tags`."
+          },
+          "response": []
+        },
+        {
+          "name": "Search by Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Search returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('All hits match category', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.hits).to.be.an('array');",
+                  "    jsonData.hits.forEach(function (hit) {",
+                  "        pm.expect(hit.category).to.equal('Electronics');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/products?category=Electronics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Electronics",
+                  "description": "Filtro exato por keyword no campo category"
+                }
+              ]
+            },
+            "description": "Filtra produtos por match exato de category."
+          },
+          "response": []
+        },
+        {
+          "name": "Search with All Filters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Filtered search returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response shape is correct', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.hits).to.be.an('array');",
+                  "    pm.expect(jsonData.total).to.be.a('number');",
+                  "    pm.expect(jsonData.from).to.equal(0);",
+                  "    pm.expect(jsonData.size).to.equal(5);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/products?q=laptop&category=Electronics&minPrice=100&maxPrice=3000&active=true&from=0&size=5&sort=price&order=asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "laptop",
+                  "description": "Termo de busca full-text"
+                },
+                {
+                  "key": "category",
+                  "value": "Electronics",
+                  "description": "Filtro exato de categoria"
+                },
+                {
+                  "key": "minPrice",
+                  "value": "100",
+                  "description": "Preço mínimo (inclusive)"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "3000",
+                  "description": "Preço máximo (inclusive)"
+                },
+                {
+                  "key": "active",
+                  "value": "true",
+                  "description": "Filtro por status ativo (true/false)"
+                },
+                {
+                  "key": "from",
+                  "value": "0",
+                  "description": "Offset de paginação"
+                },
+                {
+                  "key": "size",
+                  "value": "5",
+                  "description": "Tamanho da página (max 100)"
+                },
+                {
+                  "key": "sort",
+                  "value": "price",
+                  "description": "Campo de ordenação (ex: price, name, _score)"
+                },
+                {
+                  "key": "order",
+                  "value": "asc",
+                  "description": "Direção da ordenação (asc / desc)"
+                }
+              ]
+            },
+            "description": "Combina full-text search, filtro de categoria, range de preço, flag active, paginação e sorting."
+          },
+          "response": []
+        },
+        {
+          "name": "Search - Paginate (page 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pagination returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Offset is applied', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.from).to.equal(10);",
+                  "    pm.expect(jsonData.size).to.equal(10);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/products?from=10&size=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "10",
+                  "description": "Pular os primeiros 10 resultados"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Retornar os próximos 10 resultados"
+                }
+              ]
+            },
+            "description": "Retorna a segunda página de resultados (11–20) via paginação por offset."
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk Index Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Bulk index returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Bulk response is valid', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.succeeded).to.be.a('number');",
+                  "    pm.expect(jsonData.failed).to.be.a('number');",
+                  "    pm.expect(jsonData.errors).to.be.a('boolean');",
+                  "    pm.expect(jsonData.succeeded).to.be.greaterThan(0);",
+                  "    pm.expect(jsonData.errors).to.equal(false);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": [\n    {\n      \"name\": \"Wireless Mouse\",\n      \"description\": \"Ergonomic wireless mouse with long battery life\",\n      \"category\": \"Accessories\",\n      \"price\": 49.99,\n      \"stock\": 200,\n      \"tags\": [\"wireless\", \"mouse\", \"ergonomic\"],\n      \"active\": true\n    },\n    {\n      \"name\": \"Mechanical Keyboard\",\n      \"description\": \"Compact mechanical keyboard with RGB backlighting\",\n      \"category\": \"Accessories\",\n      \"price\": 129.99,\n      \"stock\": 75,\n      \"tags\": [\"mechanical\", \"keyboard\", \"rgb\"],\n      \"active\": true\n    },\n    {\n      \"name\": \"4K Monitor\",\n      \"description\": \"27-inch 4K UHD monitor with HDR support\",\n      \"category\": \"Electronics\",\n      \"price\": 599.99,\n      \"stock\": 30,\n      \"tags\": [\"monitor\", \"4k\", \"hdr\"],\n      \"active\": true\n    },\n    {\n      \"name\": \"USB-C Hub\",\n      \"description\": \"7-in-1 USB-C hub with HDMI, SD card, and PD charging\",\n      \"category\": \"Accessories\",\n      \"price\": 39.99,\n      \"stock\": 150,\n      \"tags\": [\"usb-c\", \"hub\", \"adapter\"],\n      \"active\": true\n    },\n    {\n      \"name\": \"Noise-Cancelling Headphones\",\n      \"description\": \"Over-ear headphones with active noise cancellation and 30h battery\",\n      \"category\": \"Audio\",\n      \"price\": 299.99,\n      \"stock\": 50,\n      \"tags\": [\"headphones\", \"anc\", \"wireless\"],\n      \"active\": true\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/es/products/bulk",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products",
+                "bulk"
+              ]
+            },
+            "description": "Indexa múltiplos produtos em uma única requisição bulk. Cada produto pode incluir um `id` opcional."
+          },
+          "response": []
+        },
+        {
+          "name": "Count All Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Count returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has count and index', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.count).to.be.a('number');",
+                  "    pm.expect(jsonData.index).to.equal('products');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/products/count",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products",
+                "count"
+              ]
+            },
+            "description": "Retorna o total de documentos no índice `products`."
+          },
+          "response": []
+        },
+        {
+          "name": "Count by Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Count returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response includes category filter', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.count).to.be.a('number');",
+                  "    pm.expect(jsonData.index).to.equal('products');",
+                  "    pm.expect(jsonData.category).to.equal('Electronics');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/es/products/count?category=Electronics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "es",
+                "products",
+                "count"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Electronics",
+                  "description": "Contar apenas documentos dessa categoria"
+                }
+              ]
+            },
+            "description": "Retorna o número de documentos no índice `products` de uma categoria específica."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

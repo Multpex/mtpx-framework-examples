@@ -25,21 +25,36 @@ Exemplo de aplicação demonstrando operações com **Elasticsearch** via SDK do
 
 ## Pré-requisitos
 
-1. **Elasticsearch** rodando localmente (porta `9200`):
+1. **Infraestrutura local** (Elasticsearch, Postgres, Redis, NATS, Keycloak) via `mtpx-framework-dev-infra`:
    ```bash
-   docker run -d --name es -p 9200:9200 -e "discovery.type=single-node" \
-     -e "xpack.security.enabled=false" \
-     docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+   cd mtpx-framework-dev-infra
+   docker compose -f docker-compose-min.yml up -d
    ```
+   O Elasticsearch sobe na porta `9200` com segurança desabilitada (modo desenvolvimento).
 
-2. **linkd** em execução com credencial Elasticsearch registrada no keystore:
-   ```bash
-   mtpx es credential add default --url http://localhost:9200
-   ```
+2. **linkd** em execução (processo nativo ou Docker, conforme o compose usado).
 
 3. Sessão CLI ativa:
    ```bash
    mtpx login
+   ```
+
+4. **Credencial do Elasticsearch** registrada no keystore do `linkd`.
+
+   > **Importante:** o `linkd` acessa o ES de dentro da rede Docker, portanto o URL deve usar o hostname do serviço (`elasticsearch`), não `localhost`:
+
+   ```bash
+   # Registrar/atualizar a credencial (confirma sobrescrita com "y")
+   echo "y" | mtpx keystore set elasticsearch default \
+     --field url=http://elasticsearch:9200 \
+     --field username=elastic \
+     --field password=multpex
+   ```
+
+   Para verificar que foi salva corretamente:
+   ```bash
+   mtpx keystore get elasticsearch default --reveal
+   # url deve ser http://elasticsearch:9200
    ```
 
 ---
