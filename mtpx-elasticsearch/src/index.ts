@@ -145,7 +145,7 @@ app.action(
     }
 
     await index.createIndex({
-      settings: { numberOfShards: 1, numberOfReplicas: 0 },
+      settings: { number_of_shards: 1, number_of_replicas: 0, "translog.durability": "async" },
       mappings: {
         properties: {
           name: { type: "text", analyzer: "standard" },
@@ -203,7 +203,7 @@ app.action(
       createdAt: nowIso(),
     };
 
-    const result = await app.es.index<Product>(INDEX).create(doc, { refresh: "wait_for" });
+    const result = await app.es.index<Product>(INDEX).create(doc, { refresh: true });
 
     return {
       id: result.id,
@@ -252,7 +252,7 @@ app.action(
     }
 
     const result = await app.es.index<Product>(INDEX).update(id, parsed.data, {
-      refresh: "wait_for",
+      refresh: true,
     });
 
     return { id: result.id, result: result.result };
@@ -269,7 +269,7 @@ app.action(
   async (ctx) => {
     const { id } = ctx.params;
 
-    const result = await app.es.index<Product>(INDEX).delete(id, { refresh: "wait_for" });
+    const result = await app.es.index<Product>(INDEX).delete(id, { refresh: true });
 
     if (result.result === "not_found") {
       return { error: "Produto não encontrado.", statusCode: 404 };
@@ -375,7 +375,7 @@ app.action(
       document: { ...p, createdAt: nowIso() } as Record<string, unknown>,
     }));
 
-    const result = await app.es.index<Product>(INDEX).bulk(operations, { refresh: "wait_for" });
+    const result = await app.es.index<Product>(INDEX).bulk(operations, { refresh: true });
 
     const succeeded = result.items.filter((i) => i.status < 300).length;
     const failed = result.items.filter((i) => i.status >= 300);
@@ -403,9 +403,7 @@ app.action(
     let count: number;
 
     if (category) {
-      count = await app.es.count(INDEX, {
-        query: { term: { category } },
-      });
+      count = await app.es.count(INDEX, { term: { category } });
     } else {
       count = await app.es.count(INDEX);
     }
