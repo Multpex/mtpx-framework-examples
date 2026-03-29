@@ -15,13 +15,13 @@ import {
   UnauthorizedError,
   env,
   z,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 import type {
   WebSocketContext,
   WebSocketMiddleware,
   WebSocketGroupAPI,
   TypedServiceContext,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 import type { Schema } from "../db/schema.js";
 
 // Type alias for WebSocket context with our schema

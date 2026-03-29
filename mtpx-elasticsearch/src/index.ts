@@ -33,7 +33,7 @@ import {
   StartupErrorHandler,
   env,
   z,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 // ---------------------------------------------------------------------------
 // Tipos

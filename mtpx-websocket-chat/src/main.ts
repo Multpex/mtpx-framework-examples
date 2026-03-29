@@ -9,7 +9,7 @@ import {
   configureReconnectCoordinator,
   env,
   StartupErrorHandler,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 (async () => {
   console.log("\n🔌 Starting WebSocket Chat Example\n");

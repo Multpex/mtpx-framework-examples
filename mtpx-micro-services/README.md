@@ -46,8 +46,8 @@ docker compose up -d pg nats redis keycloak
 
 # 2. Compilar e executar o Linkd (em outro terminal)
 cd /path/to/multpex-framework/linkd
-cargo build
-./target/debug/linkd
+set -a && source .env.local && set +a
+cargo run
 
 # 3. Instalar dependências e rodar a aplicação (em outro terminal)
 cd /path/to/multpex-framework/mtpx-framework-examples/mtpx-micro-services
@@ -84,7 +84,7 @@ Para um deployment estilo microserviços, rode cada serviço separadamente:
 ```bash
 # Terminal 1: Subir infraestrutura + linkd
 cd /path/to/mtpx-framework-dev-infra && docker compose up -d pg nats redis keycloak
-cd /path/to/multpex-framework/linkd && cargo run
+cd /path/to/multpex-framework/linkd && set -a && source .env.local && set +a && cargo run
 
 # Terminal 2: Serviço de usuários
 SERVICE=users bun run src/main.ts
@@ -539,7 +539,7 @@ error: Failed to connect
 # Linkd não faz parte da infraestrutura Docker compartilhada.
 # Inicie localmente:
 cd /path/to/multpex-framework/linkd
-cargo run
+set -a && source .env.local && set +a && cargo run
 ```
 
 ### Erro de Conexão com o Banco
@@ -556,6 +556,35 @@ docker compose up -d pg
 # Verify it's running
 docker compose ps pg
 docker compose logs pg
+```
+
+### Erro `Database gateway not configured`
+
+```text
+Migration failed: Database gateway not configured | code=11 | type=NOT_IMPLEMENTED
+```
+
+**Causa**: O `linkd` está ativo no socket, mas o Database Gateway não foi inicializado. Isso pode acontecer por falha de credenciais/env do banco ou por erro de conectividade durante o bootstrap do `linkd`.
+
+**Solução**: Verifique os logs do `linkd` por mensagens como:
+
+```text
+Failed to initialize database gateway
+Database gateway is enabled in config, but initialization failed; skipping keystore empty-router fallback.
+```
+
+Para descartar problema de carregamento local de env, reinicie o `linkd` a partir do diretório `linkd/` ou exporte `.env.local` manualmente:
+
+```bash
+cd /path/to/multpex-framework/linkd
+set -a && source .env.local && set +a
+cargo run
+```
+
+Se você só precisa validar auth/rotas sem banco, rode a aplicação com:
+
+```bash
+SKIP_MIGRATIONS=true bun dev
 ```
 
 ### Erro de Conexão com NATS

@@ -8,7 +8,7 @@ import {
   type Context,
   type EventContext,
   type EventSubscriptionContext,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 const INSTANCE_ID = env.string("INSTANCE_ID", crypto.randomUUID().slice(0, 8));
 

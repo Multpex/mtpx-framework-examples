@@ -12,7 +12,7 @@ import {
   startServices,
   env,
   StartupErrorHandler,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 import { migrations } from "./db/migrations.js";
 
 function formatError(error: unknown): string {
@@ -27,13 +27,28 @@ function formatError(error: unknown): string {
 
 function printMigrationHint(message: string): void {
   const lower = message.toLowerCase();
+  const missingDatabaseGateway =
+    lower.includes("database gateway not configured") ||
+    lower.includes("database router not configured");
   const shouldHint =
     lower.includes("default database pool") ||
-    lower.includes("database gateway") ||
-    lower.includes("database router") ||
+    missingDatabaseGateway ||
     lower.includes("connection");
 
   if (!shouldHint) return;
+
+  if (missingDatabaseGateway) {
+    console.error(
+      "\nHint: linkd is reachable, but its database gateway is unavailable.\n" +
+        "Check linkd logs for one of these warnings:\n" +
+        "  Failed to initialize database gateway\n" +
+        "  Database gateway is enabled in config, but initialization failed; skipping keystore empty-router fallback.\n\n" +
+        "If you want to rule out local env loading issues, restart linkd from ../../linkd or export .env.local manually.\n\n" +
+        "For auth-only smoke tests, you can bypass startup migrations:\n" +
+        "  SKIP_MIGRATIONS=true bun dev\n",
+    );
+    return;
+  }
 
   console.error(
     "\nHint: start linkd with local DB env loaded before running micro-services:\n" +

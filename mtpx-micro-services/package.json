@@ -22,7 +22,7 @@
     "postman:test:verbose": "bunx newman run postman/mtpx-micro-services.postman_collection.json -e postman/mtpx-micro-services.postman_environment.json --verbose"
   },
   "dependencies": {
-    "@multpex/sdk-typescript": "0.1.4",
+    "@linkd/sdk-typescript": "0.1.4",
     "zod": "^4.3.6"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import { z } from "@multpex/sdk-typescript";
+import { z } from "@linkd/sdk-typescript";
 
 export const JOB_NAMES = [
   "ProcessData",

@@ -15,7 +15,7 @@ import {
   NotFoundError,
   StartupErrorHandler,
   env,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 import {
   createJobSchema,
   createSchedulerSchema,

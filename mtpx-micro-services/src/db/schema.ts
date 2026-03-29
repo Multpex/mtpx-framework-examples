@@ -8,7 +8,7 @@
  * Run `multpex db:push` to apply changes to the database.
  */
 
-import { Schema as S } from "@multpex/sdk-typescript";
+import { Schema as S } from "@linkd/sdk-typescript";
 
 // ============================================================================
 // Table Definitions

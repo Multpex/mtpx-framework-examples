@@ -1,4 +1,4 @@
-import { env } from "@multpex/sdk-typescript";
+import { env } from "@linkd/sdk-typescript";
 
 export default {
   name: "mtpx-auth-rbac",

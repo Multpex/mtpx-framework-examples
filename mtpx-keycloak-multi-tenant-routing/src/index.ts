@@ -6,7 +6,7 @@ import {
   StartupErrorHandler,
   z,
   type TypedServiceContext,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 interface CurrentDatabaseRow {
   current_database: string;

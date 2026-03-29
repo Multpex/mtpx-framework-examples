@@ -6,7 +6,7 @@
  *   mtpx db:migrate up --all-tenants
  */
 
-import { Schema } from "@multpex/sdk-typescript";
+import { Schema } from "@linkd/sdk-typescript";
 
 export const migration = {
   name: "202602220001_create_tenant_runtime_settings",

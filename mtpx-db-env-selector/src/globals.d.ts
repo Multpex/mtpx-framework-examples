@@ -1,3 +1,3 @@
-import "@multpex/sdk-typescript/globals";
+import "@linkd/sdk-typescript/globals";
 
 export {};

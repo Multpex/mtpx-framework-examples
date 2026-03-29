@@ -11,7 +11,7 @@ import {
   createConfig,
   env,
   type ServiceEnvConfig,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 /**
  * App-specific configuration.

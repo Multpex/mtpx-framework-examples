@@ -120,7 +120,7 @@ subscription {
 ### Query
 
 ```typescript
-import { gqlQuery, GQL } from "@multpex/sdk-typescript";
+import { gqlQuery, GQL } from "@linkd/sdk-typescript";
 
 service.action("books.get", {
   route: "/books/:id",
@@ -138,7 +138,7 @@ service.action("books.get", {
 ### Mutation
 
 ```typescript
-import { gqlMutation } from "@multpex/sdk-typescript";
+import { gqlMutation } from "@linkd/sdk-typescript";
 
 service.action("books.create", {
   route: "/books",
@@ -155,7 +155,7 @@ service.action("books.create", {
 ### Subscription
 
 ```typescript
-import { gqlSubscription } from "@multpex/sdk-typescript";
+import { gqlSubscription } from "@linkd/sdk-typescript";
 
 service.action("books.stream.created", {
   route: "/books/events/created",
@@ -172,7 +172,7 @@ service.action("books.stream.created", {
 ### Tipos Customizados
 
 ```typescript
-import { gqlType, gqlInput, GQL } from "@multpex/sdk-typescript";
+import { gqlType, gqlInput, GQL } from "@linkd/sdk-typescript";
 
 const app = createApp({
   graphql: {
@@ -197,7 +197,7 @@ const app = createApp({
 ## Consumindo APIs GraphQL Externas
 
 ```typescript
-import { createGraphQLClient } from "@multpex/sdk-typescript";
+import { createGraphQLClient } from "@linkd/sdk-typescript";
 
 const client = createGraphQLClient({
   endpoint: "https://api.example.com/graphql",

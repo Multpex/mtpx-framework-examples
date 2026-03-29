@@ -2,7 +2,7 @@ import {
   createService,
   type ChannelContext,
   type EventContext,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 interface DemoMessagePayload {
   orderId: string;

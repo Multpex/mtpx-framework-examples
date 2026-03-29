@@ -1,2 +1,6 @@
 [install]
 registry = "https://registry.npmjs.org/"
+
+[install.scopes]
+"@linkd" = "https://verdaccio.devops.multpex.com.br/"
+"@multpex" = "https://verdaccio.devops.multpex.com.br/"

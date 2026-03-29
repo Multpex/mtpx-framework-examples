@@ -8,8 +8,8 @@
  * - Event emission (user.created, user.updated, user.deleted)
  */
 
-import { createService, ConflictError, NotFoundError, env, z } from "@multpex/sdk-typescript";
-import type { TypedServiceContext, EventContext } from "@multpex/sdk-typescript";
+import { createService, ConflictError, NotFoundError, env, z } from "@linkd/sdk-typescript";
+import type { TypedServiceContext, EventContext } from "@linkd/sdk-typescript";
 import type { Schema } from "../db/schema.js";
 
 // Type alias for typed context

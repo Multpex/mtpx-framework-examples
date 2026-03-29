@@ -28,7 +28,7 @@ import {
   withAuthorization,
   adminOnly,
   authenticated,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 // =============================================================================
 // Schema Definitions

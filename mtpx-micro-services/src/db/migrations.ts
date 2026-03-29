@@ -1,4 +1,4 @@
-import type { MigrationFile } from "@multpex/sdk-typescript";
+import type { MigrationFile } from "@linkd/sdk-typescript";
 
 export const migrations: MigrationFile[] = [
   {

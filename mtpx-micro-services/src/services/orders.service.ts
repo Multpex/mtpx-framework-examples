@@ -9,8 +9,8 @@
  * - HTTP endpoint caching
  */
 
-import { createService, env, z } from "@multpex/sdk-typescript";
-import type { TypedServiceContext, EventContext } from "@multpex/sdk-typescript";
+import { createService, env, z } from "@linkd/sdk-typescript";
+import type { TypedServiceContext, EventContext } from "@linkd/sdk-typescript";
 import type { Schema } from "../db/schema.js";
 
 // Order item as stored in JSON (different from the order_items table)

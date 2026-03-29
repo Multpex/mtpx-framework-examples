@@ -23,8 +23,8 @@ import {
   env,
   z,
   type AuthUser,
-} from "@multpex/sdk-typescript";
-import type { TypedServiceContext } from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
+import type { TypedServiceContext } from "@linkd/sdk-typescript";
 import type { Schema } from "../db/schema.js";
 import { authConfig, config } from "../config.js";
 

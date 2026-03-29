@@ -1,7 +1,7 @@
 import {
   createApp,
   StartupErrorHandler,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 interface ItemRow extends Record<string, unknown> {
   id: string;

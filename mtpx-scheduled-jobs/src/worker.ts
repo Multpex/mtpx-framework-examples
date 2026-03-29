@@ -13,7 +13,7 @@ import {
   type JobHandlerContext,
   StartupErrorHandler,
   env,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 // ============================================================================
 // Job Result (tipo padronizado de retorno)

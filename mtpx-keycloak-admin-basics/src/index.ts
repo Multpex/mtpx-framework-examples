@@ -4,8 +4,8 @@ import {
   UnauthorizedError,
   z,
   env,
-} from "@multpex/sdk-typescript";
-import { KeycloakApiError, KeycloakClient } from "@multpex/sdk-typescript/keycloak";
+} from "@linkd/sdk-typescript";
+import { KeycloakApiError, KeycloakClient } from "@linkd/sdk-typescript/keycloak";
 
 type OidcCredentialData = Record<string, string>;
 

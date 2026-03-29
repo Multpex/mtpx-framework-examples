@@ -2,7 +2,7 @@ import {
   createService,
   requestLogger,
   z,
-} from "@multpex/sdk-typescript";
+} from "@linkd/sdk-typescript";
 
 interface DemoMessageInput {
   orderId: string;
