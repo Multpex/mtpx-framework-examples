@@ -1,0 +1,255 @@
+{
+  "info": {
+    "name": "mtpx runtime-db demo",
+    "description": "Collection para o exemplo mtpx-runtime-db — demonstra os 3 modos de acesso a banco (RFC 0005).\n\n## Modos de acesso\n\n1. **Detached DB** — migrations via `createRuntimeContext()` no startup\n2. **Runtime DB** — seed/preload nos lifecycle hooks (`afterConnect`, `afterStart`, `beforeStop`)\n3. **Request DB** — CRUD via `ctx.db` nos handlers HTTP\n\n## Endpoints\n\n- **GET /users** — Listar usuários\n- **GET /notes** — Listar notas\n- **POST /notes** — Criar nota\n- **GET /notes/:id** — Buscar nota por ID\n- **DELETE /notes/:id** — Deletar nota",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth (Keycloak)",
+      "item": [
+        {
+          "name": "Get Access Token (Password Grant)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set('keycloakClientId', 'multpex-services');",
+                  "pm.variables.set('keycloakClientSecret', 'multpex');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('token retornado', function () { pm.expect(json.access_token).to.be.a('string'); });",
+                  "if (json.access_token) {",
+                  "  pm.environment.set('accessToken', json.access_token);",
+                  "  pm.collectionVariables.set('accessToken', json.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password", "type": "text" },
+                { "key": "client_id", "value": "{{keycloakClientId}}", "type": "text" },
+                { "key": "client_secret", "value": "{{keycloakClientSecret}}", "type": "text" },
+                { "key": "username", "value": "{{keycloakUsername}}", "type": "text" },
+                { "key": "password", "value": "{{keycloakPassword}}", "type": "text" },
+                { "key": "scope", "value": "openid profile email roles offline_access", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{keycloakRealm}}/protocol/openid-connect/token",
+              "host": ["{{keycloakUrl}}"],
+              "path": ["realms", "{{keycloakRealm}}", "protocol", "openid-connect", "token"]
+            },
+            "description": "Obtém um access token no Keycloak e salva em `accessToken`."
+          },
+          "response": []
+        }
+      ],
+      "description": "Obtenha token de acesso no Keycloak para usar nos endpoints autenticados."
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Listar Usuários",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('retorna array de users', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.users).to.be.an('array');",
+                  "});",
+                  "pm.test('admin seed existe', function () {",
+                  "  const json = pm.response.json();",
+                  "  const admin = json.users.find(u => u.email === 'admin@example.com');",
+                  "  pm.expect(admin).to.not.be.undefined;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Lista todos os usuários. O seed do `afterConnect` garante ao menos o usuário Admin."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notes",
+      "item": [
+        {
+          "name": "Listar Notas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('retorna array de notes', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.notes).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notes",
+              "host": ["{{baseUrl}}"],
+              "path": ["notes"]
+            },
+            "description": "Lista todas as notas ordenadas por `created_at` desc."
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Nota",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('nota criada com título', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.title).to.equal('Nota de teste');",
+                  "});",
+                  "if (pm.response.json().id) {",
+                  "  pm.collectionVariables.set('noteId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nota de teste\",\n  \"body\": \"Criada via Postman\",\n  \"author\": \"postman\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notes",
+              "host": ["{{baseUrl}}"],
+              "path": ["notes"]
+            },
+            "description": "Cria uma nota. O `id` retornado é salvo em `noteId` para uso nos próximos requests."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Nota por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('nota retornada', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.id).to.equal(pm.collectionVariables.get('noteId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notes/{{noteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["notes", "{{noteId}}"]
+            },
+            "description": "Busca uma nota pelo ID. Use após 'Criar Nota' para ter um `noteId` válido."
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Nota",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('ok true', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.ok).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notes/{{noteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["notes", "{{noteId}}"]
+            },
+            "description": "Deleta a nota por ID. Retorna `{ ok: true }` ou `{ error: 'Not found' }`."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "noteId", "value": "", "type": "string" },
+    { "key": "keycloakUrl", "value": "http://localhost:8180", "type": "string" },
+    { "key": "keycloakRealm", "value": "multpex", "type": "string" },
+    { "key": "keycloakClientId", "value": "multpex-services", "type": "string" },
+    { "key": "keycloakClientSecret", "value": "multpex", "type": "string" },
+    { "key": "keycloakUsername", "value": "admin", "type": "string" },
+    { "key": "keycloakPassword", "value": "admin", "type": "string" }
+  ]
+}
