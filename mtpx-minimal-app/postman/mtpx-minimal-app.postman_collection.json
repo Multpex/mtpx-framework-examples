@@ -19,8 +19,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.variables.set('keycloakClientId', 'multpex-services');",
-                  "pm.variables.set('keycloakClientSecret', 'multpex');"
+                  "pm.variables.set('keycloakClientId', 'mtpx-framework');",
+                  "pm.variables.set('keycloakClientSecret', '');"
                 ]
               }
             },
@@ -603,32 +603,32 @@
     },
     {
       "key": "keycloakUrl",
-      "value": "http://localhost:8180",
+      "value": "https://keycloak.api.gmstg.multipex.com.br/auth",
       "type": "string"
     },
     {
       "key": "keycloakRealm",
-      "value": "multpex",
+      "value": "master",
       "type": "string"
     },
     {
       "key": "keycloakClientId",
-      "value": "multpex-services",
+      "value": "mtpx-framework",
       "type": "string"
     },
     {
       "key": "keycloakClientSecret",
-      "value": "multpex",
+      "value": "",
       "type": "string"
     },
     {
       "key": "keycloakUsername",
-      "value": "admin",
+      "value": "mtpx-framework",
       "type": "string"
     },
     {
       "key": "keycloakPassword",
-      "value": "admin",
+      "value": "edfbdee6-7aa5-48b9-ac94-6a433e5b8ab3",
       "type": "string"
     }
   ]

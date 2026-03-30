@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "mtpx runtime-db demo",
-    "description": "Collection para o exemplo mtpx-runtime-db — demonstra os 3 modos de acesso a banco (RFC 0005).\n\n## Modos de acesso\n\n1. **Detached DB** — migrations via `createRuntimeContext()` no startup\n2. **Runtime DB** — seed/preload nos lifecycle hooks (`afterConnect`, `afterStart`, `beforeStop`)\n3. **Request DB** — CRUD via `ctx.db` nos handlers HTTP\n\n## Endpoints\n\n- **GET /users** — Listar usuários\n- **GET /notes** — Listar notas\n- **POST /notes** — Criar nota\n- **GET /notes/:id** — Buscar nota por ID\n- **DELETE /notes/:id** — Deletar nota",
+    "description": "Collection para o exemplo mtpx-runtime-db — demonstra os 3 modos de acesso a banco (RFC 0005).\n\n## Modos de acesso\n\n1. **Detached DB** — migrations via `createRuntimeContext()` no startup\n2. **Runtime DB** — seed/preload nos lifecycle hooks (`afterConnect`, `afterStart`, `beforeStop`)\n3. **Request DB** — CRUD via `ctx.db` nos handlers HTTP\n\n## Endpoints\n\n- **GET /users** — Listar usuários\n- **POST /users** — Criar usuário\n- **GET /notes** — Listar notas\n- **POST /notes** — Criar nota\n- **GET /notes/:id** — Buscar nota por ID\n- **DELETE /notes/:id** — Deletar nota",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -16,8 +16,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.variables.set('keycloakClientId', 'multpex-services');",
-                  "pm.variables.set('keycloakClientSecret', 'multpex');"
+                  "pm.variables.set('keycloakClientId', 'mtpx-framework');",
+                  "pm.variables.set('keycloakClientSecret', '');"
                 ]
               }
             },
@@ -68,6 +68,57 @@
     {
       "name": "Users",
       "item": [
+        {
+          "name": "Criar Usuário",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const email = `postman+${Date.now()}@example.com`;",
+                  "pm.collectionVariables.set('userEmail', email);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('usuário criado com email esperado', function () {",
+                  "  pm.expect(json.email).to.equal(pm.collectionVariables.get('userEmail'));",
+                  "});",
+                  "pm.test('role default user', function () {",
+                  "  pm.expect(json.role).to.equal('user');",
+                  "});",
+                  "if (json.id) {",
+                  "  pm.collectionVariables.set('userId', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuário Postman\",\n  \"email\": \"{{userEmail}}\",\n  \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Cria um usuário com email único por execução. O `id` retornado é salvo em `userId`."
+          },
+          "response": []
+        },
         {
           "name": "Listar Usuários",
           "event": [
@@ -244,12 +295,14 @@
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
     { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "userId", "value": "", "type": "string" },
+    { "key": "userEmail", "value": "", "type": "string" },
     { "key": "noteId", "value": "", "type": "string" },
-    { "key": "keycloakUrl", "value": "http://localhost:8180", "type": "string" },
-    { "key": "keycloakRealm", "value": "multpex", "type": "string" },
-    { "key": "keycloakClientId", "value": "multpex-services", "type": "string" },
-    { "key": "keycloakClientSecret", "value": "multpex", "type": "string" },
-    { "key": "keycloakUsername", "value": "admin", "type": "string" },
-    { "key": "keycloakPassword", "value": "admin", "type": "string" }
+    { "key": "keycloakUrl", "value": "https://keycloak.api.gmstg.multipex.com.br/auth", "type": "string" },
+    { "key": "keycloakRealm", "value": "master", "type": "string" },
+    { "key": "keycloakClientId", "value": "mtpx-framework", "type": "string" },
+    { "key": "keycloakClientSecret", "value": "", "type": "string" },
+    { "key": "keycloakUsername", "value": "mtpx-framework", "type": "string" },
+    { "key": "keycloakPassword", "value": "edfbdee6-7aa5-48b9-ac94-6a433e5b8ab3", "type": "string" }
   ]
 }

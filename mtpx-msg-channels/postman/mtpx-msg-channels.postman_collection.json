@@ -18,12 +18,12 @@
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
     { "key": "accessToken", "value": "", "type": "string" },
-    { "key": "keycloakUrl", "value": "http://localhost:8180", "type": "string" },
-    { "key": "keycloakRealm", "value": "multpex", "type": "string" },
-    { "key": "keycloakClientId", "value": "multpex-services", "type": "string" },
-    { "key": "keycloakClientSecret", "value": "multpex", "type": "string" },
-    { "key": "keycloakUsername", "value": "admin", "type": "string" },
-    { "key": "keycloakPassword", "value": "admin", "type": "string" },
+    { "key": "keycloakUrl", "value": "https://keycloak.api.gmstg.multipex.com.br/auth", "type": "string" },
+    { "key": "keycloakRealm", "value": "master", "type": "string" },
+    { "key": "keycloakClientId", "value": "mtpx-framework", "type": "string" },
+    { "key": "keycloakClientSecret", "value": "", "type": "string" },
+    { "key": "keycloakUsername", "value": "mtpx-framework", "type": "string" },
+    { "key": "keycloakPassword", "value": "edfbdee6-7aa5-48b9-ac94-6a433e5b8ab3", "type": "string" },
     { "key": "orderId", "value": "order-1001", "type": "string" },
     { "key": "customerId", "value": "customer-abc", "type": "string" }
   ],
