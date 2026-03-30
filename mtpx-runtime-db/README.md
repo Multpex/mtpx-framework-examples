@@ -1,6 +1,6 @@
 # mtpx-runtime-db
 
-Exemplo que demonstra os **três modos oficiais de acesso a banco** definidos pelo RFC 0005, usando um único app monolítico criado com `createApp<Schema>()`.
+Exemplo que demonstra os **três modos oficiais de acesso a banco** definidos pelo RFC 0005, usando um único service criado com `createService<Schema>()`.
 
 ## O que é demonstrado
 
@@ -20,7 +20,7 @@ Exemplo que demonstra os **três modos oficiais de acesso a banco** definidos pe
 3. afterConnect(ctx)        — Runtime DB disponível, service não registrado ainda
        ↓                       Usado para seed de app_config
 4. afterStart()             — Service registrado, rotas ativas
-       ↓                       Lê configs via app.runtime.db
+       ↓                       Configura cache HTTP e lê dados via service.runtime.db
 5. HTTP handlers ativos     — Request DB (ctx.db com escopo de request)
 ```
 
@@ -40,15 +40,34 @@ mtpx db database create docker-pg-test --server docker-pg
 bun dev
 ```
 
+## Performance
+
+O exemplo já sobe com:
+
+- cache HTTP habilitado para `GET /users`, `GET /notes` e `GET /notes/:id`
+- pool de conexão SDK → linkd habilitado
+- índices em `created_at` para as listagens ordenadas
+
+Variáveis opcionais:
+
+```bash
+LINKD_DB_POOL_ENABLED=true
+LINKD_DB_POOL_SIZE=3
+LINKD_HTTP_CACHE_ENABLED=true
+LINKD_HTTP_CACHE_TTL_SECONDS=300
+LINKD_HTTP_CACHE_DETAIL_TTL_SECONDS=300
+LINKD_HTTP_CACHE_MAX_ENTRIES=1000
+```
+
 ## Endpoints
 
 ```
-GET  /notes          — lista notas (Request DB)
-POST /notes          — cria nota + despacha job de audit (Request DB + Job)
-GET  /notes/:id      — busca nota por id
-DELETE /notes/:id    — remove nota
-GET  /config         — lê app_config (preload feito em afterConnect)
-GET  /audit          — lê audit_log (escrito por jobs e beforeStop)
+GET  /users          — lista usuários (cacheável)
+POST /users          — cria usuário e invalida cache
+GET  /notes          — lista notas (cacheável)
+POST /notes          — cria nota e invalida cache
+GET  /notes/:id      — busca nota por id (cacheável)
+DELETE /notes/:id    — remove nota e invalida cache
 ```
 
 ## Pré-requisitos

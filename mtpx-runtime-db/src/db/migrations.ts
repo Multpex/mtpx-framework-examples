@@ -25,4 +25,16 @@ export const migrations: MigrationFile[] = [
       `DROP TABLE IF EXISTS users`,
     ],
   },
+  {
+    name: "002_add_created_at_indexes",
+    version: "2026-03-30-0002",
+    up_statements: [
+      `CREATE INDEX IF NOT EXISTS idx_users_created_at ON users (created_at DESC)`,
+      `CREATE INDEX IF NOT EXISTS idx_notes_created_at ON notes (created_at DESC)`,
+    ],
+    down_statements: [
+      `DROP INDEX IF EXISTS idx_notes_created_at`,
+      `DROP INDEX IF EXISTS idx_users_created_at`,
+    ],
+  },
 ];

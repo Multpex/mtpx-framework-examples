@@ -7,6 +7,7 @@
  */
 
 import {
+  ConflictError,
   createService,
   createRuntimeContext,
   StartupErrorHandler,
@@ -27,12 +28,31 @@ type Ctx = TypedServiceContext<Schema>;
 
 const DATABASE_NAME = env.string("LINKD_DATABASE_NAME", "docker-pg-test");
 const LINKD_ENDPOINT = env.coalesce("LINKD_CONNECT", "LINKD_URL") ?? "unix:/tmp/linkd.sock";
+const DB_POOL_ENABLED = env.bool("LINKD_DB_POOL_ENABLED", true);
+const DB_POOL_SIZE = Math.max(1, Math.trunc(env.number("LINKD_DB_POOL_SIZE", 3)));
+const HTTP_CACHE_ENABLED = env.bool("LINKD_HTTP_CACHE_ENABLED", true);
+const HTTP_CACHE_TTL_SECONDS = Math.max(
+  1,
+  Math.trunc(env.number("LINKD_HTTP_CACHE_TTL_SECONDS", 300)),
+);
+const HTTP_CACHE_DETAIL_TTL_SECONDS = Math.max(
+  1,
+  Math.trunc(env.number("LINKD_HTTP_CACHE_DETAIL_TTL_SECONDS", HTTP_CACHE_TTL_SECONDS)),
+);
+const HTTP_CACHE_MAX_ENTRIES = Math.max(
+  1,
+  Math.trunc(env.number("LINKD_HTTP_CACHE_MAX_ENTRIES", 1000)),
+);
 
 // createService<Schema>() é necessário para ctx.db ser TypedDatabase<Schema>.
 // Use createApp() quando não precisar de ctx.db tipado nos handlers.
 const service = createService<Schema>({
   name: "runtime-db-demo",
   namespace: "default",
+  pool: {
+    enabled: DB_POOL_ENABLED,
+    dbPoolSize: DB_POOL_SIZE,
+  },
   database: {
     defaultDatabase: DATABASE_NAME,
     allowRaw: true,
@@ -107,13 +127,46 @@ service.afterConnect(async (ctx) => {
 
 // afterStart: service registrado, rotas ativas. service.runtime.db disponível.
 service.afterStart(async () => {
+  if (HTTP_CACHE_ENABLED) {
+    await service.cache({
+      defaultPolicy: {
+        enabled: true,
+        defaultTtlSeconds: HTTP_CACHE_TTL_SECONDS,
+        defaultMethods: ["GET"],
+        addCacheHeaders: true,
+      },
+      endpoints: [
+        {
+          action: "list-users",
+          route: "/users",
+          ttlSeconds: HTTP_CACHE_TTL_SECONDS,
+        },
+        {
+          action: "list-notes",
+          route: "/notes",
+          ttlSeconds: HTTP_CACHE_TTL_SECONDS,
+        },
+        {
+          action: "get-note",
+          route: "/notes/:id",
+          ttlSeconds: HTTP_CACHE_DETAIL_TTL_SECONDS,
+        },
+      ],
+      maxEntries: HTTP_CACHE_MAX_ENTRIES,
+    });
+  }
+
   const users = await service.runtime!.db.users.get();
   service.logger.info(`${users.length} usuário(s) carregado(s) via service.runtime.db`);
+  service.logger.info(
+    `Perf config: dbPool=${DB_POOL_ENABLED ? `on (${DB_POOL_SIZE})` : "off"}, cache=${HTTP_CACHE_ENABLED ? `on (${HTTP_CACHE_TTL_SECONDS}s)` : "off"}`,
+  );
 });
 
 // beforeStop: persiste nota de encerramento antes do serviço sair.
 service.beforeStop(async (ctx) => {
   await ctx.db?.notes.insert({ title: "Serviço encerrado", body: "", author: "system" });
+  service.invalidateCache({ action: "list-notes" });
 });
 
 // ============================================================================
@@ -123,6 +176,29 @@ service.beforeStop(async (ctx) => {
 service.action("list-users", { route: "/users", method: "GET" }, async (ctx: Ctx) => {
   return { users: await ctx.db.users.orderByField("created_at", "desc").get() };
 });
+
+const CreateUserSchema = z.object({
+  name: z.string().min(1).max(100),
+  email: z.string().email().max(255),
+  role: z.string().min(1).max(50).default("user"),
+});
+
+service.action(
+  "create-user",
+  { route: "/users", method: "POST", validate: CreateUserSchema },
+  async (ctx: Ctx) => {
+    const body = CreateUserSchema.parse(ctx.body);
+    const user = await ctx.db.users.insertOrNull(body, "email");
+
+    if (!user) {
+      throw ConflictError.duplicate("User", "email", body.email);
+    }
+
+    service.invalidateCache({ action: "list-users" });
+
+    return user;
+  },
+);
 
 const CreateNoteSchema = z.object({
   title: z.string().min(1).max(200),
@@ -139,7 +215,9 @@ service.action(
   { route: "/notes", method: "POST", validate: CreateNoteSchema },
   async (ctx: Ctx) => {
     const body = CreateNoteSchema.parse(ctx.body);
-    return ctx.db.notes.insert(body);
+    const note = await ctx.db.notes.insert(body);
+    service.invalidateCache({ action: "list-notes" });
+    return note;
   },
 );
 
@@ -150,7 +228,14 @@ service.action("get-note", { route: "/notes/:id", method: "GET" }, async (ctx: C
 
 service.action("delete-note", { route: "/notes/:id", method: "DELETE" }, async (ctx: Ctx) => {
   const deleted = await ctx.db.notes.whereEquals("id", ctx.params.id).delete();
-  return deleted ? { ok: true } : { error: "Not found", statusCode: 404 };
+
+  if (deleted) {
+    service.invalidateCache({ action: "list-notes" });
+    service.invalidateCache({ action: "get-note" });
+    return { ok: true };
+  }
+
+  return { error: "Not found", statusCode: 404 };
 });
 
 // ============================================================================
