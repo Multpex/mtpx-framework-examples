@@ -110,12 +110,12 @@ class MicroservicesBootstrap {
       return;
     }
 
-    if (!migrationService?.db?.runMigrations) {
+    if (!migrationService?.runtime?.rawDb?.runMigrations) {
       return;
     }
 
     try {
-      await migrationService.db.runMigrations({
+      await migrationService.runtime.rawDb.runMigrations({
         migrations,
         direction: "up",
         dry_run: false,

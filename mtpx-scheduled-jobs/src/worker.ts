@@ -57,10 +57,12 @@ class ProcessData extends JobHandler<
 
     const itemCount = this.data.items?.length ?? 1;
 
-    const hasDb = Boolean(this.ctx?.db);
+    const svc = this.ctx?.service as { runtime?: { db?: unknown } } | undefined;
+    const hasDb = Boolean(svc?.runtime?.db);
     console.log(
       `   🧩 [ProcessData] infra ctx disponível: db=${hasDb}`,
     );
+
 
     console.log(
       `   📊 [ProcessData] job='${this.job.name}' id='${this.job.id}' - ${itemCount} item(s) processado(s)`,

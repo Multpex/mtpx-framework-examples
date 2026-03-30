@@ -38,7 +38,7 @@ const app = createApp({
   },
 });
 
-app.afterStart(async (ctx) => {
+app.afterConnect(async (ctx) => {
   let exitCode = 0;
   const databaseName = mtpx.env.required("LINKD_DATABASE_NAME");
 

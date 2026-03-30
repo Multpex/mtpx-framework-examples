@@ -42,7 +42,7 @@ const createItemSchema = z.object({
 type CreateItemInput = z.infer<typeof createItemSchema>;
 
 // NOTA: armazenamento em memória — dados são perdidos ao reiniciar o processo.
-// Em um app real, substitua por service.db() para persistência.
+// Em um app real, use ctx.db em handlers ou service.runtime.db fora de request.
 const items = new Map<
   string,
   { id: string; name: string; price: number; tags?: string[] }
