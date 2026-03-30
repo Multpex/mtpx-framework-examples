@@ -26,12 +26,13 @@ type Ctx = TypedServiceContext<Schema>;
 // ============================================================================
 
 const DATABASE_NAME = env.string("LINKD_DATABASE_NAME", "docker-pg-test");
+const LINKD_ENDPOINT = env.coalesce("LINKD_CONNECT", "LINKD_URL") ?? "unix:/tmp/linkd.sock";
 
 // createService<Schema>() é necessário para ctx.db ser TypedDatabase<Schema>.
 // Use createApp() quando não precisar de ctx.db tipado nos handlers.
 const service = createService<Schema>({
   name: "runtime-db-demo",
-  namespace: "runtime-db-demo",
+  namespace: "default",
   database: {
     defaultDatabase: DATABASE_NAME,
     allowRaw: true,
@@ -69,7 +70,7 @@ service.queue.handler(CreateSystemNote);
 
 async function runMigrations(): Promise<void> {
   const runtime = await createRuntimeContext({
-    connect: env.string("LINKD_CONNECT", "unix:/tmp/linkd.sock"),
+    connect: LINKD_ENDPOINT,
     name: "runtime-db-demo:bootstrap",
     database: DATABASE_NAME,
     allowRaw: true,
@@ -77,7 +78,12 @@ async function runMigrations(): Promise<void> {
 
   try {
     if (!runtime.rawDb.runMigrations) return;
-    const results = await runtime.rawDb.runMigrations({ migrations, direction: "up", dry_run: false });
+    const results = await runtime.rawDb.runMigrations({
+      migrations,
+      direction: "up",
+      dry_run: false,
+      database: DATABASE_NAME,
+    });
     const ok = results.filter((r) => r.success).length;
     service.logger.info(`Migrations: ${ok}/${results.length} aplicada(s)`);
   } finally {
@@ -152,14 +158,19 @@ service.action("delete-note", { route: "/notes/:id", method: "DELETE" }, async (
 // ============================================================================
 
 // Modo 1: Detached DB — migrations antes de conectar o service
-await runMigrations();
+await runMigrations().catch((error) =>
+  StartupErrorHandler.fail(error, {
+    dependencyName: "Linkd",
+    endpoint: LINKD_ENDPOINT,
+    hint: `Inicie o Linkd e garanta que o database '${DATABASE_NAME}' está provisionado.`,
+  }),
+);
 
 // Modos 2 e 3: service.start() → afterConnect → afterStart → rotas ativas
 await service.start().catch((error) =>
   StartupErrorHandler.fail(error, {
     dependencyName: "Linkd",
-    endpoint: env.string("LINKD_CONNECT", "unix:/tmp/linkd.sock"),
+    endpoint: LINKD_ENDPOINT,
     hint: `Inicie o Linkd e garanta que o database '${DATABASE_NAME}' está provisionado.`,
   }),
 );
-
