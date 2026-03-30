@@ -26,19 +26,54 @@ Exemplo que demonstra os **três modos oficiais de acesso a banco** definidos pe
 
 ## Setup
 
+### 1. Configurar o db-server (uma única vez)
+
+O `install.sh` registra o db-server `docker-pg` no keystore, mas sem o `runtime_host`.
+O linkd roda dentro de um container Docker e precisa do hostname interno `postgres` para acessar o Postgres — `localhost` não funciona de dentro do container.
+
+Verifique a configuração atual:
+
 ```bash
-# 1. Copie e ajuste o .env
-cp .env.example .env
+mtpx db server list
+```
 
-# 2. Instale as deps
-bun install
+Se `runtimeHost` mostrar `localhost` (ou vazio), atualize:
 
-# 3. Garanta que o database está provisionado no linkd
+```bash
+mtpx db server add docker-pg \
+  --host localhost \
+  --runtime-host postgres \
+  --admin-user multpex \
+  --admin-password multpex
+```
+
+> `server add` faz upsert — se o server já existe, sobrescreve mantendo o `server_uid`.
+
+### 2. Criar o database
+
+O `install.sh` **não** provisiona databases de exemplos. Crie manualmente:
+
+```bash
 mtpx db database create docker-pg-test --server docker-pg
+```
 
-# 4. Rode
+> Aguarde ~5s para o watcher do linkd detectar a nova credencial no keystore.
+
+### 3. Rodar o exemplo
+
+```bash
+cp .env.example .env
+bun install
 bun dev
 ```
+
+### Troubleshooting
+
+| Sintoma | Causa | Solução |
+|---------|-------|---------|
+| `Database not found: docker-pg-test` | Database não provisionado | `mtpx db database create docker-pg-test --server docker-pg` |
+| `Database not found` mesmo após criar | `runtimeHost` do server é `localhost` | `mtpx db server add docker-pg --host localhost --runtime-host postgres --admin-user multpex --admin-password multpex` e depois recrie o database |
+| `Connection refused` | linkd ou Postgres não estão rodando | `cd mtpx-framework-dev-infra && docker compose up -d` |
 
 ## Performance
 
