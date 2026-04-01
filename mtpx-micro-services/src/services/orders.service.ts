@@ -118,7 +118,7 @@ service.afterStart(async () => {
  * List orders with filtering
  * GET /orders?userId=xxx&status=pending&page=1&limit=20
  */
-service.action("list", { route: "/orders", method: "GET", auth: true }, async (ctx: Context) => {
+service.get("/orders", { name: "list", auth: true }, async (ctx: Context) => {
   const { userId, status, page = "1", limit = "20" } = ctx.query;
   const offset = (parseInt(page) - 1) * parseInt(limit);
 
@@ -148,7 +148,7 @@ service.action("list", { route: "/orders", method: "GET", auth: true }, async (c
  * Get order by ID
  * GET /orders/:id
  */
-service.action("get", { route: "/orders/:id", method: "GET", auth: true }, async (ctx: Context) => {
+service.get("/orders/:id", { name: "get", auth: true }, async (ctx: Context) => {
   const { id } = ctx.params;
 
   const order = await ctx.db.orders.whereEquals("id", id).first();
@@ -164,7 +164,7 @@ service.action("get", { route: "/orders/:id", method: "GET", auth: true }, async
  * Create new order
  * POST /orders
  */
-service.post("/orders", { auth: true}, async (ctx: Context) => {
+service.post("/orders", { name: "create", auth: true }, async (ctx: Context) => {
   const data = CreateOrderSchema.parse(ctx.body);
 
   // Validate user exists via inter-service call
@@ -239,7 +239,7 @@ service.post("/orders", { auth: true}, async (ctx: Context) => {
  * Update order status
  * PATCH /orders/:id/status
  */
-service.action("updateStatus", { route: "/orders/:id/status", method: "PATCH", auth: true }, async (ctx: Context) => {
+service.patch("/orders/:id/status", { name: "updateStatus", auth: true }, async (ctx: Context) => {
   const { id } = ctx.params;
   const data = UpdateOrderStatusSchema.parse(ctx.body);
 
@@ -280,7 +280,7 @@ service.action("updateStatus", { route: "/orders/:id/status", method: "PATCH", a
  * Cancel order
  * POST /orders/:id/cancel
  */
-service.action("cancel", { route: "/orders/:id/cancel", method: "POST", auth: true }, async (ctx: Context) => {
+service.post("/orders/:id/cancel", { name: "cancel", auth: true }, async (ctx: Context) => {
   const { id } = ctx.params;
   const body = ctx.body as { reason?: string };
 
@@ -318,7 +318,7 @@ service.action("cancel", { route: "/orders/:id/cancel", method: "POST", auth: tr
  * Get order statistics
  * GET /orders/stats
  */
-service.action("stats", { route: "/orders/stats", method: "GET", auth: true }, async (ctx: Context) => {
+service.get("/orders/stats", { name: "stats", auth: true }, async (ctx: Context) => {
   const [totalOrders, pendingOrders, deliveredOrders, deliveredList] = await Promise.all([
     ctx.db.orders.count(),
     ctx.db.orders.whereEquals("status", "pending").count(),

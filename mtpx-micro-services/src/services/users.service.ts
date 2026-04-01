@@ -84,7 +84,7 @@ service.afterStart(async () => {
  * List users with filtering
  * GET /users?status=active&role=user&page=1&limit=20
  */
-service.action("list", { route: "/users", method: "GET", auth: true }, async (ctx: Context) => {
+service.get("/users", { name: "list", auth: true }, async (ctx: Context) => {
   const { status, role, page = "1", limit = "20" } = ctx.query;
   const offset = (parseInt(page) - 1) * parseInt(limit);
 
@@ -114,7 +114,7 @@ service.action("list", { route: "/users", method: "GET", auth: true }, async (ct
  * Get user by ID
  * GET /users/:id
  */
-service.action("get", { route: "/users/:id", method: "GET", auth: true }, async (ctx: Context) => {
+service.get("/users/:id", { name: "get", auth: true }, async (ctx: Context) => {
   const { id } = ctx.params;
 
   const user = await ctx.db.users.whereEquals("id", id).first();
@@ -132,7 +132,7 @@ service.action("get", { route: "/users/:id", method: "GET", auth: true }, async 
  * 
  * Optimized: Uses insertOrNull with ON CONFLICT to avoid 2 roundtrips.
  */
-service.action("create", { route: "/users", method: "POST", auth: true, roles: ["admin"] }, async (ctx: Context) => {
+service.post("/users", { name: "create", auth: true, roles: ["admin"] }, async (ctx: Context) => {
   const data = CreateUserSchema.parse(ctx.body);
 
   // Single query: INSERT ... ON CONFLICT (email) DO NOTHING RETURNING *
@@ -157,7 +157,7 @@ service.action("create", { route: "/users", method: "POST", auth: true, roles: [
  * Update user
  * PUT /users/:id
  */
-service.action("update", { route: "/users/:id", method: "PUT", auth: true }, async (ctx: Context) => {
+service.put("/users/:id", { name: "update", auth: true }, async (ctx: Context) => {
   const { id } = ctx.params;
   const data = UpdateUserSchema.parse(ctx.body);
 
@@ -182,7 +182,7 @@ service.action("update", { route: "/users/:id", method: "PUT", auth: true }, asy
  * Delete user (soft delete)
  * DELETE /users/:id
  */
-service.action("delete", { route: "/users/:id", method: "DELETE", auth: true, roles: ["admin"] }, async (ctx: Context) => {
+service.delete("/users/:id", { name: "delete", auth: true, roles: ["admin"] }, async (ctx: Context) => {
   const { id } = ctx.params;
 
   const exists = await ctx.db.users.whereEquals("id", id).exists();
@@ -205,7 +205,7 @@ service.action("delete", { route: "/users/:id", method: "DELETE", auth: true, ro
  * Get user statistics
  * GET /users/stats
  */
-service.action("stats", { route: "/users/stats", method: "GET", auth: true }, async (ctx: Context) => {
+service.get("/users/stats", { name: "stats", auth: true }, async (ctx: Context) => {
   const [total, active, inactive, suspended] = await Promise.all([
     ctx.db.users.count(),
     ctx.db.users.whereEquals("status", "active").count(),

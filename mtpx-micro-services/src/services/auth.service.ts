@@ -113,13 +113,7 @@ service.afterStart(async () => {
  *
  * Access via ctx.tenant (realm, clientId, source)
  */
-service.action(
-  "login",
-  {
-    route: "/auth/login",
-    method: "POST",
-    validate: LoginSchema,
-  },
+service.post("/auth/login", { name: "login", validate: LoginSchema },
   async (ctx: Context) => {
     const { username, password } = ctx.body as z.infer<typeof LoginSchema>;
 
@@ -172,13 +166,7 @@ service.action(
  * Refresh access token
  * POST /auth/refresh
  */
-service.action(
-  "refresh",
-  {
-    route: "/auth/refresh",
-    method: "POST",
-    validate: RefreshSchema,
-  },
+service.post("/auth/refresh", { name: "refresh", validate: RefreshSchema },
   async (ctx: Context) => {
     const { refreshToken } = ctx.body as z.infer<typeof RefreshSchema>;
 
@@ -200,14 +188,7 @@ service.action(
  * Logout (revoke tokens)
  * POST /auth/logout
  */
-service.action(
-  "logout",
-  {
-    route: "/auth/logout",
-    method: "POST",
-    auth: true,
-    validate: LogoutSchema,
-  },
+service.post("/auth/logout", { name: "logout", auth: true, validate: LogoutSchema },
   async (ctx: Context) => {
     const { refreshToken } = ctx.body as z.infer<typeof LogoutSchema>;
 
@@ -236,13 +217,7 @@ service.action(
  *
  * Uses ctx.user injected by sidecar, or fetches fresh info from identity provider.
  */
-service.action(
-  "me",
-  {
-    route: "/auth/me",
-    method: "GET",
-    auth: true,
-  },
+service.get("/auth/me", { name: "me", auth: true },
   async (ctx: Context) => {
     if (!ctx.user) {
       throw new UnauthorizedError("Not authenticated");
@@ -282,13 +257,7 @@ service.action(
  * Note: The sidecar already validates the token and injects ctx.user.
  * This endpoint allows apps to explicitly check token validity.
  */
-service.action(
-  "verify",
-  {
-    route: "/auth/verify",
-    method: "POST",
-    auth: true,
-  },
+service.post("/auth/verify", { name: "verify", auth: true },
   async (ctx: Context) => {
     // If we reached here, sidecar validated the token
     if (!ctx.user) {
@@ -312,12 +281,7 @@ service.action(
  *
  * Multi-tenant: realm auto-resolved by SDK
  */
-service.action(
-  "discovery",
-  {
-    route: "/auth/discovery",
-    method: "GET",
-  },
+service.get("/auth/discovery", { name: "discovery" },
   async (ctx: Context) => {
     // Realm already resolved in ctx.realm, auth client auto-configured
     return ctx.auth!.getDiscovery();

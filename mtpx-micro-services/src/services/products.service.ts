@@ -94,7 +94,7 @@ service.afterStart(async () => {
  * List products with filtering
  * GET /products?category=electronics&status=active&page=1&limit=20
  */
-service.action("list", { route: "/products", method: "GET", auth: true }, async (ctx: Context) => {
+service.get("/products", { name: "list", auth: true }, async (ctx: Context) => {
   const { category, status, page = "1", limit = "20" } = ctx.query;
   const offset = (parseInt(page) - 1) * parseInt(limit);
 
@@ -130,7 +130,7 @@ service.action("list", { route: "/products", method: "GET", auth: true }, async 
  * Get product by ID
  * GET /products/:id
  */
-service.action("get", { route: "/products/:id", method: "GET", auth: true }, async (ctx: Context) => {
+service.get("/products/:id", { name: "get", auth: true }, async (ctx: Context) => {
   const { id } = ctx.params;
 
   const product = await ctx.db.products.whereEquals("id", id).first();
@@ -146,7 +146,7 @@ service.action("get", { route: "/products/:id", method: "GET", auth: true }, asy
  * Create new product
  * POST /products
  */
-service.action("create", { route: "/products", method: "POST", auth: true, roles: ["admin"] }, async (ctx: Context) => {
+service.post("/products", { name: "create", auth: true, roles: ["admin"] }, async (ctx: Context) => {
   const data = CreateProductSchema.parse(ctx.body);
 
   // Check SKU exists
@@ -179,7 +179,7 @@ service.action("create", { route: "/products", method: "POST", auth: true, roles
  * Update product
  * PUT /products/:id
  */
-service.action("update", { route: "/products/:id", method: "PUT", auth: true }, async (ctx: Context) => {
+service.put("/products/:id", { name: "update", auth: true }, async (ctx: Context) => {
   const { id } = ctx.params;
   const data = UpdateProductSchema.parse(ctx.body);
 
@@ -203,7 +203,7 @@ service.action("update", { route: "/products/:id", method: "PUT", auth: true }, 
  * Adjust stock
  * POST /products/:id/stock
  */
-service.action("adjustStock", { route: "/products/:id/stock", method: "POST", auth: true }, async (ctx: Context) => {
+service.post("/products/:id/stock", { name: "adjustStock", auth: true }, async (ctx: Context) => {
   const { id } = ctx.params;
   const { quantity, reason } = AdjustStockSchema.parse(ctx.body);
 
@@ -239,7 +239,7 @@ service.action("adjustStock", { route: "/products/:id/stock", method: "POST", au
  * Delete product (soft delete)
  * DELETE /products/:id
  */
-service.action("delete", { route: "/products/:id", method: "DELETE", auth: true, roles: ["admin"] }, async (ctx: Context) => {
+service.delete("/products/:id", { name: "delete", auth: true, roles: ["admin"] }, async (ctx: Context) => {
   const { id } = ctx.params;
 
   const exists = await ctx.db.products.whereEquals("id", id).exists();
@@ -262,7 +262,7 @@ service.action("delete", { route: "/products/:id", method: "DELETE", auth: true,
  * Get all categories
  * GET /products/categories
  */
-service.action("categories", { route: "/products/categories", method: "GET", auth: true }, async (ctx: Context) => {
+service.get("/products/categories", { name: "categories", auth: true }, async (ctx: Context) => {
   const products = await ctx.db.products
     .select("category")
     .whereEquals("status", "active")

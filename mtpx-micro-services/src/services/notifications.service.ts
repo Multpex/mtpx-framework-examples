@@ -42,9 +42,8 @@ const service = createService<Schema>({
 // ============================================================================
 
 /** POST /notifications/email - Queue email for delivery */
-service.action(
-  "sendEmail",
-  { route: "/notifications/email", method: "POST" },
+service.post(
+  "/notifications/email",
   async (ctx: Context) => {
     const { to, subject, body, priority } = ctx.body as EmailNotification;
 
@@ -69,9 +68,8 @@ service.action(
 );
 
 /** POST /notifications/sms - Queue SMS for delivery */
-service.action(
-  "sendSms",
-  { route: "/notifications/sms", method: "POST" },
+service.post(
+  "/notifications/sms",
   async (ctx: Context) => {
     const { phone, message } = ctx.body as SmsNotification;
 
