@@ -16,7 +16,7 @@
     "postman:test:verbose": "bunx newman run postman/mtpx-scheduled-jobs.postman_collection.json -e postman/mtpx-scheduled-jobs.postman_environment.json --verbose"
   },
   "dependencies": {
-    "@linkd/sdk-typescript": "0.1.4",
+    "@linkd/sdk-typescript": "0.1.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {

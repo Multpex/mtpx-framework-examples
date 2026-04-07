@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@linkd/sdk-typescript": "0.1.4"
+    "@linkd/sdk-typescript": "0.1.5"
   },
   "devDependencies": {
     "@types/bun": "^1.3.9",

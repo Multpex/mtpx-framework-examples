@@ -10,7 +10,7 @@
     "postman:test:verbose": "bunx newman run postman/mtpx-websocket-chat.postman_collection.json -e postman/mtpx-websocket-chat.postman_environment.json --verbose"
   },
   "dependencies": {
-    "@linkd/sdk-typescript": "0.1.4",
+    "@linkd/sdk-typescript": "0.1.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {
