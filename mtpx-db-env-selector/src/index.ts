@@ -1,6 +1,7 @@
 import {
   createApp,
   StartupErrorHandler,
+  env,
 } from "@linkd/sdk-typescript";
 
 interface ItemRow extends Record<string, unknown> {
@@ -29,7 +30,7 @@ const app = createApp({
   namespace: "db-env-selector",
   database: {
     allowRaw: true,
-    multiTenant: mtpx.env.bool("MTPX_DB_MULTI_TENANT", true),
+    multiTenant: env.bool("MTPX_DB_MULTI_TENANT", true),
   },
   logging: {
     level: "info",
@@ -40,7 +41,7 @@ const app = createApp({
 
 app.afterConnect(async (ctx) => {
   let exitCode = 0;
-  const databaseName = mtpx.env.required("LINKD_DATABASE_NAME");
+  const databaseName = env.required("LINKD_DATABASE_NAME");
 
   try {
     const database = ctx.db;
@@ -107,11 +108,11 @@ app.afterConnect(async (ctx) => {
 await app.start().catch((error) =>
   StartupErrorHandler.fail(error, {
     dependencyName: "Linkd",
-    endpoint: mtpx.env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
+    endpoint: env.string("LINKD_URL", "unix:/tmp/linkd.sock"),
     hint: "Inicie o Linkd e tente novamente.",
   }),
 );
 
 app.logger.info("db-env-selector iniciado", {
-  databaseName: mtpx.env.string("LINKD_DATABASE_NAME"),
+  databaseName: env.string("LINKD_DATABASE_NAME"),
 });

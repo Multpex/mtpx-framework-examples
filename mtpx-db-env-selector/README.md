@@ -51,7 +51,7 @@ bun run typecheck
 ## O que o exemplo demonstra
 
 - Autoload de `.env` no SDK
-- Uso de `mtpx.env` para acessar variáveis de ambiente
+- Uso de `env` do SDK para acessar variáveis de ambiente
 - Criação de tabela com `database.schema.createTableIfNotExists`
 - Escrita com `table.upsert(...)`
 - Leitura e remoção de registro
