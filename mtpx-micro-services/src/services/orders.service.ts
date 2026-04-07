@@ -4,7 +4,7 @@
  * Manages order processing with PostgreSQL storage.
  * Demonstrates:
  * - Inter-service calls (users, products)
- * - Fluent Query Builder with createTypedService
+ * - Fluent Query Builder com createService<Schema>()
  * - Event-driven patterns
  * - HTTP endpoint caching
  */
