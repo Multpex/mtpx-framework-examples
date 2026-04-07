@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "mtpx-runtime-db",
+      "name": "mtpx-auth-rbac",
       "dependencies": {
         "@linkd/sdk-typescript": "0.1.5",
       },

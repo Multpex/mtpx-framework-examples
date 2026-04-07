@@ -1,6 +1,6 @@
 {
   "name": "mtpx-fluent-v2-lambda",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Example focused on Fluent V2 lambda-style where queries and the explicit predicate API",
   "main": "src/index.ts",

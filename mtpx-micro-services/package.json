@@ -1,6 +1,6 @@
 {
   "name": "mtpx-micro-services",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Moleculer-style microservices example with service loader, PostgreSQL, NATS events and caching",
   "main": "src/main.ts",

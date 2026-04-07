@@ -1,6 +1,6 @@
 {
   "name": "mtpx-elasticsearch",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Example app demonstrating Elasticsearch operations via the Multpex SDK sidecar client",
   "main": "src/index.ts",

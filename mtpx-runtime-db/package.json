@@ -1,6 +1,6 @@
 {
   "name": "mtpx-runtime-db",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Example demonstrating RFC 0005 — Runtime DB access outside of HTTP request handlers",
   "main": "src/index.ts",
