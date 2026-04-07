@@ -18,6 +18,7 @@ Cada pasta neste repositorio mostra um caso de uso pratico do `@linkd/sdk-typesc
 | [mtpx-scheduled-jobs](./mtpx-scheduled-jobs) | Jobs agendados, scheduler e worker | [Abrir](./mtpx-scheduled-jobs/README.md) |
 | [mtpx-websocket-chat](./mtpx-websocket-chat) | Exemplo de API WebSocket do SDK | [Abrir](./mtpx-websocket-chat/README.md) |
 | [mtpx-db-env-selector](./mtpx-db-env-selector) | Seleciona database via env var e valida credencial no keystore | [Abrir](./mtpx-db-env-selector/src/index.ts) |
+| [mtpx-fluent-v2-lambda](./mtpx-fluent-v2-lambda) | Exemplo focado em `where((...) => ...)`, joins com lambda e fallback para `whereExpr(...)` | [Abrir](./mtpx-fluent-v2-lambda/README.md) |
 
 ## Pre-requisitos
 
