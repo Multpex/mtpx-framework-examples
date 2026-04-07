@@ -17,6 +17,7 @@ const service = createApp({
   instanceId: INSTANCE_ID,
   namespace: "minimal-app",  // Namespace isolado para evitar conflitos
   auth: {
+    enabled: false,
     realm: env.string("AUTH_REALM", "multpex"),
     clientId: env.string("AUTH_CLIENT_ID", "multpex-services"),
   },

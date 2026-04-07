@@ -1,6 +1,6 @@
 {
   "name": "mtpx-minimal-app",
-  "version": "0.1.5",
+  "version": "0.1.4",
   "type": "module",
   "description": "Minimal example of @linkd/sdk-typescript features",
   "main": "src/index.ts",
