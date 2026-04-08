@@ -42,7 +42,7 @@ O arquivo `linkd.config.ts` define como o app se conecta ao linkd e ao banco:
 
 ```ts
 export default {
-  name: "mtpx-sdk-app-nano",
+  name: "mtpx-sdk-app",
   database: {
     schemaFile: "./src/db/schema.ts",
     output: "./src/db/schema.ts",
@@ -53,7 +53,7 @@ export default {
   },
   linkd: {
     connect: "tcp://localhost:9999",
-    database: "mtpx_sdk_app_nano",
+    database: "mtpx_sdk_app",
   },
 };
 ```
@@ -78,10 +78,10 @@ mtpx db server add docker-pg \
 ### 2. Criar o banco de dados da aplicação
 
 ```bash
-mtpx db database create mtpx_sdk_app_nano --server docker-pg
+mtpx db database create mtpx_sdk_app --server docker-pg
 ```
 
-Isso cria o banco e o usuário `mtpx_sdk_app_nano` no Postgres, e salva a credencial no keystore local.
+Isso cria o banco e o usuário `mtpx_sdk_app` no Postgres, e salva a credencial no keystore local.
 
 > **Aguarde ~5 segundos** após este comando antes de rodar migrations — o linkd atualiza o pool de conexões a cada 5 segundos ao detectar novas credenciais no keystore.
 

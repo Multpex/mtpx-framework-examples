@@ -1,5 +1,5 @@
 export default {
-  name: "mtpx-sdk-app",
+  name: "mtpx-sdk-app-nano",
 
   database: {
     schemaFile: "./src/db/schema.ts",
@@ -12,7 +12,7 @@ export default {
 
   linkd: {
     connect: "tcp://localhost:9999",
-    database: "mtpx_sdk_app",
+    database: "mtpx_sdk_app_nano",
   },
 
   dev: {
