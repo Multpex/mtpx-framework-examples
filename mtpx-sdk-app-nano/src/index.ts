@@ -3,7 +3,6 @@ import type { Schema } from "./db/schema.js";
 
 const service = createService<Schema>({
   name: "users",
-  connect: "tcp://localhost:9999",
   database: { defaultDatabase: "mtpx_sdk_app_nano" },
 });
 
