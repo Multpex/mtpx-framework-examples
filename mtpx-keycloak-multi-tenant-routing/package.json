@@ -1,6 +1,6 @@
 {
   "name": "mtpx-keycloak-multi-tenant-routing",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "type": "module",
   "description": "Example app for host-based multi-tenant Keycloak auth with automatic database routing",

@@ -1,6 +1,6 @@
 {
   "name": "mtpx-scheduled-jobs",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "type": "module",
   "description": "Example of scheduled/cron jobs with @linkd/sdk-typescript",
   "main": "src/index.ts",
