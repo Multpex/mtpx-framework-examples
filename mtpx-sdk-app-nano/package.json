@@ -13,6 +13,6 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@linkd/sdk-typescript": "0.1.5"
+    "@linkd/sdk-typescript": "0.1.6"
   }
 }
