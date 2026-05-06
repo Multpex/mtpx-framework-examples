@@ -4,7 +4,7 @@ import {
   type ChannelContext,
 } from "@linkd/sdk-typescript";
 
-const CHANNEL = env.string("MONITOR_CHANNEL", "demo.order.created");
+const CHANNEL = env.string("MONITOR_CHANNEL", "voucher.legado");
 const GROUP = env.string("MONITOR_GROUP", "channel-monitor");
 
 console.log(`\n═══════════════════════════════════════════════`);
