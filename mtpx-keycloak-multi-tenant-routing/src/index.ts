@@ -3,14 +3,11 @@ import {
   decodeJwtPayload,
   env,
   requestLogger,
+  Schema,
   StartupErrorHandler,
   z,
   type TypedServiceContext,
 } from "@linkd/sdk-typescript";
-
-interface CurrentDatabaseRow {
-  current_database: string;
-}
 
 interface NoteRow extends Record<string, unknown> {
   id: string;
@@ -39,6 +36,16 @@ const noteSchema = z.object({
   message: z.string().min(1, "message is required").max(400),
 });
 
+// Declarative table definition — the SDK auto-creates per tenant (cached)
+const tenantNotesTable = Schema.createTable("tenant_notes", {
+  id: Schema.varchar(64).primaryKey(),
+  message: Schema.varchar(400).notNull(),
+  created_by: Schema.varchar(120).notNull(),
+  realm: Schema.varchar(40).notNull(),
+  db_tenant: Schema.varchar(80).notNull(),
+  created_at: Schema.timestamp().notNull().defaultNow(),
+});
+
 const service = createService<ExampleSchema>({
   name: "keycloak-multi-tenant-routing",
   namespace: env.string("LINKD_NAMESPACE", "tenant-routing-demo"),
@@ -51,6 +58,7 @@ const service = createService<ExampleSchema>({
   database: {
     allowRaw: true,
     multiTenant: true,
+    tables: { tenant_notes: tenantNotesTable },
   },
   logging: {
     level: env.bool("DEBUG") ? "debug" : "info",
@@ -60,64 +68,6 @@ const service = createService<ExampleSchema>({
 });
 
 service.use(requestLogger());
-
-function requireDb(ctx: AppContext) {
-  return ctx.db;
-}
-
-function buildTokenPreview(accessToken: string) {
-  const claims = decodeJwtPayload(accessToken);
-  return {
-    iss: claims.iss ?? null,
-    azp: claims.azp ?? null,
-    tenant: claims.tenant ?? null,
-    tenantId: claims.tenant_id ?? null,
-    preferredUsername: claims.preferred_username ?? null,
-  };
-}
-
-function currentUsername(ctx: AppContext): string {
-  const preferredUsername = ctx.user?.metadata?.preferred_username;
-  if (typeof preferredUsername === "string" && preferredUsername.length > 0) {
-    return preferredUsername;
-  }
-
-  return ctx.user?.id || "anonymous";
-}
-
-async function currentDatabase(ctx: AppContext): Promise<string> {
-  const db = requireDb(ctx);
-  const rows = await db.raw<CurrentDatabaseRow>(
-    "SELECT current_database() AS current_database",
-  );
-  return rows[0]?.current_database ?? "unknown";
-}
-
-async function ensureTenantSchema(ctx: AppContext): Promise<void> {
-  const db = requireDb(ctx);
-
-  await db.schema.createTableIfNotExists("tenant_notes", (table) => {
-    table.string("id", 64).primary();
-    table.string("message", 400).notNullable();
-    table.string("created_by", 120).notNullable();
-    table.string("realm", 40).notNullable();
-    table.string("db_tenant", 80).notNullable();
-    table
-      .timestamp("created_at")
-      .notNullable()
-      .default("CURRENT_TIMESTAMP");
-  });
-}
-
-async function tenantSummary(ctx: AppContext) {
-  return {
-    host: ctx.header("host") ?? null,
-    realm: ctx.tenant.realm,
-    realmSource: ctx.tenant.source,
-    userTenantId: ctx.user?.tenantId ?? null,
-    currentDatabase: await currentDatabase(ctx),
-  };
-}
 
 service.beforeStart(async () => {
   service.logger.info("Starting Keycloak multi-tenant routing example", {
@@ -175,6 +125,7 @@ service.action(
   async (ctx: AppContext) => {
     const body = ctx.body as z.infer<typeof loginSchema>;
     const result = await ctx.auth!.login(body);
+    const claims = decodeJwtPayload(result.accessToken);
 
     return {
       accessToken: result.accessToken,
@@ -188,7 +139,13 @@ service.action(
         source: ctx.tenant.source,
         host: ctx.header("host") ?? null,
       },
-      tokenPreview: buildTokenPreview(result.accessToken),
+      tokenPreview: {
+        iss: claims.iss ?? null,
+        azp: claims.azp ?? null,
+        tenant: claims.tenant ?? null,
+        tenantId: claims.tenant_id ?? null,
+        preferredUsername: claims.preferred_username ?? null,
+      },
     };
   },
 );
@@ -201,7 +158,12 @@ service.action(
     auth: true,
   },
   async (ctx: AppContext) => ({
-    tenant: await tenantSummary(ctx),
+    tenant: {
+      realm: ctx.tenant.realm,
+      realmSource: ctx.tenant.source,
+      host: ctx.header("host") ?? null,
+      userTenantId: ctx.user?.tenantId ?? null,
+    },
     user: {
       id: ctx.user?.id ?? null,
       tenantId: ctx.user?.tenantId ?? null,
@@ -220,17 +182,14 @@ service.action(
     auth: true,
   },
   async (ctx: AppContext) => {
-    await ensureTenantSchema(ctx);
-
-    const db = requireDb(ctx);
-    const notes = await db
+    const notes = await ctx.db
       .table<NoteRow>("tenant_notes")
       .select("id", "message", "created_by", "realm", "db_tenant", "created_at")
       .orderByField("created_at", "desc")
       .get();
 
     return {
-      tenant: await tenantSummary(ctx),
+      tenant: { realm: ctx.tenant.realm, source: ctx.tenant.source },
       total: notes.length,
       notes,
     };
@@ -247,20 +206,22 @@ service.action(
   },
   async (ctx: AppContext) => {
     const body = ctx.body as z.infer<typeof noteSchema>;
+    const username =
+      (typeof ctx.user?.metadata?.preferred_username === "string" &&
+        ctx.user.metadata.preferred_username) ||
+      ctx.user?.id ||
+      "anonymous";
 
-    await ensureTenantSchema(ctx);
-
-    const db = requireDb(ctx);
-    const note = await db.table<NoteRow>("tenant_notes").insert({
+    const note = await ctx.db.table<NoteRow>("tenant_notes").insert({
       id: crypto.randomUUID(),
       message: body.message,
-      created_by: currentUsername(ctx),
+      created_by: username,
       realm: ctx.tenant.realm,
       db_tenant: ctx.user?.tenantId ?? "unknown",
     });
 
     return {
-      tenant: await tenantSummary(ctx),
+      tenant: { realm: ctx.tenant.realm, source: ctx.tenant.source },
       note,
     };
   },
@@ -272,16 +233,13 @@ service.action(
     route: "/tenant-routing/notes",
     method: "DELETE",
     auth: true,
-    roles: ["admin"],
+    authorize: "admin:global",
   },
   async (ctx: AppContext) => {
-    await ensureTenantSchema(ctx);
-
-    const db = requireDb(ctx);
-    const deleted = await db.table<NoteRow>("tenant_notes").delete();
+    const deleted = await ctx.db.table<NoteRow>("tenant_notes").delete();
 
     return {
-      tenant: await tenantSummary(ctx),
+      tenant: { realm: ctx.tenant.realm, source: ctx.tenant.source },
       deleted,
     };
   },
