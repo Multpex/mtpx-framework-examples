@@ -12,20 +12,8 @@ import {
 
 const INSTANCE_ID = env.string("INSTANCE_ID", crypto.randomUUID().slice(0, 8));
 
-const service = createApp({
-  name: "minimal-app",
-  instanceId: INSTANCE_ID,
-  namespace: "minimal-app",  // Namespace isolado para evitar conflitos
-  auth: {
-    enabled: false,
-    realm: env.string("AUTH_REALM", "multpex"),
-    clientId: env.string("AUTH_CLIENT_ID", "multpex-services"),
-  },
-
-  // Connection examples:
-  // connect: "tcp://localhost:9999",  // TCP for development/remote debugging
-  // connect: "/tmp/multpex.sock",                      // Unix socket (default)
-});
+// DX plan §7.4 — zero-config: `name` é o único campo obrigatório.
+const service = createApp({ name: "minimal-app" });
 
 service.use(requestLogger());
 
