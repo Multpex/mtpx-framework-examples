@@ -1,13 +1,12 @@
 /**
  * Auth RBAC Example
  *
- * Demonstra como usar o sistema de autorização baseado em roles (RBAC)
- * integrado com Keycloak.
+ * Demonstra como usar autorização baseada em permissions com o SDK.
  *
- * Roles suportadas:
- *   - admin: Acesso total a todas as operações
- *   - editor: Pode criar e editar recursos
- *   - viewer: Somente leitura
+ * Permissions usadas:
+ *   - admin:global: Acesso total a todas as operações
+ *   - write:db:*: Pode criar e editar recursos
+ *   - read:db:*: Somente leitura
  *
  * Para testar:
  *   1. Inicie a infraestrutura: docker-compose up -d
@@ -21,13 +20,7 @@ import {
   z,
   StartupErrorHandler,
   env,
-  // Authorization helpers
   requireAuth,
-  requireAdmin,
-  getAuthInfo,
-  withAuthorization,
-  adminOnly,
-  authenticated,
 } from "@linkd/sdk-typescript";
 
 // =============================================================================
@@ -85,87 +78,64 @@ const service = createService({
 // Public Actions (sem autenticação)
 // =============================================================================
 
-/**
- * Endpoint público - não requer autenticação
- */
 service.action(
   "health",
   { route: "/auth-example/health", method: "GET" },
-  async () => {
-    return {
-      status: "healthy",
-      timestamp: new Date().toISOString(),
-      documentCount: documents.size,
-    };
-  }
+  async () => ({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    documentCount: documents.size,
+  }),
 );
 
 // =============================================================================
-// Viewer Actions (qualquer usuário autenticado pode acessar)
+// Viewer Actions (read:db:*)
 // =============================================================================
 
-/**
- * Listar documentos - requer role viewer ou superior
- *
- * Usando o parâmetro `roles` no action options:
- */
 service.action(
   "documents.list",
   {
     route: "/auth-example/documents",
     method: "GET",
-    roles: ["viewer", "editor", "admin"], // Qualquer uma dessas roles
+    authorize: "read:db:*",
   },
-  async (ctx) => {
-    const auth = getAuthInfo(ctx);
-
-    ctx.logger.info("Listing documents", {
-      userId: auth.userId ?? undefined,
-      roles: auth.roles ?? undefined,
-    });
-
-    return {
-      documents: Array.from(documents.values()),
-      meta: {
-        total: documents.size,
-        requestedBy: auth.userId,
-      },
-    };
-  }
+  async (ctx) => ({
+    documents: Array.from(documents.values()),
+    meta: {
+      total: documents.size,
+      requestedBy: ctx.user?.id,
+    },
+  }),
 );
 
-/**
- * Obter documento por ID - usando withAuthorization()
- */
 service.action(
   "documents.get",
-  { route: "/auth-example/documents/:id", method: "GET", validateParams: documentParamsSchema },
-  withAuthorization({ roles: ["viewer", "editor", "admin"] }, async (ctx) => {
+  {
+    route: "/auth-example/documents/:id",
+    method: "GET",
+    authorize: "read:db:*",
+    validateParams: documentParamsSchema,
+  },
+  async (ctx) => {
     const doc = documents.get(ctx.params.id);
-    if (!doc) {
-      return { error: "Document not found", statusCode: 404 };
-    }
+    if (!doc) return { error: "Document not found", statusCode: 404 };
     return doc;
-  })
+  },
 );
 
 // =============================================================================
-// Editor Actions (requer role editor ou admin)
+// Editor Actions (write:db:*)
 // =============================================================================
 
-/**
- * Criar documento - usando roles no options
- */
 service.action(
   "documents.create",
   {
     route: "/auth-example/documents",
     method: "POST",
-    roles: ["editor", "admin"],
+    authorize: "write:db:*",
     validate: createDocumentSchema,
   },
   async (ctx) => {
-    const auth = getAuthInfo(ctx);
     const body = ctx.body as CreateDocumentInput;
     const id = crypto.randomUUID();
 
@@ -174,131 +144,87 @@ service.action(
       title: body.title,
       content: body.content,
       tags: body.tags ?? [],
-      createdBy: auth.userId!,
+      createdBy: ctx.user!.id,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
     documents.set(id, doc);
-
-    service.logger.info("Document created", {
-      documentId: id,
-      createdBy: auth.userId,
-    });
-
     ctx.emit("document.created", { documentId: id, title: doc.title });
-
     return doc;
-  }
+  },
 );
 
-/**
- * Atualizar documento - usando withAuthorization()
- */
 service.action(
   "documents.update",
   {
     route: "/auth-example/documents/:id",
     method: "PUT",
+    authorize: "write:db:*",
     validate: updateDocumentSchema,
     validateParams: documentParamsSchema,
   },
-  withAuthorization({ roles: ["editor", "admin"] }, async (ctx) => {
+  async (ctx) => {
     const doc = documents.get(ctx.params.id);
-    if (!doc) {
-      return { error: "Document not found", statusCode: 404 };
-    }
+    if (!doc) return { error: "Document not found", statusCode: 404 };
 
-    const auth = getAuthInfo(ctx);
     const body = ctx.body as UpdateDocumentInput;
-
-    // Atualizar campos fornecidos
     if (body.title !== undefined) doc.title = body.title;
     if (body.content !== undefined) doc.content = body.content;
     if (body.tags !== undefined) doc.tags = body.tags;
     doc.updatedAt = new Date();
 
-    service.logger.info("Document updated", {
-      documentId: ctx.params.id,
-      updatedBy: auth.userId,
-    });
-
     ctx.emit("document.updated", { documentId: doc.id });
-
     return doc;
-  })
+  },
 );
 
 // =============================================================================
-// Admin Actions (somente admin)
+// Admin Actions (admin:global)
 // =============================================================================
 
-/**
- * Deletar documento - usando roles: ["admin"]
- */
 service.action(
   "documents.delete",
   {
     route: "/auth-example/documents/:id",
     method: "DELETE",
-    roles: ["admin"],
+    authorize: "admin:global",
     validateParams: documentParamsSchema,
   },
   async (ctx) => {
     const doc = documents.get(ctx.params.id);
-    if (!doc) {
-      return { error: "Document not found", statusCode: 404 };
-    }
+    if (!doc) return { error: "Document not found", statusCode: 404 };
 
     documents.delete(ctx.params.id);
-
-    const auth = getAuthInfo(ctx);
-    service.logger.info("Document deleted", {
-      documentId: ctx.params.id,
-      deletedBy: auth.userId,
-    });
-
     ctx.emit("document.deleted", { documentId: ctx.params.id });
-
     return { success: true, deletedId: ctx.params.id };
-  }
+  },
 );
 
-/**
- * Configurações do sistema - usando wrapper adminOnly()
- */
 service.action(
   "admin.settings",
-  { route: "/auth-example/admin/settings", method: "GET" },
-  adminOnly(async (ctx) => {
-    return {
-      maxDocuments: 1000,
-      retentionDays: 90,
-      features: {
-        versioning: true,
-        audit: true,
-      },
-      requestedBy: ctx.user?.id,
-    };
-  })
+  {
+    route: "/auth-example/admin/settings",
+    method: "GET",
+    authorize: "admin:global",
+  },
+  async (ctx) => ({
+    maxDocuments: 1000,
+    retentionDays: 90,
+    features: { versioning: true, audit: true },
+    requestedBy: ctx.user?.id,
+  }),
 );
 
-/**
- * Estatísticas administrativas - verificação manual de role
- */
 service.action(
   "admin.stats",
   {
     route: "/auth-example/admin/stats",
     method: "GET",
-    authRequired: true, // Requer autenticação
+    authorize: "admin:global",
   },
-  async (ctx) => {
-    // Verificação manual usando requireAdmin
-    requireAdmin(ctx);
-
+  async () => {
     const docs = Array.from(documents.values());
-
     return {
       totalDocuments: docs.length,
       documentsPerUser: docs.reduce(
@@ -306,51 +232,40 @@ service.action(
           acc[doc.createdBy] = (acc[doc.createdBy] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       ),
-      oldestDocument: docs.sort(
-        (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-      )[0],
-      newestDocument: docs.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-      )[0],
+      oldestDocument: docs.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())[0],
+      newestDocument: docs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0],
     };
-  }
+  },
 );
 
 // =============================================================================
 // Profile Action (qualquer usuário autenticado)
 // =============================================================================
 
-/**
- * Obter perfil do usuário atual - usando wrapper authenticated()
- */
 service.action(
   "profile.me",
-  { route: "/auth-example/profile/me", method: "GET" },
-  authenticated(async (ctx) => {
-    const auth = getAuthInfo(ctx);
-
-    return {
-      id: auth.userId,
-      tenantId: auth.tenantId,
-      roles: auth.roles,
-      permissions: {
-        canView: auth.isViewer,
-        canEdit: auth.isEditor,
-        canAdmin: auth.isAdmin,
-      },
-      // Documentos criados pelo usuário
-      myDocuments: Array.from(documents.values()).filter(
-        (doc) => doc.createdBy === auth.userId
-      ),
-    };
-  })
+  {
+    route: "/auth-example/profile/me",
+    method: "GET",
+    authRequired: true,
+  },
+  async (ctx) => ({
+    id: ctx.user!.id,
+    tenantId: ctx.user!.tenantId,
+    roles: ctx.user!.roles,
+    permissions: {
+      canView: (ctx.user as any).can("read:db:*"),
+      canEdit: (ctx.user as any).can("write:db:*"),
+      canAdmin: (ctx.user as any).can("admin:global"),
+    },
+    myDocuments: Array.from(documents.values()).filter(
+      (doc) => doc.createdBy === ctx.user!.id,
+    ),
+  }),
 );
 
-/**
- * Action com lógica condicional baseada em role
- */
 service.action(
   "documents.export",
   {
@@ -359,14 +274,10 @@ service.action(
     authRequired: true,
   },
   async (ctx) => {
-    // Verificação manual para lógica condicional
     requireAuth(ctx);
-
-    const auth = getAuthInfo(ctx);
     const allDocs = Array.from(documents.values());
 
-    // Admin: exporta tudo com metadados completos
-    if (auth.isAdmin) {
+    if ((ctx.user as any).can("admin:global")) {
       return {
         format: "full",
         documents: allDocs,
@@ -374,8 +285,7 @@ service.action(
       };
     }
 
-    // Editor: exporta tudo, mas sem metadados sensíveis
-    if (auth.isEditor) {
+    if ((ctx.user as any).can("write:db:*")) {
       return {
         format: "standard",
         documents: allDocs.map(({ createdBy, ...doc }) => doc),
@@ -383,7 +293,6 @@ service.action(
       };
     }
 
-    // Viewer: exporta apenas títulos
     return {
       format: "summary",
       documents: allDocs.map((doc) => ({
@@ -393,7 +302,7 @@ service.action(
       })),
       includesPrivateData: false,
     };
-  }
+  },
 );
 
 // =============================================================================
@@ -401,7 +310,6 @@ service.action(
 // =============================================================================
 
 service.beforeStart(async () => {
-  // Seed com alguns documentos de exemplo
   const seedDoc: Document = {
     id: "seed-1",
     title: "Welcome Document",
@@ -425,3 +333,4 @@ await service.start().catch((error) =>
     hint: "Inicie o Linkd e tente novamente.",
   }),
 );
+
