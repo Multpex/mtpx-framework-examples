@@ -1,27 +1,24 @@
 /**
  * Scheduled Jobs Example - API
  *
- * Este arquivo demonstra como criar e gerenciar schedulers via API HTTP.
- * Os schedulers definem QUANDO criar jobs na fila.
+ * A partir da Fase 6, os schedulers são declarados de forma declarativa em
+ * `mtpx.config.ts` (chave `mtpx.schedulers`). O SDK faz upsert automático
+ * no boot — não há mais necessidade de endpoints `/jobs` e `/schedulers`
+ * apenas para empacotar a API imperativa do `Queue`.
  *
- * O Worker (worker.ts) define O QUE FAZER quando receber o job.
+ * Esta API mantém apenas operações de inspeção/operação das filas:
+ * stats, drain, pause/resume e gestão da DLQ (Dead Letter Queue).
+ *
+ * O Worker (worker.ts) continua sendo responsável por processar os jobs.
  */
 
 import {
   createApp,
   requestLogger,
   type Context,
-  BadRequestError,
-  NotFoundError,
   StartupErrorHandler,
   env,
 } from "@linkd/sdk-typescript";
-import {
-  createJobSchema,
-  createSchedulerSchema,
-  type CreateJobInput,
-  type CreateSchedulerInput,
-} from "./schemas.js";
 
 const service = createApp({
   name: "scheduler-api",
@@ -44,10 +41,6 @@ service.beforeStart(async () => {
 service.afterStart(async () => {
   console.log("✅ API pronta!");
   console.log("📋 Endpoints disponíveis:");
-  console.log("   POST   /jobs             - Criar job para execução imediata (auth)");
-  console.log("   POST   /schedulers       - Criar/atualizar scheduler (auth)");
-  console.log("   GET    /schedulers       - Listar schedulers (auth)");
-  console.log("   DELETE /schedulers/:key  - Remover scheduler (auth)");
   console.log("   GET    /queues/:name/stats  - Estatísticas da fila (auth)");
   console.log(
     "   DELETE /queues/:name/drain  - Limpar fila (remove TODOS os jobs não-ativos) (auth)",
@@ -63,205 +56,14 @@ service.afterStart(async () => {
   console.log(
     "   DELETE /queues/:name/failed       - Limpar todos jobs com falha (auth)",
   );
+  console.log(
+    "ℹ️  Schedulers são declarados em mtpx.config.ts (`mtpx.schedulers`)",
+  );
 });
 
 // ============================================================================
 // Actions
 // ============================================================================
-
-/**
- * POST /jobs
- * Criar um job para execução imediata (ou com delay)
- */
-service.action(
-  "create-job",
-  {
-    route: "/jobs",
-    method: "POST",
-    authRequired: true,
-    validate: createJobSchema,
-  },
-  async (ctx: Context<CreateJobInput>) => {
-    const {
-      queue: queueName,
-      name,
-      data,
-      delay,
-      priority,
-      attempts,
-    } = ctx.body;
-
-    const queue = service.queue(queueName);
-
-    const job = await queue.add(name, data, {
-      delay,
-      priority,
-      attempts,
-      backoff: { type: "exponential", delay: 5000 },
-    });
-
-    const executeAt = delay > 0 ? new Date(Date.now() + delay) : null;
-
-    console.log(`📤 Job criado: ${name}`);
-    console.log(`   Fila: ${queueName}`);
-    console.log(`   ID: ${job.id}`);
-    if (executeAt) {
-      console.log(`   Execução em: ${executeAt.toISOString()}`);
-    }
-
-    return {
-      success: true,
-      jobId: job.id,
-      queue: queueName,
-      name,
-      delay,
-      executeAt: executeAt?.toISOString() ?? null,
-    };
-  },
-);
-
-/**
- * POST /schedulers
- * Criar ou atualizar um scheduler
- */
-service.action(
-  "create-scheduler",
-  {
-    route: "/schedulers",
-    method: "POST",
-    authRequired: true,
-    validate: createSchedulerSchema,
-  },
-  async (ctx: Context<CreateSchedulerInput>) => {
-    const {
-      schedulerKey,
-      queue: queueName,
-      pattern,
-      every,
-      jobName,
-      data,
-      timezone,
-      limit,
-    } = ctx.body;
-
-    // Validar: precisa ter pattern OU every
-    if (!pattern && !every) {
-      throw new BadRequestError(
-        "É necessário informar 'pattern' (cron) ou 'every' (intervalo em ms)",
-      );
-    }
-
-    if (pattern && every) {
-      throw new BadRequestError(
-        "Informe apenas 'pattern' (cron) OU 'every' (intervalo), não ambos",
-      );
-    }
-
-    // Obter queue via service.queue (usando nome da fila do body)
-    const queue = service.queue(queueName);
-
-    // Upsert scheduler
-    const result = await queue.upsertJobScheduler(
-      schedulerKey,
-      {
-        pattern,
-        every,
-        timezone,
-        limit,
-      },
-      {
-        name: jobName,
-        data: data as Record<string, unknown>,
-        opts: {
-          attempts: 3,
-          backoff: { type: "exponential", delay: 5000 },
-        },
-      },
-    );
-
-    const nextRunDate = new Date(Number(result.nextRun));
-
-    console.log(`📅 Scheduler criado: ${schedulerKey}`);
-    console.log(`   Fila: ${queueName}`);
-    console.log(`   Job: ${jobName}`);
-    console.log(`   Próxima execução: ${nextRunDate.toISOString()}`);
-
-    return {
-      success: true,
-      schedulerKey: result.schedulerKey,
-      queue: queueName,
-      nextRun: nextRunDate.toISOString(),
-      nextRunMs: Number(result.nextRun),
-    };
-  },
-);
-
-/**
- * GET /schedulers
- * Listar todos os schedulers
- * Query params:
- *   - queue: Nome da fila (default: "jobs")
- */
-service.action(
-  "list",
-  { route: "/schedulers", method: "GET", authRequired: true },
-  async (ctx: Context) => {
-    const queueName = (ctx.query?.queue as string) || "jobs";
-    const queue = service.queue(queueName);
-    const schedulers = await queue.getJobSchedulers();
-
-    return {
-      queue: queueName,
-      count: schedulers.length,
-      schedulers: schedulers.map((s) => ({
-        key: s.key,
-        jobName: s.jobName,
-        pattern: s.pattern || null,
-        every: s.every ? Number(s.every) : null,
-        timezone: s.timezone || null,
-        nextRun: new Date(Number(s.nextRun)).toISOString(),
-        jobRunCount: s.jobRunCount,
-        jobExecutionCount: s.jobExecutionCount,
-        limit: s.limit,
-        data: s.data, // Already deserialized by SDK
-      })),
-    };
-  },
-);
-
-/**
- * DELETE /schedulers/:key
- * Remover um scheduler
- */
-service.action(
-  "remove",
-  { route: "/schedulers/:key", method: "DELETE", authRequired: true },
-  async (ctx: Context) => {
-    const { key } = ctx.params;
-    const queueName = (ctx.query?.queue as string) || "jobs";
-
-    const queue = service.queue(queueName);
-
-    const schedulers = await queue.getJobSchedulers();
-    const exists = schedulers.some((scheduler) => scheduler.key === key);
-
-    if (!exists) {
-      throw new NotFoundError(
-        `Scheduler '${key}' não encontrado na fila '${queueName}'`,
-      );
-    }
-
-    await queue.removeJobScheduler(key);
-
-    console.log(`🗑️  Scheduler removido: ${key} (fila=${queueName})`);
-
-    return {
-      success: true,
-      queue: queueName,
-      message: `Scheduler '${key}' removido com sucesso`,
-    };
-  },
-);
 
 /**
  * GET /queues/:name/stats
