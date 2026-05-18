@@ -16,7 +16,8 @@ bun run dev
 
 ## Modos de conexão com linkd
 
-- TCP: `LINKD_CONNECT=tcp://localhost:9999` com a sessão atual do `mtpx login` (recomendado para host -> Docker)
+- TCP local: `LINKD_CONNECT=tcp://localhost:9999` com a sessão atual do `mtpx login` (recomendado para host -> Docker)
+- TCP staging (público, via Istio Gateway): `LINKD_CONNECT=tcp://linkd.stg.k8s.multpex.com.br:9999`
 - Unix socket: `LINKD_CONNECT=unix:///tmp/linkd.sock` (quando o linkd roda local no host)
 
 ## Autenticação HTTP
@@ -29,17 +30,9 @@ Se o linkd estiver em Docker no macOS, prefira TCP.
 
 ## Modo staging (linkd no k8s)
 
-Para rodar o app local apontando para o linkd do cluster de staging:
+O linkd de staging é exposto publicamente via Istio Gateway em `linkd.stg.k8s.multpex.com.br:9999` (TCP). A autenticação acontece na camada do protocolo (JWT do realm `staging-multpex` validado contra o JWKS do Keycloak). Nada de port-forward.
 
-1. Em um terminal, abra o port-forward (o helper já cuida do contexto certo):
-
-   ```bash
-   ../scripts/portforward-staging.sh
-   ```
-
-   Isso expõe `linkd:9999` do namespace `linkd` (contexto `stg.k8s.multpex.com.br`) em `localhost:9999`.
-
-2. Faça login na CLI contra o realm de staging:
+1. Faça login na CLI contra o realm de staging:
 
    ```bash
    mtpx login \
@@ -48,15 +41,23 @@ Para rodar o app local apontando para o linkd do cluster de staging:
      --client-id web-client
    ```
 
-3. Ajuste o `.env` para usar o realm de staging (`AUTH_REALM=staging-multpex`, `AUTH_CLIENT_ID=web-client`) e mantenha `LINKD_CONNECT=tcp://localhost:9999`.
+2. Ajuste o `.env`:
 
-4. Suba o app normalmente:
+   ```bash
+   LINKD_CONNECT=tcp://linkd.stg.k8s.multpex.com.br:9999
+   AUTH_REALM=staging-multpex
+   AUTH_CLIENT_ID=web-client
+   ```
+
+3. Suba o app:
 
    ```bash
    bun run dev
    ```
 
-O linkd em staging valida JWT contra o JWKS de `staging-multpex`, então o token emitido pelo `mtpx login` é o mesmo usado pelo TCP handshake e pelos endpoints HTTP protegidos.
+O mesmo JWT emitido pelo `mtpx login` é usado pelo handshake TCP do SDK e pelos endpoints HTTP protegidos do exemplo.
+
+> Se você quiser bypass do gateway (debug em uma rota individual), o helper antigo `../scripts/portforward-staging.sh` continua funcionando — mas não é mais necessário para o fluxo padrão.
 
 ## Executar em modo normal
 
