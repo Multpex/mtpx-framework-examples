@@ -27,6 +27,37 @@ bun run dev
 
 Se o linkd estiver em Docker no macOS, prefira TCP.
 
+## Modo staging (linkd no k8s)
+
+Para rodar o app local apontando para o linkd do cluster de staging:
+
+1. Em um terminal, abra o port-forward (o helper já cuida do contexto certo):
+
+   ```bash
+   ../scripts/portforward-staging.sh
+   ```
+
+   Isso expõe `linkd:9999` do namespace `linkd` (contexto `stg.k8s.multpex.com.br`) em `localhost:9999`.
+
+2. Faça login na CLI contra o realm de staging:
+
+   ```bash
+   mtpx login \
+     --server https://keycloak.api.gmstg.multipex.com.br/auth \
+     --realm staging-multpex \
+     --client-id web-client
+   ```
+
+3. Ajuste o `.env` para usar o realm de staging (`AUTH_REALM=staging-multpex`, `AUTH_CLIENT_ID=web-client`) e mantenha `LINKD_CONNECT=tcp://localhost:9999`.
+
+4. Suba o app normalmente:
+
+   ```bash
+   bun run dev
+   ```
+
+O linkd em staging valida JWT contra o JWKS de `staging-multpex`, então o token emitido pelo `mtpx login` é o mesmo usado pelo TCP handshake e pelos endpoints HTTP protegidos.
+
 ## Executar em modo normal
 
 ```bash
