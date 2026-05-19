@@ -19,7 +19,7 @@ MONITOR_CHANNEL=external.payments.received MONITOR_GROUP=my-monitor bun run dev
 |----------|---------|-----------|
 | `MONITOR_CHANNEL` | `demo.order.created` | Channel (subject) a monitorar |
 | `MONITOR_GROUP` | `channel-monitor` | Consumer group no JetStream |
-| `LINKD_CONNECT` | `tcp://localhost:9999` | Endpoint TCP do linkd |
+| `LINKD_CONNECT` | `tcp://localhost:9998` | Endpoint TCP do linkd |
 | `LINKD_NAMESPACE` | `mtpx-channel-monitor` | Namespace do serviço |
 
 ## Publicar mensagem de teste

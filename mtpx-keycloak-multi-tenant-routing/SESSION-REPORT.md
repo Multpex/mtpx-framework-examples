@@ -23,7 +23,7 @@ The final working path is:
    - `multpex` for CLI/app-to-linkd auth
    - `realm1` and `realm2` for HTTP multi-tenant auth
 3. `mtpx login` authenticates the local CLI session against `multpex`
-4. The example app connects to `tcp://localhost:9999` using the CLI session JWT
+4. The example app connects to `tcp://localhost:9998` using the CLI session JWT
 5. HTTP login on `realm1.localhost` / `realm2.localhost` returns user tokens with:
    - `tenant=realm1|realm2`
    - `tenant_id=local_pg_realm1|local_pg_realm2`
@@ -192,7 +192,7 @@ Environment is healthy when all of these hold:
 
 - `mtpx keystore info` shows `Enabled: true`
 - `mtpx keystore list` works
-- app starts and authenticates to `tcp://localhost:9999`
+- app starts and authenticates to `tcp://localhost:9998`
 - login works on both `realm1.localhost` and `realm2.localhost`
 - `GET /tenant-routing/context` shows:
   - `realm1` -> `currentDatabase=local_pg_realm1`

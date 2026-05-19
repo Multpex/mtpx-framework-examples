@@ -16,7 +16,7 @@
     ]
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "baseUrl", "value": "https://linkd.stg.k8s.multpex.com.br", "type": "string" },
     { "key": "accessToken", "value": "", "type": "string" },
     { "key": "keycloakUrl", "value": "https://keycloak.api.gmstg.multipex.com.br/auth", "type": "string" },
     { "key": "keycloakRealm", "value": "master", "type": "string" },

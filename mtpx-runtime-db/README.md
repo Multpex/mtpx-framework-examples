@@ -107,6 +107,6 @@ DELETE /notes/:id    — remove nota e invalida cache
 
 ## Pré-requisitos
 
-- linkd rodando (`tcp://localhost:9999` ou configurar `LINKD_CONNECT`)
+- linkd rodando (`tcp://localhost:9998` ou configurar `LINKD_CONNECT`)
 - database provisionado via `mtpx db database create`
 - `LINKD_DATABASE_NAME` no `.env`

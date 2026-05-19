@@ -16,8 +16,8 @@ bun run dev
 
 ## Modos de conexão com linkd
 
-- TCP local: `LINKD_CONNECT=tcp://localhost:9999` com a sessão atual do `mtpx login` (recomendado para host -> Docker)
-- TCP staging (público, via Istio Gateway): `LINKD_CONNECT=tcp://linkd.stg.k8s.multpex.com.br:9999`
+- TCP local: `LINKD_CONNECT=tcp://localhost:9998` com a sessão atual do `mtpx login` (recomendado para host -> Docker)
+- TCPS staging (público, via NLB/ACM + Istio Gateway): `LINKD_CONNECT=tcps://linkd.stg.k8s.multpex.com.br:9998`
 - Unix socket: `LINKD_CONNECT=unix:///tmp/linkd.sock` (quando o linkd roda local no host)
 
 ## Autenticação HTTP
@@ -30,7 +30,7 @@ Se o linkd estiver em Docker no macOS, prefira TCP.
 
 ## Modo staging (linkd no k8s)
 
-O linkd de staging é exposto publicamente via Istio Gateway em `linkd.stg.k8s.multpex.com.br:9999` (TCP). A autenticação acontece na camada do protocolo (JWT do realm `staging-multpex` validado contra o JWKS do Keycloak). Nada de port-forward.
+O linkd de staging é exposto publicamente via NLB/ACM + Istio Gateway em `linkd.stg.k8s.multpex.com.br:9998` (TCPS externo, TCP claro interno). A autenticação acontece na camada do protocolo (JWT do realm `staging-multpex` validado contra o JWKS do Keycloak). Nada de port-forward.
 
 1. Faça login na CLI contra o realm de staging:
 
@@ -44,7 +44,7 @@ O linkd de staging é exposto publicamente via Istio Gateway em `linkd.stg.k8s.m
 2. Ajuste o `.env`:
 
    ```bash
-   LINKD_CONNECT=tcp://linkd.stg.k8s.multpex.com.br:9999
+   LINKD_CONNECT=tcps://linkd.stg.k8s.multpex.com.br:9998
    AUTH_REALM=staging-multpex
    AUTH_CLIENT_ID=web-client
    ```

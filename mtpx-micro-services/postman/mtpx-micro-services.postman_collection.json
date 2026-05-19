@@ -18,7 +18,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3000"
+      "value": "https://linkd.stg.k8s.multpex.com.br"
     }
   ],
   "item": [

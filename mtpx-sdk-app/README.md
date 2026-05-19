@@ -52,7 +52,7 @@ export default {
     exclude: ["_migrations"],
   },
   linkd: {
-    connect: "tcp://localhost:9999",
+    connect: "tcp://localhost:9998",
     database: "mtpx_sdk_app",
   },
 };

@@ -293,7 +293,7 @@
     ]
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "baseUrl", "value": "https://linkd.stg.k8s.multpex.com.br", "type": "string" },
     { "key": "accessToken", "value": "", "type": "string" },
     { "key": "userId", "value": "", "type": "string" },
     { "key": "userEmail", "value": "", "type": "string" },

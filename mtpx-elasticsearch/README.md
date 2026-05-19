@@ -74,7 +74,7 @@ bun run dev
 
 | Variável | Padrão | Descrição |
 |----------|--------|-----------|
-| `LINKD_CONNECT` | `tcp://localhost:9999` | Endereço do sidecar linkd |
+| `LINKD_CONNECT` | `tcp://localhost:9998` | Endereço do sidecar linkd |
 | `AUTH_REALM` | `multpex` | Realm Keycloak para autenticação HTTP |
 | `AUTH_CLIENT_ID` | `multpex-services` | Client ID OIDC |
 | `ES_CREDENTIAL` | `default` | Nome da credencial no keystore do linkd |

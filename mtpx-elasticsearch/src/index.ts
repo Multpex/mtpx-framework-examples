@@ -419,7 +419,7 @@ app.action(
 await app.start().catch((error) =>
   StartupErrorHandler.fail(error, {
     dependencyName: "Linkd",
-    endpoint: env.string("LINKD_CONNECT", "tcp://localhost:9999"),
+    endpoint: env.string("LINKD_CONNECT", "tcp://localhost:9998"),
     hint: [
       "Certifique-se de que o linkd está em execução e que a credencial Elasticsearch está registrada:",
       "  mtpx es credential add default --url http://localhost:9200",
