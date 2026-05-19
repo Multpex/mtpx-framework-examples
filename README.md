@@ -71,4 +71,17 @@ Alguns exemplos usam scripts adicionais (`worker`, `test`, `postman:test`, etc).
 
 ## Collections (Postman)
 
-Cada exemplo continua com os arquivos em `postman/*.postman_collection.json` e `postman/*.postman_environment.json`.
+Cada exemplo tem arquivos em `postman/*.postman_collection.json` e `postman/*.postman_environment.json`.
+
+### Autenticação (staging)
+
+As collections que falam com `linkd.stg.k8s.multpex.com.br` autenticam contra o realm `staging-multpex` no Keycloak via **OAuth2 Authorization Code + PKCE** (SSO). Como o Postman não suporta SSO diretamente sem registrar `https://oauth.pstmn.io/v1/callback` como Valid Redirect URI no `web-client`, as collections usam um **fluxo de refresh-token** pré-configurado:
+
+1. No terminal, autentique-se com o CLI: `mtpx login` (abre o browser, faz SSO).
+2. Copie o `refreshToken` de `~/.multpex/cli/.credentials.yaml` (perfil `default`).
+3. No Postman, abra o environment do exemplo → coluna **Current Value** da variável `refreshToken` → cole o token.
+4. Rode qualquer request — um pre-request script da collection troca o `refreshToken` por um `accessToken` válido automaticamente e o renova quando expira.
+
+> ⚠️ O refresh token expira em ~7h (lifetime do realm). Quando isso acontecer, repita o `mtpx login` e cole o novo `refreshToken`.
+>
+> Alternativa futura: cadastrar `https://oauth.pstmn.io/v1/callback` como Valid Redirect URI do `web-client` no Keycloak e usar o suporte nativo a OAuth 2.0 do Postman (Authorization Code + PKCE) na aba *Authorization* da collection.

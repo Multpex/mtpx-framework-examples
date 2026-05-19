@@ -114,19 +114,21 @@ Importe a collection do Postman para testar facilmente:
 postman/mtpx-scheduled-jobs.postman_collection.json
 ```
 
-Preencha a variável `accessToken` no environment local:
+Preencha a variável `refreshToken` (secret) no environment local com o valor do CLI:
 
 ```
 postman/mtpx-scheduled-jobs.postman_environment.json
 ```
 
+Para obter o `refreshToken`:
+
+1. `mtpx login` (autentica via SSO no browser).
+2. Copie `profiles.default.refreshToken` de `~/.multpex/cli/.credentials.yaml`.
+3. Cole no campo *Current Value* da variável `refreshToken` no Postman environment.
+
 > Nota: o recurso de importação de schedules ainda não está implementado.
 
-Na collection, execute primeiro o grupo `Auth (Keycloak)`:
-
-- Request: `Get Access Token (Password Grant)`
-- O token é salvo automaticamente na variável `accessToken`
-- Depois execute os endpoints de `Jobs`, `Schedulers`, `Queues` e `DLQ`
+O pre-request script da collection troca o `refreshToken` por um `accessToken` válido automaticamente antes de cada request. Use a request `Refresh Token (Keycloak) — manual` apenas se precisar inspecionar a resposta.
 
 ## Testando via cURL
 
