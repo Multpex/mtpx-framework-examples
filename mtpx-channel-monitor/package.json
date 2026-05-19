@@ -1,6 +1,6 @@
 {
   "name": "mtpx-channel-monitor",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "type": "module",
   "description": "Monitor messages from a configurable channel/consumer group",
   "scripts": {
@@ -8,7 +8,7 @@
     "start": "bun run src/monitor.ts"
   },
   "dependencies": {
-    "@linkd/sdk-typescript": "0.1.7",
+    "@linkd/sdk-typescript": "0.1.8",
     "real-require": "^1.0.0"
   },
   "devDependencies": {
